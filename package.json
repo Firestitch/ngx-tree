@@ -80,7 +80,7 @@
     "webpack": "^4.20.2",
     "zone.js": "^0.8.26",
     "rxjs-compat": "^6.3.3",
-    "tslib": "^1.9.3"    
+    "tslib": "^1.9.3"
   },
   "engines": {
     "node": ">=6.0.0"

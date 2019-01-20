@@ -1,0 +1,45 @@
+.drop-above {
+ /*
+  border-top: 20px solid #dddddd;
+  margin-top: -20px;
+  */
+}
+
+.drop-above {
+  /*
+  border-bottom: 20px solid #dddddd;
+  margin-bottom: -20px;
+  */
+
+  .drop-indicator {
+    visibility: visible;
+  }
+}
+
+.drop-center {
+  background-color: #dddddd;
+  border-radius: 2px;
+}
+
+.node {
+  width: 100%;
+  position: relative;
+  .container {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.drop-indicator {
+  border-top: 18px solid #dddddd;
+  visibility: hidden;
+  position: absolute;
+  width: calc(100% - 40px);
+  top: -14px;
+  margin-left: 40px;
+  border-radius: 2px;
+}
+
+.mat-tree-node {
+  overflow: visible;
+}
