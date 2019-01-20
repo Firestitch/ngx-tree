@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, Injectable, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject } from 'rxjs';
 import { FsComponentService } from 'src/app/services';
@@ -81,20 +81,20 @@ export class FsComponentComponent {
   }
 
   /** Whether all the descendants of the node are selected */
-  descendantsAllSelected(node: TodoItemFlatNode): boolean {
+  public descendantsAllSelected(node: TodoItemFlatNode): boolean {
     const descendants = this.treeControl.getDescendants(node);
     return descendants.every(child => this.checklistSelection.isSelected(child));
   }
 
   /** Whether part of the descendants are selected */
-  descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
+  public descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
     const descendants = this.treeControl.getDescendants(node);
     const result = descendants.some(child => this.checklistSelection.isSelected(child));
     return result && !this.descendantsAllSelected(node);
   }
 
   /** Toggle the to-do item selection. Select/deselect all the descendants node */
-  todoItemSelectionToggle(node: TodoItemFlatNode): void {
+  public todoItemSelectionToggle(node: TodoItemFlatNode): void {
     this.checklistSelection.toggle(node);
     const descendants = this.treeControl.getDescendants(node);
     this.checklistSelection.isSelected(node)
@@ -102,29 +102,16 @@ export class FsComponentComponent {
       : this.checklistSelection.deselect(...descendants);
   }
 
-  /** Select the category so we can insert the new item. */
-  addNewItem(node: TodoItemFlatNode) {
-    const parentNode = this.flatNodeMap.get(node);
-    this.database.insertItem(parentNode, '');
-    this.treeControl.expand(node);
-  }
-
-  /** Save the node to database */
-  saveNode(node: TodoItemFlatNode, itemValue: string) {
-    const nestedNode = this.flatNodeMap.get(node);
-    this.database.updateItem(nestedNode, itemValue);
-  }
-
-  handleDragStart(event, node) {
+  public handleDragStart(event, node) {
     event.stopPropagation();
     // Required by Firefox (https://stackoverflow.com/questions/19055264/why-doesnt-html5-drag-and-drop-work-in-firefox)
-    event.dataTransfer.setData('foo', 'bar');
-    event.dataTransfer.setDragImage(this.emptyItem.nativeElement, 0, 0);
+    //event.dataTransfer.setData('foo', 'bar');
+    //event.dataTransfer.setDragImage(this.emptyItem.nativeElement, 0, 0);
     this.dragNode = node;
-    this.treeControl.collapse(node);
+    //this.treeControl.collapse(node);
   }
 
-  handleDragOver(event, node) {
+  public handleDragOver(event, node) {
     event.preventDefault();
 
     // Handle node expand
@@ -139,11 +126,8 @@ export class FsComponentComponent {
       this.dragNodeExpandOverTime = new Date().getTime();
     }
 
-    console.log(event);
-
     const percentageY = event.offsetY / event.srcElement.clientHeight;
 
-    console.log(percentageY);
     if (percentageY < 0.30) {
       this.dragNodeExpandOverArea = 'above';
     } else if (percentageY >= 0.30) {
@@ -151,7 +135,7 @@ export class FsComponentComponent {
     }
   }
 
-  handleDrop(event, node) {
+  public handleDrop(event, node) {
     event.preventDefault();
     if (node !== this.dragNode) {
       let newItem: TodoItemNode;
@@ -170,7 +154,7 @@ export class FsComponentComponent {
     this.dragNodeExpandOverTime = 0;
   }
 
-  handleDragEnd(event) {
+  public handleDragEnd(event) {
     this.dragNode = null;
     this.dragNodeExpandOverNode = null;
     this.dragNodeExpandOverTime = 0;

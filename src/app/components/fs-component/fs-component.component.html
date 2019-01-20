@@ -40,7 +40,7 @@
       (drop)="handleDrop($event, node);"
       (dragend)="handleDragEnd($event);"
       [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                  'sdrop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
+                  'xdrop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
                   'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
       <div class="drop-indicator"></div>
       <div class="container">
@@ -55,7 +55,6 @@
                       [checked]="descendantsAllSelected(node)"
                       [indeterminate]="descendantsPartiallySelected(node)"
                       (change)="todoItemSelectionToggle(node)">{{node.item}}</mat-checkbox>
-        <!-- <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button> -->
       </div>
     </div>
   </mat-tree-node>
