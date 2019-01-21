@@ -1,51 +1,41 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-  <mat-tree-node *matTreeNodeDef="let node"
-                 matTreeNodeToggle
-                 matTreeNodePadding>
-    <div
-      class="node"
-      draggable="true"
-      (dragstart)="handleDragStart($event, node);"
-      (dragover)="handleDragOver($event, node);"
-      (drop)="handleDrop($event, node);"
-      (dragend)="handleDragEnd($event);"
-      [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                'xdrop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-                'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
+  <mat-tree-node  *matTreeNodeDef="let node"
+                  matTreeNodeToggle
+                  matTreeNodePadding>
+    <div  class="node"
+          draggable="true"
+          (dragstart)="handleDragStart($event, node);"
+          (dragover)="handleDragOver($event, node);"
+          (drop)="handleDrop($event, node);"
+          (dragend)="handleDragEnd($event);"
+          [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
+                    'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
       <div class="drop-indicator"></div>
       <div class="container">
         <button mat-icon-button disabled></button>
+
         <mat-checkbox class="checklist-leaf-node"
                       [checked]="checklistSelection.isSelected(node)"
-                      (change)="checklistSelection.toggle(node);">{{node.item}}</mat-checkbox>
+                      (change)="checklistSelection.toggle(node);"></mat-checkbox>
+        <div class="content">{{node.item}}</div>
       </div>
     </div>
   </mat-tree-node>
 
-  <!-- <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
-    <button mat-icon-button disabled></button>
-    <mat-form-field>
-      <input matInput #itemValue placeholder="New item...">
-    </mat-form-field>
-    <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
-  </mat-tree-node> -->
-
-  <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
-                 matTreeNodePadding>
-    <div
-      class="node"
-      draggable="true"
-      (dragstart)="handleDragStart($event, node);"
-      (dragover)="handleDragOver($event, node);"
-      (drop)="handleDrop($event, node);"
-      (dragend)="handleDragEnd($event);"
-      [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                  'xdrop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-                  'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
+  <mat-tree-node  *matTreeNodeDef="let node; when: hasChild"
+                  matTreeNodePadding>
+    <div  class="node"
+          draggable="true"
+          (dragstart)="handleDragStart($event, node);"
+          (dragover)="handleDragOver($event, node);"
+          (drop)="handleDrop($event, node);"
+          (dragend)="handleDragEnd($event);"
+          [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
+                      'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
       <div class="drop-indicator"></div>
       <div class="container">
         <button mat-icon-button matTreeNodeToggle
-              [attr.aria-label]="'toggle ' + node.filename">
+                [attr.aria-label]="'toggle ' + node.filename">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
@@ -54,7 +44,8 @@
 
                       [checked]="descendantsAllSelected(node)"
                       [indeterminate]="descendantsPartiallySelected(node)"
-                      (change)="todoItemSelectionToggle(node)">{{node.item}}</mat-checkbox>
+                      (change)="todoItemSelectionToggle(node)"></mat-checkbox>
+        <div class="content">{{node.item}}</div>
       </div>
     </div>
   </mat-tree-node>
