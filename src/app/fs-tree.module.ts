@@ -1,10 +1,16 @@
-import { NgModule, ModuleWithProviders } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { FsComponentComponent } from './components/fs-component/fs-component.component';
+import {
+  MatButtonModule,
+  MatCheckboxModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatTreeModule
+} from '@angular/material';
 
-// import { FsComponentService } from './services';
-import { MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTreeModule } from '@angular/material';
+import { FsComponentComponent } from './components/tree/tree.component';
 
 @NgModule({
   imports: [
@@ -28,10 +34,10 @@ import { MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, 
     // FsComponentService,
   ],
 })
-export class FsComponentModule {
+export class FsTreeModule {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: FsComponentModule,
+      ngModule: FsTreeModule,
       // providers: [FsComponentService]
     };
   }

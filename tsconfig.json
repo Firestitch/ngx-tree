@@ -18,7 +18,7 @@
       "dom"
     ],
     "paths": {
-      "fs-package": [
+      "@firestitch/tree": [
         "src/public_api.ts"
       ]
     }
