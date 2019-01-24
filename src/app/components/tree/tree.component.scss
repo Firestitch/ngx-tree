@@ -5,6 +5,16 @@
 .drop-above {
   .drop-indicator {
     visibility: visible;
+    top: -7px;
+    border-bottom: 14px solid #dddddd;
+  }
+}
+
+.drop-below {
+  .drop-indicator {
+    visibility: visible;
+    border-bottom: 14px solid #dddddd;
+    top: 41px;
   }
 }
 
@@ -16,6 +26,9 @@
 .node {
   width: 100%;
   position: relative;
+  display: flex;
+  align-items: center;
+
   .container {
     display: flex;
     align-items: center;
@@ -23,15 +36,14 @@
 }
 
 .drop-indicator {
-  border-top: 18px solid #dddddd;
   visibility: hidden;
   position: absolute;
   width: calc(100% - 40px);
-  top: -14px;
   margin-left: 40px;
   border-radius: 2px;
 }
 
 .mat-tree-node {
   overflow: visible;
+  align-items: stretch;
 }

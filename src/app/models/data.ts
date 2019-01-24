@@ -1,19 +1,4 @@
 /**
- * Node for to-do item
- */
-export class TodoItemNode {
-  children: TodoItemNode[];
-  item: string;
-}
-
-/** Flat to-do item node with expandable and level information */
-export class TodoItemFlatNode {
-  item: string;
-  level: number;
-  expandable: boolean;
-}
-
-/**
  * The Json object for to-do list data.
  */
 export const TREE_DATA = {
@@ -21,6 +6,11 @@ export const TREE_DATA = {
     'Almond Meal flour': null,
     'Organic eggs': null,
     'Protein Powder': null,
+    Animals: {
+      Dogs: null,
+      Cats: ['Britanian', 'Svyat'],
+      Birds: null
+    },
     Fruits: {
       Apple: null,
       Berries: ['Blueberry', 'Raspberry'],

@@ -8,8 +8,11 @@
           (dragover)="handleDragOver($event, node);"
           (drop)="handleDrop($event, node);"
           (dragend)="handleDragEnd($event);"
-          [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                    'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
+          [ngClass]="{
+            'drop-above': drag.expandOverArea === 'above' && drag.expandOverNode === node,
+            'drop-center': drag.expandOverArea === 'center' && drag.expandOverNode === node,
+            'drop-below': drag.expandOverArea === 'below' && drag.expandOverNode === node
+          }">
       <div class="drop-indicator"></div>
       <div class="container">
         <button mat-icon-button disabled></button>
@@ -30,8 +33,11 @@
           (dragover)="handleDragOver($event, node);"
           (drop)="handleDrop($event, node);"
           (dragend)="handleDragEnd($event);"
-          [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                      'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}">
+          [ngClass]="{
+            'drop-above': drag.expandOverArea === 'above' && drag.expandOverNode === node,
+            'drop-center': drag.expandOverArea === 'center' && drag.expandOverNode === node,
+            'drop-below': drag.expandOverArea === 'below' && drag.expandOverNode === node
+          }">
       <div class="drop-indicator"></div>
       <div class="container">
         <button mat-icon-button matTreeNodeToggle
@@ -51,4 +57,3 @@
   </mat-tree-node>
 </mat-tree>
 
-<span #emptyItem></span>
