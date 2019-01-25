@@ -20,7 +20,12 @@
         <mat-checkbox class="checklist-leaf-node"
                       [checked]="checklistSelection.isSelected(node)"
                       (change)="checklistSelection.toggle(node);"></mat-checkbox>
-        <div class="content">{{node.item}}</div>
+        <div class="content">
+          <ng-template
+            [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
+            [ngTemplateOutletContext]="node"
+          ></ng-template>
+        </div>
       </div>
     </div>
   </mat-tree-node>
@@ -51,9 +56,17 @@
                       [checked]="descendantsAllSelected(node)"
                       [indeterminate]="descendantsPartiallySelected(node)"
                       (change)="todoItemSelectionToggle(node)"></mat-checkbox>
-        <div class="content">{{node.item}}</div>
+        <div class="content">
+          <ng-template
+            [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
+            [ngTemplateOutletContext]="node"
+          ></ng-template>
+        </div>
       </div>
     </div>
   </mat-tree-node>
 </mat-tree>
 
+<ng-template #defaultNodeTemplate let-data="data">
+  {{data}}
+</ng-template>

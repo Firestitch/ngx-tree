@@ -11,6 +11,7 @@ import {
 } from '@angular/material';
 
 import { FsComponentComponent } from './components/tree/tree.component';
+import { FsTreeNodeDirective } from './directives/tree-node.directive';
 
 @NgModule({
   imports: [
@@ -24,11 +25,13 @@ import { FsComponentComponent } from './components/tree/tree.component';
   ],
   exports: [
     FsComponentComponent,
+    FsTreeNodeDirective,
   ],
   entryComponents: [
   ],
   declarations: [
     FsComponentComponent,
+    FsTreeNodeDirective,
   ],
   providers: [
     // FsComponentService,

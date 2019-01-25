@@ -1,6 +1,12 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component, ContentChild,
+  ElementRef,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
 import { FsTreeService } from '../../services/tree.service';
@@ -9,6 +15,8 @@ import { FlatItemNode } from '../../models/flat-item-node.model';
 import { getLevel } from '../../helpers/get-level';
 import { isExpandable } from '../../helpers/is-expandable';
 import { getChildren } from '../../helpers/get-children';
+
+import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 
 
 @Component({
@@ -22,6 +30,10 @@ export class FsComponentComponent {
 
   @ViewChild('emptyItem')
   public emptyItem: ElementRef;
+
+  // Template for node
+  @ContentChild(FsTreeNodeDirective, { read: TemplateRef })
+  public nodeTemplate: TemplateRef<any>;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   public flatNodeMap = new Map<FlatItemNode, ItemNode>();
@@ -74,11 +86,11 @@ export class FsComponentComponent {
    */
   public transformer = (node: ItemNode, level: number) => {
     const existingNode = this.nestedNodeMap.get(node);
-    const flatNode = existingNode && existingNode.item === node.item
+    const flatNode = existingNode && existingNode.data === node.data
       ? existingNode
       : new FlatItemNode();
 
-    flatNode.item = node.item;
+    flatNode.data = node.data;
     flatNode.original = node;
     flatNode.parent = this.nestedNodeMap.get(node.parent);
     flatNode.originalParent = this.flatNodeMap.get(flatNode.parent);

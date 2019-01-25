@@ -8,14 +8,14 @@ export function treeBuilder(obj: object, level: number, parent = null): ItemNode
   return Object.keys(obj).reduce<ItemNode[]>((accumulator, key) => {
     const value = obj[key];
     const nodeData: any = {};
-    nodeData.item = key;
+    nodeData.data = key;
     nodeData.parent = parent;
 
     if (value != null) {
       if (typeof value === 'object') {
         nodeData.children = treeBuilder(value, level + 1, nodeData);
       } else {
-        nodeData.item = value;
+        nodeData.data = value;
       }
     }
 
