@@ -21,6 +21,7 @@ import { getChildren } from '../../helpers/get-children';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { ITreeConfig } from '../../interfaces/config.interface';
+import { dataBuilder } from '../../helpers/data-builder';
 
 
 @Component({
@@ -87,7 +88,7 @@ export class FsTreeComponent<T> implements OnInit {
       this.dataSource.data = data;
 
       if (this.config.changed) {
-        this.config.changed(data as any);
+        this.config.changed(this.getData());
       }
     });
   }
@@ -248,10 +249,23 @@ export class FsTreeComponent<T> implements OnInit {
     }
   }
 
+  /**
+   * Transform tree to object
+   */
+  public getData() {
+    return dataBuilder(this.dataSource.data);
+  }
+
+  /**
+   * Collapse nodes
+   */
   public collapseAll() {
     this.treeControl.collapseAll();
   }
 
+  /**
+   * Expand nodes
+   */
   public expandAll() {
     this.treeControl.expandAll();
   }

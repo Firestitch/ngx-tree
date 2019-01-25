@@ -8,7 +8,7 @@ export const TREE_DATA = {
     'Protein Powder': null,
     Animals: {
       Dogs: null,
-      Cats: ['Britanian', 'Svyat'],
+      Cats: ['American', 'Asian', 'British'],
       Birds: null
     },
     Fruits: {

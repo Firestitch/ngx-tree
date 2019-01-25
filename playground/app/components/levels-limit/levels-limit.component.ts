@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 import { TREE_DATA } from '../../data';
 
+
 @Component({
   selector: 'levels-limit',
   templateUrl: 'levels-limit.component.html'
