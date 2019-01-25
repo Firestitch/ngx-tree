@@ -30,7 +30,7 @@ import { ITreeConfig } from '../../interfaces/config.interface';
   providers: [ FsTreeService ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FsComponentComponent<T> implements OnInit {
+export class FsTreeComponent<T> implements OnInit {
 
   @Input()
   public config: ITreeConfig<T> = {};
@@ -246,5 +246,13 @@ export class FsComponentComponent<T> implements OnInit {
     } else {
       this.drag.expandOverTime = new Date().getTime();
     }
+  }
+
+  public collapseAll() {
+    this.treeControl.collapseAll();
+  }
+
+  public expandAll() {
+    this.treeControl.expandAll();
   }
 }

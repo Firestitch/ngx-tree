@@ -1,4 +1,9 @@
-<fs-tree [config]="config">
+<div style="float: right">
+  <button mat-raised-button color="primary" (click)="collapseAll()">Collapse All</button>
+  &nbsp;
+  <button mat-raised-button color="primary" (click)="expandAll()">Expand All</button>
+</div>
+<fs-tree [config]="config" #tree>
   <ng-template fsTreeNode let-data="data">
     {{data}}
   </ng-template>

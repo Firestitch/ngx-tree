@@ -10,7 +10,7 @@ import {
   MatTreeModule
 } from '@angular/material';
 
-import { FsComponentComponent } from './components/tree/tree.component';
+import { FsTreeComponent } from './components/tree/tree.component';
 import { FsTreeNodeDirective } from './directives/tree-node.directive';
 
 @NgModule({
@@ -24,13 +24,13 @@ import { FsTreeNodeDirective } from './directives/tree-node.directive';
     MatTreeModule
   ],
   exports: [
-    FsComponentComponent,
+    FsTreeComponent,
     FsTreeNodeDirective,
   ],
   entryComponents: [
   ],
   declarations: [
-    FsComponentComponent,
+    FsTreeComponent,
     FsTreeNodeDirective,
   ],
   providers: [
