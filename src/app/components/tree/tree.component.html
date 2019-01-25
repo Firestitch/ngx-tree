@@ -1,14 +1,14 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-  <mat-tree-node  *matTreeNodeDef="let node"
-                  matTreeNodeToggle
-                  matTreeNodePadding>
-    <div  class="node"
-          draggable="true"
-          (dragstart)="handleDragStart($event, node);"
-          (dragover)="handleDragOver($event, node);"
-          (drop)="handleDrop($event, node);"
-          (dragend)="handleDragEnd($event);"
-          [ngClass]="{
+  <mat-tree-node *matTreeNodeDef="let node"
+                 matTreeNodeToggle
+                 matTreeNodePadding>
+    <div class="node"
+         draggable="true"
+         (dragstart)="handleDragStart($event, node);"
+         (dragover)="handleDragOver($event, node);"
+         (drop)="handleDrop($event, node);"
+         (dragend)="handleDragEnd($event);"
+         [ngClass]="{
             'drop-above': drag.expandOverArea === 'above' && drag.expandOverNode === node,
             'drop-center': drag.expandOverArea === 'center' && drag.expandOverNode === node,
             'drop-below': drag.expandOverArea === 'below' && drag.expandOverNode === node
@@ -18,8 +18,10 @@
         <button mat-icon-button disabled></button>
 
         <mat-checkbox class="checklist-leaf-node"
+                      *ngIf="config.selection"
                       [checked]="checklistSelection.isSelected(node)"
-                      (change)="checklistSelection.toggle(node);"></mat-checkbox>
+                      (change)="checklistSelection.toggle(node);">
+        </mat-checkbox>
         <div class="content">
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
@@ -30,15 +32,15 @@
     </div>
   </mat-tree-node>
 
-  <mat-tree-node  *matTreeNodeDef="let node; when: hasChild"
-                  matTreeNodePadding>
-    <div  class="node"
-          draggable="true"
-          (dragstart)="handleDragStart($event, node);"
-          (dragover)="handleDragOver($event, node);"
-          (drop)="handleDrop($event, node);"
-          (dragend)="handleDragEnd($event);"
-          [ngClass]="{
+  <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
+                 matTreeNodePadding>
+    <div class="node"
+         draggable="true"
+         (dragstart)="handleDragStart($event, node);"
+         (dragover)="handleDragOver($event, node);"
+         (drop)="handleDrop($event, node);"
+         (dragend)="handleDragEnd($event);"
+         [ngClass]="{
             'drop-above': drag.expandOverArea === 'above' && drag.expandOverNode === node,
             'drop-center': drag.expandOverArea === 'center' && drag.expandOverNode === node,
             'drop-below': drag.expandOverArea === 'below' && drag.expandOverNode === node
@@ -52,10 +54,11 @@
           </mat-icon>
         </button>
         <mat-checkbox
-
-                      [checked]="descendantsAllSelected(node)"
-                      [indeterminate]="descendantsPartiallySelected(node)"
-                      (change)="todoItemSelectionToggle(node)"></mat-checkbox>
+          *ngIf="config.selection"
+          [checked]="descendantsAllSelected(node)"
+          [indeterminate]="descendantsPartiallySelected(node)"
+          (change)="todoItemSelectionToggle(node)">
+        </mat-checkbox>
         <div class="content">
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"

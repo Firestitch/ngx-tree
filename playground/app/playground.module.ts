@@ -10,7 +10,7 @@ import { FsTreeModule } from '@firestitch/tree';
 import { ToastrModule } from 'ngx-toastr';
 
 import { AppMaterialModule } from './material.module';
-import { ExampleComponent, ExamplesComponent } from './components';
+import { ExampleComponent, LevelsLimitComponent } from './components';
 import { AppComponent } from './app.component';
 
 
@@ -30,8 +30,8 @@ import { AppComponent } from './app.component';
   ],
   declarations: [
     AppComponent,
-    ExamplesComponent,
-    ExampleComponent
+    ExampleComponent,
+    LevelsLimitComponent,
   ],
   providers: [
   ],

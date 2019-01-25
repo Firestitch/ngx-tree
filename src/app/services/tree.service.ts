@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-import { TREE_DATA } from '../models/data';
 import { ItemNode } from '../models/item-node.model';
 import { treeBuilder } from '../helpers/tree-builder';
 
@@ -11,18 +10,16 @@ export class FsTreeService {
 
   public dataChange = new BehaviorSubject<ItemNode[]>([]);
 
-  constructor() {
-    this.initialize();
-  }
+  constructor() {}
 
   get data(): ItemNode[] {
     return this.dataChange.value;
   }
 
-  public initialize() {
+  public initialize(treeData: any, maxLevel: number) {
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
-    const data = treeBuilder(TREE_DATA, 0);
+    const data = treeBuilder(treeData, 0, null, maxLevel);
 
     // Notify the change.
     this.dataChange.next(data);

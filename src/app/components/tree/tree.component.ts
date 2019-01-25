@@ -2,8 +2,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import {
   ChangeDetectionStrategy,
-  Component, ContentChild,
+  Component,
+  ContentChild,
   ElementRef,
+  Input,
+  OnInit,
   TemplateRef,
   ViewChild
 } from '@angular/core';
@@ -17,6 +20,7 @@ import { isExpandable } from '../../helpers/is-expandable';
 import { getChildren } from '../../helpers/get-children';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
+import { ITreeConfig } from '../../interfaces/config.interface';
 
 
 @Component({
@@ -26,7 +30,10 @@ import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
   providers: [ FsTreeService ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FsComponentComponent {
+export class FsComponentComponent<T> implements OnInit {
+
+  @Input()
+  public config: ITreeConfig<T> = {};
 
   @ViewChild('emptyItem')
   public emptyItem: ElementRef;
@@ -70,10 +77,18 @@ export class FsComponentComponent {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+  }
 
-    _database.dataChange.subscribe(data => {
+  public ngOnInit() {
+    this._database.initialize(this.config.data, this.config.levels);
+
+    this._database.dataChange.subscribe(data => {
       this.dataSource.data = [];
       this.dataSource.data = data;
+
+      if (this.config.changed) {
+        this.config.changed(data as any);
+      }
     });
   }
 

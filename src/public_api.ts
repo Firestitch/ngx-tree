@@ -3,3 +3,5 @@
  */
 
 export { FsTreeModule } from './app/fs-tree.module';
+
+export { ITreeConfig } from './app/interfaces/config.interface';

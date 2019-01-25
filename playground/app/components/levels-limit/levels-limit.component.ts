@@ -3,15 +3,16 @@ import { ITreeConfig } from '@firestitch/tree';
 import { TREE_DATA } from '../../data';
 
 @Component({
-  selector: 'example',
-  templateUrl: 'example.component.html'
+  selector: 'levels-limit',
+  templateUrl: 'levels-limit.component.html'
 })
-export class ExampleComponent {
+export class LevelsLimitComponent {
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
     changed: (data) => {
       console.log('Data was changed: ', data);
     },
-    selection: true,
+    levels: 2,
+    selection: false,
   }
 }

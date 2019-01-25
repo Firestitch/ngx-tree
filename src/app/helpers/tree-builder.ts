@@ -4,7 +4,10 @@ import { ItemNode } from '../models/item-node.model';
  * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
  * The return value is the list of `treeBuilder`.
  */
-export function treeBuilder(obj: object, level: number, parent = null): ItemNode[] {
+export function treeBuilder(obj: object, level = 0, parent = null, maxLevel = Infinity): ItemNode[] {
+  // Limit
+  if (level > maxLevel) { return; }
+
   return Object.keys(obj).reduce<ItemNode[]>((accumulator, key) => {
     const value = obj[key];
     const nodeData: any = {};
@@ -13,7 +16,7 @@ export function treeBuilder(obj: object, level: number, parent = null): ItemNode
 
     if (value != null) {
       if (typeof value === 'object') {
-        nodeData.children = treeBuilder(value, level + 1, nodeData);
+        nodeData.children = treeBuilder(value, level + 1, nodeData, maxLevel);
       } else {
         nodeData.data = value;
       }
