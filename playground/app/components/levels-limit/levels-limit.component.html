@@ -3,9 +3,11 @@
   &nbsp;
   <button mat-raised-button color="primary" (click)="expandAll()">Expand All</button>
 </div>
+
 <p>With max depth 2 and without selection</p>
+
 <fs-tree [config]="config" #tree>
-  <ng-template fsTreeNode let-data="data">
-    {{data}}
+  <ng-template fsTreeNode let-name="name" let-id="id">
+    {{ name }} (ID: {{ id }})
   </ng-template>
 </fs-tree>

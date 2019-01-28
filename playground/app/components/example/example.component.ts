@@ -18,6 +18,7 @@ export class ExampleComponent {
       console.log('Data was changed: ', data);
     },
     selection: true,
+    childrenName: 'accounts',
   };
 
   public collapseAll() {

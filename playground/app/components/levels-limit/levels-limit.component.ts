@@ -18,6 +18,7 @@ export class LevelsLimitComponent {
     },
     levels: 2,
     selection: false,
+    childrenName: 'accounts',
   };
 
   public collapseAll() {

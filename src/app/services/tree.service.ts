@@ -16,10 +16,10 @@ export class FsTreeService {
     return this.dataChange.value;
   }
 
-  public initialize(treeData: any, maxLevel: number) {
+  public initialize(treeData: any, childrenName, maxLevel: number) {
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
-    const data = treeBuilder(treeData, 0, null, maxLevel);
+    const data = treeBuilder(treeData, 0, null, childrenName, maxLevel);
 
     // Notify the change.
     this.dataChange.next(data);

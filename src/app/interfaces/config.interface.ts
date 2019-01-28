@@ -5,4 +5,5 @@ export interface ITreeConfig<T> {
   selection?: boolean;
   data?: T;
   changed?: (data: T) => void;
+  childrenName?: string;
 }

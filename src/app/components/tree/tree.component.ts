@@ -81,7 +81,7 @@ export class FsTreeComponent<T> implements OnInit {
   }
 
   public ngOnInit() {
-    this._database.initialize(this.config.data, this.config.levels);
+    this._database.initialize(this.config.data, this.config.childrenName, this.config.levels);
 
     this._database.dataChange.subscribe(data => {
       this.dataSource.data = [];
@@ -253,7 +253,7 @@ export class FsTreeComponent<T> implements OnInit {
    * Transform tree to object
    */
   public getData() {
-    return dataBuilder(this.dataSource.data);
+    return dataBuilder(this.dataSource.data, this.config.childrenName);
   }
 
   /**

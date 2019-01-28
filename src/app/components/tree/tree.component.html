@@ -25,7 +25,7 @@
         <div class="content">
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
-            [ngTemplateOutletContext]="node"
+            [ngTemplateOutletContext]="node.data"
           ></ng-template>
         </div>
       </div>
@@ -62,7 +62,7 @@
         <div class="content">
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
-            [ngTemplateOutletContext]="node"
+            [ngTemplateOutletContext]="node.data"
           ></ng-template>
         </div>
       </div>

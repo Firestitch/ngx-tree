@@ -4,7 +4,7 @@
   <button mat-raised-button color="primary" (click)="expandAll()">Expand All</button>
 </div>
 <fs-tree [config]="config" #tree>
-  <ng-template fsTreeNode let-data="data">
-    {{data}}
+  <ng-template fsTreeNode let-id="id" let-name="name">
+    {{ name }} (ID: {{ id }})
   </ng-template>
 </fs-tree>
