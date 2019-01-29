@@ -3,7 +3,7 @@
                  matTreeNodeToggle
                  matTreeNodePadding>
     <div class="node"
-         draggable="true"
+         [draggable]="reorder"
          (dragstart)="handleDragStart($event, node);"
          (dragover)="handleDragOver($event, node);"
          (drop)="handleDrop($event, node);"
@@ -27,6 +27,9 @@
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.data"
           ></ng-template>
+
+          <fs-node-actions [actions]="actions" [node]="node">
+          </fs-node-actions>
         </div>
       </div>
     </div>
@@ -35,7 +38,7 @@
   <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
                  matTreeNodePadding>
     <div class="node"
-         draggable="true"
+         [draggable]="reorder"
          (dragstart)="handleDragStart($event, node);"
          (dragover)="handleDragOver($event, node);"
          (drop)="handleDrop($event, node);"
@@ -64,6 +67,9 @@
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.data"
           ></ng-template>
+
+          <fs-node-actions *ngIf="actions.length > 0" [actions]="actions" [node]="node">
+          </fs-node-actions>
         </div>
       </div>
     </div>

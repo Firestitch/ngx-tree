@@ -1,3 +1,4 @@
+import { IAction } from './action.interface';
 
 
 export interface ITreeConfig<T> {
@@ -6,4 +7,5 @@ export interface ITreeConfig<T> {
   data?: T;
   changed?: (data: T) => void;
   childrenName?: string;
+  actions?: IAction[]
 }

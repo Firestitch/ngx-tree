@@ -9,9 +9,12 @@ import {
   MatInputModule,
   MatTreeModule
 } from '@angular/material';
+import { FsMenuModule } from '@firestitch/menu';
 
 import { FsTreeComponent } from './components/tree/tree.component';
+import { FsNodeActionsComponent } from './components/node-actions/node-actions.component';
 import { FsTreeNodeDirective } from './directives/tree-node.directive';
+
 
 @NgModule({
   imports: [
@@ -21,7 +24,8 @@ import { FsTreeNodeDirective } from './directives/tree-node.directive';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatTreeModule
+    MatTreeModule,
+    FsMenuModule.forRoot(),
   ],
   exports: [
     FsTreeComponent,
@@ -32,6 +36,7 @@ import { FsTreeNodeDirective } from './directives/tree-node.directive';
   declarations: [
     FsTreeComponent,
     FsTreeNodeDirective,
+    FsNodeActionsComponent,
   ],
   providers: [
     // FsComponentService,

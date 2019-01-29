@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 import { TREE_DATA } from '../../data';
+import { TreeActionType } from '../../../../src/app/models/action.model';
 
 
 @Component({
@@ -19,6 +20,30 @@ export class LevelsLimitComponent {
     levels: 2,
     selection: false,
     childrenName: 'accounts',
+    actions: [
+      {
+        type: TreeActionType.Menu,
+        icon: 'move_vert',
+        items: [
+          {
+            label: 'Add',
+            show: (node) => {
+              return node.level === 0;
+            },
+            click: (node) => {
+              this.tree.appendElement({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node)
+            }
+          },
+          {
+            label: 'Delete',
+            click: (node) => {
+              this.tree.removeNode(node)
+            }
+          }
+        ],
+
+      }
+    ]
   };
 
   public collapseAll() {
@@ -27,5 +52,13 @@ export class LevelsLimitComponent {
 
   public expandAll() {
     this.tree.expandAll();
+  }
+
+  public createRootNode() {
+    this.tree.appendElement({ name: 'Root Object', id: this.getRandomId(100, 999) })
+  }
+
+  private getRandomId(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 }

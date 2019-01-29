@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { ItemNode } from '../models/item-node.model';
+import { FlatItemNode } from '../models/flat-item-node.model';
 import { treeBuilder } from '../helpers/tree-builder';
 
 
@@ -25,11 +26,32 @@ export class FsTreeService {
     this.dataChange.next(data);
   }
 
+  public changeData() {
+    this.dataChange.next(this.data);
+  }
+
+  public createNode(data: any, parent: FlatItemNode = null) {
+    const node = new ItemNode({
+      data: data,
+      parent: parent
+    });
+
+    const flatNode = new FlatItemNode({
+      data: data,
+      original: node,
+      parent: parent,
+      originalParent: parent ? parent.original : null,
+      level: parent ? parent.level + 1 : 0
+    });
+
+    return flatNode;
+  }
+
   public insertNodeAbove(target: ItemNode, node: ItemNode) {
 
     const parent = target.parent;
 
-    this.deleteItem(node);
+    this.removeItem(node);
 
     if (parent) {
       const nodeIndex = parent.children.indexOf(target);
@@ -41,14 +63,14 @@ export class FsTreeService {
 
     node.parent = target.parent;
 
-    this.dataChange.next(this.data);
+    this.changeData();
   }
 
   public insertNodeBelow(target: ItemNode, node: ItemNode) {
 
     const parent = target.parent;
 
-    this.deleteItem(node);
+    this.removeItem(node);
 
     if (parent) {
       const nodeIndex = parent.children.indexOf(target);
@@ -60,34 +82,42 @@ export class FsTreeService {
 
     node.parent = target.parent;
 
-    this.dataChange.next(this.data);
+    this.changeData();
   }
 
   public insertNode(target: ItemNode, node: ItemNode) {
 
-    this.deleteItem(node);
+    this.removeItem(node);
 
-    if (!target.children) {
-      target.children = [];
+    if (target) {
+      if (!target.children) {
+        target.children = [];
+      }
+
+      target.children.push(node);
+
+      node.parent = target;
+    } else {
+      this.data.push(node);
     }
 
-    target.children.push(node);
-
-    node.parent = target;
-
-    this.dataChange.next(this.data);
+    this.changeData();
   }
 
 
-  public deleteItem(node: ItemNode) {
+  public removeItem(node: ItemNode) {
     const parent = node.parent;
 
-    if (parent) {
+    if (parent && parent.children) {
       const nodeIndex = parent.children.indexOf(node);
-      parent.children.splice(nodeIndex, 1);
+      if (nodeIndex > -1) {
+        parent.children.splice(nodeIndex, 1);
+      }
     } else {
       const nodeIndex = this.data.indexOf(node);
-      this.data.splice(nodeIndex, 1);
+      if (nodeIndex > -1) {
+        this.data.splice(nodeIndex, 1);
+      }
     }
   }
 }

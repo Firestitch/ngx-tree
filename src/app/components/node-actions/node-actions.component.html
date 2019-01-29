@@ -1,0 +1,15 @@
+<ng-container *ngFor="let action of actions" [ngSwitch]="action.type">
+  <!-- Menu -->
+  <ng-container *ngSwitchCase="0">
+    <fs-menu>
+      <ng-container *ngFor="let item of action.items">
+        <ng-container *ngIf="item.show(node)">
+          <ng-template fs-menu-item (click)="item.click(node)">
+            {{ item.label }}
+          </ng-template>
+        </ng-container>
+      </ng-container>
+    </fs-menu>
+  </ng-container>
+  <!-- /Menu -->
+</ng-container>

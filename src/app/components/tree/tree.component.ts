@@ -13,15 +13,18 @@ import {
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
 import { FsTreeService } from '../../services/tree.service';
+
 import { ItemNode } from '../../models/item-node.model';
 import { FlatItemNode } from '../../models/flat-item-node.model';
+import { Action } from '../../models/action.model';
+
 import { getLevel } from '../../helpers/get-level';
 import { isExpandable } from '../../helpers/is-expandable';
+import { dataBuilder } from '../../helpers/data-builder';
 import { getChildren } from '../../helpers/get-children';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { ITreeConfig } from '../../interfaces/config.interface';
-import { dataBuilder } from '../../helpers/data-builder';
 
 
 @Component({
@@ -49,17 +52,15 @@ export class FsTreeComponent<T> implements OnInit {
   /** Map from nested node to flattened node. This helps us to keep the same object for selection */
   public nestedNodeMap = new Map<ItemNode, FlatItemNode>();
 
-  /** A selected parent node to be inserted */
-  public selectedParent: FlatItemNode | null = null;
-
-  /** The new item's name */
-  public newItemName = '';
-
   public treeControl: FlatTreeControl<FlatItemNode>;
 
   public treeFlattener: MatTreeFlattener<ItemNode, FlatItemNode>;
 
   public dataSource: MatTreeFlatDataSource<ItemNode, FlatItemNode>;
+
+  public actions: Action[] = [];
+
+  public reorder = true;
 
   /** The selection for checklist */
   public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
@@ -82,6 +83,7 @@ export class FsTreeComponent<T> implements OnInit {
 
   public ngOnInit() {
     this._database.initialize(this.config.data, this.config.childrenName, this.config.levels);
+    this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
 
     this._database.dataChange.subscribe(data => {
       this.dataSource.data = [];
@@ -268,5 +270,39 @@ export class FsTreeComponent<T> implements OnInit {
    */
   public expandAll() {
     this.treeControl.expandAll();
+  }
+
+  /**
+   * Enable drag&drop
+   */
+  public enableReorder() {
+    this.reorder = true;
+  }
+
+  /**
+   * Disable drag&drop
+   */
+  public disableReorder() {
+    this.reorder = false;
+  }
+
+  /**
+   * Insert element as child element for target node
+   * @param data
+   * @param parent
+   */
+  public appendElement(data: any = {}, parent: FlatItemNode = null) {
+    const originalParent = parent && parent.original || null;
+    const node = this._database.createNode(data, parent);
+    this._database.insertNode(originalParent, node.original);
+  }
+
+  /**
+   * Remove node from DB
+   * @param item
+   */
+  public removeNode(item: FlatItemNode) {
+    this._database.removeItem(item.original);
+    this._database.changeData();
   }
 }
