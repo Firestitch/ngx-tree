@@ -2,6 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   ElementRef,
@@ -11,6 +12,8 @@ import {
   ViewChild
 } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+
+import { Observable } from 'rxjs';
 
 import { FsTreeService } from '../../services/tree.service';
 
@@ -58,14 +61,19 @@ export class FsTreeComponent<T> implements OnInit {
 
   public dataSource: MatTreeFlatDataSource<ItemNode, FlatItemNode>;
 
+  // List of actions for tree
   public actions: Action[] = [];
 
+  // Nodes can be dragged&dropped. Draggable flag
   public reorder = true;
+
+  // Possibility to expand/collapse for nodes
+  public blocked = false;
 
   /** The selection for checklist */
   public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
 
-  /* Drag and drop */
+  // Drag & Drop state object
   public drag = {
     node: null,
     expandOverWaitTime: 300,
@@ -75,7 +83,7 @@ export class FsTreeComponent<T> implements OnInit {
     expandStatus: false
   };
 
-  constructor(private _database: FsTreeService) {
+  constructor(private _database: FsTreeService, private _cd: ChangeDetectorRef) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
@@ -206,33 +214,76 @@ export class FsTreeComponent<T> implements OnInit {
   public handleDrop(event, node) {
     event.preventDefault();
 
-    if (node !== this.drag.node) {
-
-      const targetNode = this.flatNodeMap.get(node);
-      const dragNode = this.flatNodeMap.get(this.drag.node);
-
-      if (this.drag.expandOverArea === 'above') {
-        this._database.insertNodeAbove(targetNode, dragNode);
-      } else if (this.drag.expandOverArea === 'below') {
-        this._database.insertNodeBelow(targetNode, dragNode);
-      } else {
-        this._database.insertNode(targetNode, dragNode);
-      }
+    if (node === this.drag.node) {
+      return;
     }
 
-    this.drag.node = null;
-    this.drag.expandOverNode = null;
-    this.drag.expandOverTime = 0;
+    const targetNode = this.flatNodeMap.get(node);
+    const dragNode = this.flatNodeMap.get(this.drag.node);
+
+    if (this.config.dropStart) {
+      const toParent = this.drag.expandOverArea === 'above' || this.drag.expandOverArea === 'below'
+        ? this.drag.expandOverNode.parent
+        : this.drag.expandOverNode;
+
+      const canDrop = this.config.dropStart(this.drag.node, this.drag.node.parent, toParent);
+
+      if (canDrop instanceof Observable) {
+        this.lockTree();
+
+        canDrop.subscribe((result) => {
+          if (result) {
+            this.dropNode(targetNode, dragNode);
+          }
+          this.unlockTree();
+        })
+      } else if (canDrop) {
+        this.dropNode(targetNode, dragNode);
+      }
+    } else {
+      this.dropNode(targetNode, dragNode);
+    }
+
+    this.handleDragEnd();
   }
 
   /**
    * Drag end
    * @param event
    */
-  public handleDragEnd(event) {
+  public handleDragEnd(event = null) {
     this.drag.node = null;
     this.drag.expandOverNode = null;
     this.drag.expandOverTime = 0;
+  }
+
+  /**
+   * Custom method for expand/collapse, because we must check blocked flag before
+   * @param node
+   */
+  public toggleNode(node) {
+    if (!this.blocked) {
+      if (this.treeControl.isExpanded(node)) {
+        this.treeControl.collapse(node);
+      } else {
+        this.treeControl.expand(node);
+      }
+    }
+  }
+
+  /**
+   * Drop logic implementation
+   * @param targetNode
+   * @param dragNode
+   */
+  private dropNode(targetNode, dragNode) {
+    if (this.drag.expandOverArea === 'above') {
+      this._database.insertNodeAbove(targetNode, dragNode);
+    } else if (this.drag.expandOverArea === 'below') {
+      this._database.insertNodeBelow(targetNode, dragNode);
+    } else {
+      this._database.insertNode(targetNode, dragNode);
+    }
   }
 
   /**
@@ -277,6 +328,8 @@ export class FsTreeComponent<T> implements OnInit {
    */
   public enableReorder() {
     this.reorder = true;
+
+    this._cd.markForCheck();
   }
 
   /**
@@ -284,6 +337,8 @@ export class FsTreeComponent<T> implements OnInit {
    */
   public disableReorder() {
     this.reorder = false;
+
+    this._cd.markForCheck();
   }
 
   /**
@@ -304,5 +359,25 @@ export class FsTreeComponent<T> implements OnInit {
   public removeNode(item: FlatItemNode) {
     this._database.removeItem(item.original);
     this._database.changeData();
+  }
+
+  /**
+   * Disabled reorder and block tree
+   */
+  public lockTree() {
+    this.disableReorder();
+    this.blocked = true;
+
+    this._cd.markForCheck();
+  }
+
+  /**
+   * Enable reorder back and unlock tree
+   */
+  public unlockTree() {
+    this.enableReorder();
+    this.blocked = false;
+
+    this._cd.markForCheck();
   }
 }

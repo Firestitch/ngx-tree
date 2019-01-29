@@ -25,7 +25,7 @@ import { FsTreeNodeDirective } from './directives/tree-node.directive';
     MatIconModule,
     MatInputModule,
     MatTreeModule,
-    FsMenuModule.forRoot(),
+    FsMenuModule,
   ],
   exports: [
     FsTreeComponent,

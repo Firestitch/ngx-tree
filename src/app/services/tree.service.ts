@@ -30,6 +30,7 @@ export class FsTreeService {
     this.dataChange.next(this.data);
   }
 
+  // Create new fresh node which is ready to be insterted into tree
   public createNode(data: any, parent: FlatItemNode = null) {
     const node = new ItemNode({
       data: data,

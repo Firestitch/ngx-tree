@@ -1,5 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
+
+import { of } from 'rxjs';
+import { delay } from 'rxjs/operators';
+
 import { TREE_DATA } from '../../data';
 import { TreeActionType } from '../../../../src/app/models/action.model';
 
@@ -20,6 +24,10 @@ export class LevelsLimitComponent {
     levels: 2,
     selection: false,
     childrenName: 'accounts',
+    dropStart: (node, fromParent, toParent) => {
+      // return fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
+      return of(true).pipe(delay(2000))
+    },
     actions: [
       {
         type: TreeActionType.Menu,

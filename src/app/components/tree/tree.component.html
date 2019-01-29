@@ -1,4 +1,4 @@
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" [ngClass]="{ 'blocked': blocked }">
   <mat-tree-node *matTreeNodeDef="let node"
                  matTreeNodeToggle
                  matTreeNodePadding>
@@ -50,7 +50,8 @@
           }">
       <div class="drop-indicator"></div>
       <div class="container">
-        <button mat-icon-button matTreeNodeToggle
+        <button mat-icon-button
+                (click)="toggleNode(node)"
                 [attr.aria-label]="'toggle ' + node.filename">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
