@@ -25,8 +25,9 @@ export class LevelsLimitComponent {
     selection: false,
     childrenName: 'accounts',
     dropStart: (node, fromParent, toParent) => {
-      // return fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
-      return of(true).pipe(delay(2000))
+      const canDrop = fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
+      // return canDrop;
+      return of(canDrop).pipe(delay(1000))
     },
     actions: [
       {
@@ -34,7 +35,7 @@ export class LevelsLimitComponent {
         icon: 'move_vert',
         items: [
           {
-            label: 'Add',
+            label: 'Create Level 2 Object',
             show: (node) => {
               return node.level === 0;
             },
