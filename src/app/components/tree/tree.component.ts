@@ -6,14 +6,14 @@ import {
   Component,
   ContentChild,
   ElementRef,
-  Input,
+  Input, OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild
 } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { FsTreeService } from '../../services/tree.service';
 
@@ -28,6 +28,7 @@ import { getChildren } from '../../helpers/get-children';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { ITreeConfig } from '../../interfaces/config.interface';
+import { takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -37,7 +38,7 @@ import { ITreeConfig } from '../../interfaces/config.interface';
   providers: [ FsTreeService ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FsTreeComponent<T> implements OnInit {
+export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   @Input()
   public config: ITreeConfig<T> = {};
@@ -83,6 +84,8 @@ export class FsTreeComponent<T> implements OnInit {
     expandStatus: false
   };
 
+  private _destroy$ = new Subject<void>();
+
   constructor(private _database: FsTreeService, private _cd: ChangeDetectorRef) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
@@ -93,14 +96,23 @@ export class FsTreeComponent<T> implements OnInit {
     this._database.initialize(this.config.data, this.config.childrenName, this.config.levels);
     this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
 
-    this._database.dataChange.subscribe(data => {
-      this.dataSource.data = [];
-      this.dataSource.data = data;
+    this._database.dataChange
+      .pipe(
+        takeUntil(this._destroy$),
+      )
+      .subscribe(data => {
+        this.dataSource.data = [];
+        this.dataSource.data = data;
 
-      if (this.config.changed) {
-        this.config.changed(this.getData());
-      }
-    });
+        if (this.config.changed) {
+          this.config.changed(this.getData());
+        }
+      });
+  }
+
+  public ngOnDestroy() {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 
   public hasChild(_: number, _nodeData: FlatItemNode): boolean {
@@ -231,12 +243,16 @@ export class FsTreeComponent<T> implements OnInit {
       if (canDrop instanceof Observable) {
         this.lockTree();
 
-        canDrop.subscribe((result) => {
-          if (result) {
-            this.dropNode(targetNode, dragNode);
-          }
-          this.unlockTree();
-        })
+        canDrop
+          .pipe(
+            takeUntil(this._destroy$),
+          )
+          .subscribe((result) => {
+            if (result) {
+              this.dropNode(targetNode, dragNode);
+            }
+            this.unlockTree();
+          })
       } else if (canDrop) {
         this.dropNode(targetNode, dragNode);
       }

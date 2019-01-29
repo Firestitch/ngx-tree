@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { ItemNode } from '../models/item-node.model';
 import { FlatItemNode } from '../models/flat-item-node.model';
@@ -7,14 +8,24 @@ import { treeBuilder } from '../helpers/tree-builder';
 
 
 @Injectable()
-export class FsTreeService {
+export class FsTreeService implements OnDestroy {
 
-  public dataChange = new BehaviorSubject<ItemNode[]>([]);
+  private _dataChange = new BehaviorSubject<ItemNode[]>([]);
+  private _destroy$ = new Subject<void>();
 
   constructor() {}
 
+  get dataChange(): Observable<ItemNode[]> {
+    return this._dataChange.pipe(takeUntil(this._destroy$));
+  }
+
   get data(): ItemNode[] {
-    return this.dataChange.value;
+    return this._dataChange.value;
+  }
+
+  public ngOnDestroy() {
+    this._destroy$.next();
+    this._destroy$.complete();
   }
 
   public initialize(treeData: any, childrenName, maxLevel: number) {
@@ -23,11 +34,11 @@ export class FsTreeService {
     const data = treeBuilder(treeData, 0, null, childrenName, maxLevel);
 
     // Notify the change.
-    this.dataChange.next(data);
+    this._dataChange.next(data);
   }
 
   public changeData() {
-    this.dataChange.next(this.data);
+    this._dataChange.next(this.data);
   }
 
   // Create new fresh node which is ready to be insterted into tree
@@ -37,15 +48,13 @@ export class FsTreeService {
       parent: parent
     });
 
-    const flatNode = new FlatItemNode({
+    return new FlatItemNode({
       data: data,
       original: node,
       parent: parent,
       originalParent: parent ? parent.original : null,
       level: parent ? parent.level + 1 : 0
     });
-
-    return flatNode;
   }
 
   public insertNodeAbove(target: ItemNode, node: ItemNode) {
