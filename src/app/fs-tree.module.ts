@@ -14,6 +14,9 @@ import { FsMenuModule } from '@firestitch/menu';
 import { FsTreeComponent } from './components/tree/tree.component';
 import { FsNodeActionsComponent } from './components/node-actions/node-actions.component';
 import { FsTreeNodeDirective } from './directives/tree-node.directive';
+import { FsDraggableNodeDirective } from './directives/draggable-node.directive';
+import { FsDraggableNodeTargetDirective } from './directives/draggable-node-target.directive';
+import { FsDraggableNodeContentDirective } from './directives/draggable-node-content.directive';
 
 
 @NgModule({
@@ -37,6 +40,9 @@ import { FsTreeNodeDirective } from './directives/tree-node.directive';
     FsTreeComponent,
     FsTreeNodeDirective,
     FsNodeActionsComponent,
+    FsDraggableNodeDirective,
+    FsDraggableNodeContentDirective,
+    FsDraggableNodeTargetDirective
   ],
   providers: [
     // FsComponentService,

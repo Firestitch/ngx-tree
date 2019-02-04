@@ -50,12 +50,6 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   @ContentChild(FsTreeNodeDirective, { read: TemplateRef })
   public nodeTemplate: TemplateRef<any>;
 
-  /** Map from flat node to nested node. This helps us finding the nested node to be modified */
-  public flatNodeMap = new Map<FlatItemNode, ItemNode>();
-
-  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-  public nestedNodeMap = new Map<ItemNode, FlatItemNode>();
-
   public treeControl: FlatTreeControl<FlatItemNode>;
 
   public treeFlattener: MatTreeFlattener<ItemNode, FlatItemNode>;
@@ -96,6 +90,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     this._database.initialize(this.config.data, this.config.childrenName, this.config.levels);
     this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
 
+    console.log(this._database);
     this._database.dataChange
       .pipe(
         takeUntil(this._destroy$),
@@ -123,20 +118,20 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
    */
   public transformer = (node: ItemNode, level: number) => {
-    const existingNode = this.nestedNodeMap.get(node);
+    const existingNode = this._database.nestedNodeMap.get(node);
     const flatNode = existingNode && existingNode.data === node.data
       ? existingNode
       : new FlatItemNode();
 
     flatNode.data = node.data;
     flatNode.original = node;
-    flatNode.parent = this.nestedNodeMap.get(node.parent);
-    flatNode.originalParent = this.flatNodeMap.get(flatNode.parent);
+    flatNode.parent = this._database.nestedNodeMap.get(node.parent);
+    flatNode.originalParent = this._database.flatNodeMap.get(flatNode.parent);
     flatNode.level = level;
     flatNode.expandable = (node.children && node.children.length > 0);
 
-    this.flatNodeMap.set(flatNode, node);
-    this.nestedNodeMap.set(node, flatNode);
+    this._database.flatNodeMap.set(flatNode, node);
+    this._database.nestedNodeMap.set(node, flatNode);
 
     return flatNode;
   };
@@ -210,9 +205,9 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
     }
 
-    if (handleBelow && isExpandable(node)) {
-      this.drag.expandOverArea = null;
-    }
+    // if (handleBelow && isExpandable(node)) {
+    //   this.drag.expandOverArea = null;
+    // }
 
     this.drag.expandOverNode = node;
   }
@@ -230,8 +225,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
       return;
     }
 
-    const targetNode = this.flatNodeMap.get(node);
-    const dragNode = this.flatNodeMap.get(this.drag.node);
+    const targetNode = this._database.flatNodeMap.get(node);
+    const dragNode = this._database.flatNodeMap.get(this.drag.node);
 
     if (this.config.dropStart) {
       const toParent = this.drag.expandOverArea === 'above' || this.drag.expandOverArea === 'below'

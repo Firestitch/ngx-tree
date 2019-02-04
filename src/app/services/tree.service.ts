@@ -10,6 +10,12 @@ import { treeBuilder } from '../helpers/tree-builder';
 @Injectable()
 export class FsTreeService implements OnDestroy {
 
+  /** Map from flat node to nested node. This helps us finding the nested node to be modified */
+  public flatNodeMap = new Map<FlatItemNode, ItemNode>();
+
+  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
+  public nestedNodeMap = new Map<ItemNode, FlatItemNode>();
+
   private _dataChange = new BehaviorSubject<ItemNode[]>([]);
   private _destroy$ = new Subject<void>();
 

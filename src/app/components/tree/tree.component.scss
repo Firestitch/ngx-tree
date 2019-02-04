@@ -2,23 +2,7 @@
   margin-right: 10px;
 }
 
-.drop-above {
-  .drop-indicator {
-    visibility: visible;
-    top: -7px;
-    border-bottom: 14px solid #dddddd;
-  }
-}
-
-.drop-below {
-  .drop-indicator {
-    visibility: visible;
-    border-bottom: 14px solid #dddddd;
-    top: 41px;
-  }
-}
-
-.drop-center {
+.drop-into {
   background-color: #dddddd;
   border-radius: 2px;
 }
@@ -31,6 +15,7 @@
   width: 100%;
   position: relative;
   display: flex;
+  flex: 1;
   align-items: center;
 
   .container {
@@ -39,15 +24,25 @@
   }
 }
 
-.drop-indicator {
-  visibility: hidden;
-  position: absolute;
-  width: calc(100% - 40px);
-  margin-left: 40px;
-  border-radius: 2px;
-}
-
 .mat-tree-node {
   overflow: visible;
-  align-items: stretch;
+  //align-items: stretch;
+  flex-direction: column;
+
+  .draggable {
+    position: fixed;
+    z-index: 999999;
+    border: 1px dashed;
+    background: #fff;
+  }
+
+  ::ng-deep {
+    .droppable {
+      display: block;
+      position: fixed;
+      z-index: 99999;
+      background: #dddddd;
+      height: 10px;
+    }
+  }
 }

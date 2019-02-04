@@ -1,6 +1,8 @@
 import { ItemNode } from './item-node.model';
 
+
 export class FlatItemNode {
+  public el: any;
   public data: string;
   public level: number;
   public expandable: boolean;
