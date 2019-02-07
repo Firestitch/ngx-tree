@@ -3,7 +3,8 @@ import {
   ChangeDetectorRef,
   ContentChild,
   Directive,
-  ElementRef, EventEmitter,
+  ElementRef,
+  EventEmitter,
   Input,
   NgZone,
   OnDestroy,
@@ -11,7 +12,10 @@ import {
   Output,
 } from '@angular/core';
 
-import { Draggable } from './draggable';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+import { Draggable } from '../class/draggable';
 import { FsDraggableNodeContentDirective } from './draggable-node-content.directive';
 import { FsDraggableNodeTargetDirective } from './draggable-node-target.directive';
 import { FsTreeService } from '../services/tree.service';
@@ -27,6 +31,12 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
   @Input('fsDraggableNode')
   public node: FlatItemNode;
 
+  @Input('fsCanDrop')
+  public candDrop: any;
+
+  @Output()
+  public dragStart = new EventEmitter<FlatItemNode>();
+
   @Output()
   public drop = new EventEmitter<IDragEnd>();
 
@@ -38,23 +48,27 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
 
   private _draggable: Draggable;
 
+  private _destroy = new Subject<void>();
+
   constructor(
     private _db: FsTreeService,
     private _el: ElementRef,
     private _cdRef: ChangeDetectorRef,
     private _zone: NgZone
-  ) {
-
-  }
+  ) {}
 
   public ngOnInit() {
-    this._draggable = new Draggable(
-      this.draggableContent,
-      this.draggableTarget,
-      this._cdRef,
-      this._zone,
-      this._db.nestedNodeMap
-    );
+    this._zone.runOutsideAngular(() => {
+      this._draggable = new Draggable(
+        this.node,
+        this.draggableContent,
+        this.draggableTarget,
+        this._db.nestedNodeMap,
+        { canDrop: this.candDrop }
+      );
+    });
+
+    this._initSubscriptions();
   }
 
   public ngAfterViewInit() {
@@ -68,5 +82,34 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
 
   public ngOnDestroy() {
     this._draggable.destroy();
+
+    this._destroy.next();
+    this._destroy.complete();
+  }
+
+  private _initSubscriptions() {
+    this._draggable.dragStart$
+      .pipe(
+        takeUntil(this._destroy)
+      )
+      .subscribe(() => {
+        this.dragStart.emit(this.node);
+      });
+
+    this._draggable.dragEnd$
+      .pipe(
+        takeUntil(this._destroy),
+      )
+      .subscribe((data) => {
+        this.drop.emit(data);
+      });
+
+    this._draggable.expandNode$
+      .pipe(
+        takeUntil(this._destroy),
+      )
+      .subscribe((data) => {
+        this._db.treeControl.expand(data);
+      });
   }
 }

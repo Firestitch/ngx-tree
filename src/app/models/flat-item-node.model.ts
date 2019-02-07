@@ -9,6 +9,7 @@ export class FlatItemNode {
   public parent: FlatItemNode;
   public original: ItemNode;
   public originalParent: ItemNode;
+  public hidden = false; // Need for droppable orderNodesByCoords
 
   constructor(data: any = {}) {
     this.data = data.data || null;

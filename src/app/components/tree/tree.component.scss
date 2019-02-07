@@ -1,10 +1,15 @@
-.mat-checkbox {
-  margin-right: 10px;
+::ng-deep {
+  .block-selection {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+  }
 }
 
-.drop-into {
-  background-color: #dddddd;
-  border-radius: 2px;
+.mat-checkbox {
+  margin-right: 10px;
 }
 
 .blocked {
@@ -21,6 +26,14 @@
   .container {
     display: flex;
     align-items: center;
+
+    .content {
+      align-self: stretch;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      cursor: grab;
+    }
   }
 }
 
@@ -29,15 +42,30 @@
   //align-items: stretch;
   flex-direction: column;
 
-  .draggable {
+  &.draggable-elem {
+    opacity: 0.6;
+  }
+
+  &.drag-over {
+    background-color: #dddddd;
+    border-radius: 2px;
+  }
+
+  .draggable-item {
     position: fixed;
     z-index: 999999;
     border: 1px dashed;
     background: #fff;
+    opacity: 0.6;
+    cursor: copy;
+
+    &.no-drop {
+      cursor: no-drop;
+    }
   }
 
   ::ng-deep {
-    .droppable {
+    .droppable-area {
       display: block;
       position: fixed;
       z-index: 99999;

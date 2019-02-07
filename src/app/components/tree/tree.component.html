@@ -2,14 +2,12 @@
   <mat-tree-node *matTreeNodeDef="let node"
                  matTreeNodeToggle
                  matTreeNodePadding
-                 [fsDraggableNode]="node">
-    <div class="node"
-         fsDraggableNodeContent
-         [ngClass]="{
-            'drop-above': drag.expandOverArea === 'above' && drag.expandOverNode === node,
-            'drop-center': drag.expandOverArea === 'center' && drag.expandOverNode === node,
-            'drop-below': drag.expandOverArea === 'below' && drag.expandOverNode === node
-          }">
+                 [fsDraggableNode]="node"
+                 [fsCanDrop]="config.canDrop"
+                 (dragStart)="onDragStart($event)"
+                 (drop)="onDrop($event)"
+                 (dragOver)="expandNode($event)">
+    <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button disabled></button>
 
@@ -32,14 +30,12 @@
 
   <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
                  matTreeNodePadding
-                 [fsDraggableNode]="node">
-    <div class="node"
-         fsDraggableNodeContent
-         [ngClass]="{
-            'drop-above': drag.expandOverArea === 'above' && drag.expandOverNode === node,
-            'drop-center': drag.expandOverArea === 'center' && drag.expandOverNode === node,
-            'drop-below': drag.expandOverArea === 'below' && drag.expandOverNode === node
-          }">
+                 [fsDraggableNode]="node"
+                 [fsCanDrop]="config.canDrop"
+                 (dragStart)="onDragStart($event)"
+                 (drop)="onDrop($event)"
+                 (dragOver)="expandNode($event)">
+    <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button
                 (click)="toggleNode(node)"

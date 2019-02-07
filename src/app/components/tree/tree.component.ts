@@ -29,6 +29,7 @@ import { getChildren } from '../../helpers/get-children';
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { ITreeConfig } from '../../interfaces/config.interface';
 import { takeUntil } from 'rxjs/operators';
+import { IDragEnd } from '../../interfaces/draggable.interface';
 
 
 @Component({
@@ -68,15 +69,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   /** The selection for checklist */
   public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
 
-  // Drag & Drop state object
-  public drag = {
-    node: null,
-    expandOverWaitTime: 300,
-    expandOverTime: null,
-    expandOverArea: null,
-    expandOverNode: null,
-    expandStatus: false
-  };
+  private _expandedBeforeDrag = false;
 
   private _destroy$ = new Subject<void>();
 
@@ -87,10 +80,9 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    this._database.initialize(this.config.data, this.config.childrenName, this.config.levels);
+    this._database.initialize(this.treeControl, this.config.data, this.config.childrenName, this.config.levels);
     this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
 
-    console.log(this._database);
     this._database.dataChange
       .pipe(
         takeUntil(this._destroy$),
@@ -160,112 +152,39 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Setup drag
-   * @param event
    * @param node
    */
-  public handleDragStart(event, node) {
-    event.stopPropagation();
+  public onDragStart(node: FlatItemNode) {
+    if (this.treeControl.isExpanded(node)) {
+      this._expandedBeforeDrag = true;
+    }
 
-    this.drag.node = node;
-    this.drag.expandStatus = this.treeControl.isExpanded(node);
     this.treeControl.collapse(node);
   }
 
-  /**
-   * Handle when cursor hovered over element
-   * @param event
-   * @param node
-   */
-  public handleDragOver(event, node) {
-    event.preventDefault();
-
-    if (!event.target.classList.contains('node')) {
-      return;
-    }
-
-    const percentageY = Math.abs(event.offsetY / event.target.clientHeight);
-
-    const handleAbove = percentageY >= 0 && percentageY < 0.30;
-    const handleOver = percentageY >= 0.30 && percentageY <= 0.70;
-    const handleBelow = percentageY > 0.70;
-
-    if (handleAbove) {
-
-      this.drag.expandOverArea = 'above';
-
-    } else if (handleOver) {
-
-      this.expandNode(node);
-
-      this.drag.expandOverArea = 'center';
-
-    } else if (handleBelow) {
-
-      this.drag.expandOverArea = 'below';
-
-    }
-
-    // if (handleBelow && isExpandable(node)) {
-    //   this.drag.expandOverArea = null;
-    // }
-
-    this.drag.expandOverNode = node;
+  public expandNode(node: FlatItemNode) {
+    this.treeControl.expand(node);
   }
 
+  public onDrop(data: IDragEnd) {
 
-  /**
-   * Drop
-   * @param event
-   * @param node
-   */
-  public handleDrop(event, node) {
-    event.preventDefault();
-
-    if (node === this.drag.node) {
-      return;
+    if (this._expandedBeforeDrag) {
+      this.treeControl.expand(data.node);
+      this._expandedBeforeDrag = false;
     }
 
-    const targetNode = this._database.flatNodeMap.get(node);
-    const dragNode = this._database.flatNodeMap.get(this.drag.node);
+    if (data.dropInto === data.node) { return; }
 
-    if (this.config.dropStart) {
-      const toParent = this.drag.expandOverArea === 'above' || this.drag.expandOverArea === 'below'
-        ? this.drag.expandOverNode.parent
-        : this.drag.expandOverNode;
+    const dropInto = this._database.flatNodeMap.get(data.dropInto);
+    const node = this._database.flatNodeMap.get(data.node);
 
-      const canDrop = this.config.dropStart(this.drag.node, this.drag.node.parent, toParent);
-
-      if (canDrop instanceof Observable) {
-        this.lockTree();
-
-        canDrop
-          .pipe(
-            takeUntil(this._destroy$),
-          )
-          .subscribe((result) => {
-            if (result) {
-              this.dropNode(targetNode, dragNode);
-            }
-            this.unlockTree();
-          })
-      } else if (canDrop) {
-        this.dropNode(targetNode, dragNode);
-      }
+    if (data.dropPosition === 'above') {
+      this._database.insertNodeAbove(dropInto, node);
+    } else if (data.dropPosition === 'below') {
+      this._database.insertNodeBelow(dropInto, node);
     } else {
-      this.dropNode(targetNode, dragNode);
+      this._database.insertNode(dropInto, node);
     }
-
-    this.handleDragEnd();
-  }
-
-  /**
-   * Drag end
-   * @param event
-   */
-  public handleDragEnd(event = null) {
-    this.drag.node = null;
-    this.drag.expandOverNode = null;
-    this.drag.expandOverTime = 0;
   }
 
   /**
@@ -279,37 +198,6 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
       } else {
         this.treeControl.expand(node);
       }
-    }
-  }
-
-  /**
-   * Drop logic implementation
-   * @param targetNode
-   * @param dragNode
-   */
-  private dropNode(targetNode, dragNode) {
-    if (this.drag.expandOverArea === 'above') {
-      this._database.insertNodeAbove(targetNode, dragNode);
-    } else if (this.drag.expandOverArea === 'below') {
-      this._database.insertNodeBelow(targetNode, dragNode);
-    } else {
-      this._database.insertNode(targetNode, dragNode);
-    }
-  }
-
-  /**
-   * Expand node after some time
-   * @param node
-   */
-  private expandNode(node: FlatItemNode) {
-    if (node === this.drag.expandOverNode) {
-      if (this.drag.node !== node && !this.treeControl.isExpanded(node)) {
-        if ((new Date().getTime() - this.drag.expandOverTime) > this.drag.expandOverWaitTime) {
-          this.treeControl.expand(node);
-        }
-      }
-    } else {
-      this.drag.expandOverTime = new Date().getTime();
     }
   }
 

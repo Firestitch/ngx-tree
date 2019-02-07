@@ -10,5 +10,5 @@ export interface ITreeConfig<T> {
   changed?: (data: T) => void;
   childrenName?: string;
   actions?: IAction[];
-  dropStart?: (node?: FlatItemNode, fromParent?: FlatItemNode, toParent?: FlatItemNode) => boolean | Observable<boolean>;
+  canDrop?: (node?: FlatItemNode, fromParent?: FlatItemNode, toParent?: FlatItemNode) => boolean;
 }

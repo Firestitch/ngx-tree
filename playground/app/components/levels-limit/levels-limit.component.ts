@@ -24,10 +24,8 @@ export class LevelsLimitComponent {
     levels: 2,
     selection: false,
     childrenName: 'accounts',
-    dropStart: (node, fromParent, toParent) => {
-      const canDrop = fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
-      // return canDrop;
-      return of(canDrop).pipe(delay(1000))
+    canDrop: (node, fromParent, toParent) => {
+      return fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
     },
     actions: [
       {

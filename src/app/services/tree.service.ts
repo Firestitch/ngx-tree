@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ItemNode } from '../models/item-node.model';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { treeBuilder } from '../helpers/tree-builder';
+import { FlatTreeControl } from '@angular/cdk/tree';
 
 
 @Injectable()
@@ -15,6 +16,8 @@ export class FsTreeService implements OnDestroy {
 
   /** Map from nested node to flattened node. This helps us to keep the same object for selection */
   public nestedNodeMap = new Map<ItemNode, FlatItemNode>();
+
+  public treeControl: FlatTreeControl<FlatItemNode>;
 
   private _dataChange = new BehaviorSubject<ItemNode[]>([]);
   private _destroy$ = new Subject<void>();
@@ -34,7 +37,13 @@ export class FsTreeService implements OnDestroy {
     this._destroy$.complete();
   }
 
-  public initialize(treeData: any, childrenName, maxLevel: number) {
+  public initialize(
+    treeControl: FlatTreeControl<FlatItemNode>,
+    treeData: any,
+    childrenName,
+    maxLevel: number
+  ) {
+    this.treeControl = treeControl;
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
     const data = treeBuilder(treeData, 0, null, childrenName, maxLevel);
