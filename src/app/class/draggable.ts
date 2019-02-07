@@ -155,7 +155,8 @@ export class Draggable {
     window.document.removeEventListener('touchcancel', this._dropHandler);
 
     // console.log(this._droppable.dropTarget.node, this._droppable.dropPosition, this._droppable.dropLevel);
-    if (this._droppable.dropTarget && this._droppable.dropPosition) {
+
+    if (this._droppable.dropTarget && this._droppable.dropPosition && this._droppable.canDropHere) {
       this._dragEnd$.next({
         node: this._node,
         dropInto: this._droppable.dropTarget,

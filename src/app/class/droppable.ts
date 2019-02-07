@@ -24,6 +24,7 @@ export class Droppable {
   private _dropTarget: FlatItemNode;
   // Level for drop (padding from left side)
   private _dropLevel = 0;
+  private _canDropHere = true;
   // Х position for first level (0)
   private _rootLevelPosition: number = null;
   // Shift for align element under correct cursor position
@@ -83,6 +84,10 @@ export class Droppable {
     return this._dropTarget;
   }
 
+  get canDropHere() {
+    return this._canDropHere;
+  }
+
   public shift(val) {
     this._shiftX = val;
   }
@@ -127,7 +132,7 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        if (!this._checkIfCanDrop()) {
+        if (!this._checkIfCanDrop(this._dropTarget && this._dropTarget.parent)) {
           this._droppableEl.style.display = 'none';
           this._draggableEl.classList.add('no-drop');
         } else {
@@ -145,7 +150,7 @@ export class Droppable {
 
         this._droppableEl.style.display = 'none';
 
-        if (this._checkIfCanDrop() && element.node !== this._node) {
+        if (this._checkIfCanDrop(this._dropTarget) && element.node !== this._node) {
           // Add marked element for unmark in feature
           this._cacheOfDragOveredElements.add(element.node.el);
 
@@ -192,7 +197,7 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        if (!this._checkIfCanDrop()) {
+        if (!this._checkIfCanDrop(this._dropTarget && this._dropTarget.parent)) {
           this._droppableEl.style.display = 'none';
           this._draggableEl.classList.add('no-drop');
         } else {
@@ -476,11 +481,12 @@ export class Droppable {
    * If can drop function passed - do call for result
    * @private
    */
-  private _checkIfCanDrop() {
+  private _checkIfCanDrop(toParent) {
     if (!this._canDrop) {
       return true
     } else {
-      return this._canDrop(this._node, this._node.parent, this._dropTarget && this._dropTarget.parent);
+      this._canDropHere = this._canDrop(this._node, this._node.parent, toParent);
+      return this._canDropHere;
     }
   }
 
