@@ -7,6 +7,7 @@ import { Droppable } from './droppable';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
+import { LoggerService } from '../services/logger.service';
 
 
 export class Draggable {
@@ -20,6 +21,8 @@ export class Draggable {
   private _dragTarget: HTMLDivElement = null;
   // Draggable HTML node (copy from dragTarget)
   private _draggableEl: HTMLDivElement = null;
+
+  private _expandedBeforeDrag = false;
 
   // Observables
   private _dragStart$ = new Subject<void>();
@@ -45,13 +48,15 @@ export class Draggable {
    * @param _target
    * @param _nodes
    * @param _restrictions
+   * @param _logger
    */
   constructor(
     private _node: FlatItemNode,
     private _el: ElementRef,
     private _target: ElementRef,
     private _nodes: Map<ItemNode, FlatItemNode>,
-    private _restrictions: any
+    private _restrictions: any,
+    private _logger: LoggerService,
   ) {
 
     // Listen mouse or touch events
@@ -82,7 +87,28 @@ export class Draggable {
 
     this._dragStart$.next();
 
-    this._hideChildrenNodes(this._node);
+    this._expandedBeforeDrag = this._node.isExpanded();
+    if (this._expandedBeforeDrag) {
+      this._node.collapse();
+      this._hideChildrenNodes(this._node);
+    }
+
+    this._logger.timeStart('DRAG_START');
+    this._nodes.forEach((node) => {
+      if (node.level === 0) {
+
+        this._logger.log('Drag Start Checking', node);
+
+        node.hidden = false;
+        if (node.isExpanded()) {
+          this._checkChildrenExpandedStatus(node, true);
+        } else {
+          this._hideChildrenNodes(node);
+        }
+      }
+    });
+
+    this._logger.timeStop('DRAG_START');
 
     // If already dragging cancel event
     if (this.dragging) {
@@ -109,7 +135,8 @@ export class Draggable {
       this._nodes,
       this._dragDims,
       this._expandNode$,
-      this._restrictions.canDrop
+      this._restrictions.canDrop,
+      this._logger,
     );
 
     this._droppable.shift((event.x || event.clientX) - this._dragDims.left);
@@ -154,7 +181,10 @@ export class Draggable {
     window.document.removeEventListener('touchend', this._dropHandler);
     window.document.removeEventListener('touchcancel', this._dropHandler);
 
-    // console.log(this._droppable.dropTarget.node, this._droppable.dropPosition, this._droppable.dropLevel);
+    if (this._expandedBeforeDrag) {
+      this._expandedBeforeDrag = false;
+      this._node.expand();
+    }
 
     if (this._droppable.dropTarget && this._droppable.dropPosition && this._droppable.canDropHere) {
       this._dragEnd$.next({
@@ -164,7 +194,6 @@ export class Draggable {
       });
     }
 
-    this._showChildrenNodes(this._node);
 
     window.document.body.classList.remove('block-selection');
     this._node.el.classList.remove('draggable-elem');
@@ -196,7 +225,13 @@ export class Draggable {
       .pipe(takeUntil(this._destroy$))
       .subscribe((node) => {
         if (this._node !== node) {
-          this._showChildrenNodes(node);
+          this._logger.log('EXPANDED OVER', node);
+          node.expand();
+
+          this._logger.timeStart('EXPANDED_OVER');
+          this._checkChildrenExpandedStatus(node, true);
+          this._droppable.orderNodesByCoords();
+          this._logger.timeStop('EXPANDED_OVER');
         }
       })
   }
@@ -220,22 +255,57 @@ export class Draggable {
     this._draggableEl = el;
   }
 
-  // Mark all children nodes as hidden = false
-  private _showChildrenNodes(node: FlatItemNode) {
+  /**
+   * Do check and update hidden status for all children for target node
+   * @param node
+   * @param showFirstLevel
+   * @private
+   */
+  private _checkChildrenExpandedStatus(node: FlatItemNode, showFirstLevel = false) {
     if (node.original.children) {
       node.original.children.forEach((child) => {
         const childNode = this._nodes.get(child);
-        childNode.hidden = false;
-        this._showChildrenNodes(childNode);
+
+        if (showFirstLevel) {
+          childNode.hidden = false;
+        }
+
+        if (!childNode.isExpanded()) {
+
+          this._logger.log('Check Children[NOT EXPANDED]', node);
+
+          this._hideChildrenNodes(childNode);
+        } else {
+          this._logger.log('Check Children[EXPANDED]', node);
+
+          this._checkChildrenExpandedStatus(childNode, true);
+        }
       });
     }
   }
+  // // Mark all children nodes as hidden = false
+  // private _showChildrenNodes(node: FlatItemNode) {
+  //   if (node.original.children) {
+  //     node.original.children.forEach((child) => {
+  //       const childNode = this._nodes.get(child);
+  //       childNode.hidden = false;
+  //       this._showChildrenNodes(childNode);
+  //     });
+  //   }
+  // }
 
-  // Mark all children nodes as hidden
+  /**
+   * Mark all children nodes as hidden
+   * @param node
+   * @private
+   */
   private _hideChildrenNodes(node: FlatItemNode) {
     if (node.original.children) {
       node.original.children.forEach((child) => {
         const childNode = this._nodes.get(child);
+
+        this._logger.log('Hide Children', [childNode.data, childNode]);
+
         childNode.hidden = true;
         this._hideChildrenNodes(childNode);
       });

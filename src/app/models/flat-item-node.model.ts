@@ -10,6 +10,9 @@ export class FlatItemNode {
   public original: ItemNode;
   public originalParent: ItemNode;
   public hidden = false; // Need for droppable orderNodesByCoords
+  public isExpanded;
+  public collapse;
+  public expand;
 
   constructor(data: any = {}) {
     this.data = data.data || null;
@@ -18,6 +21,10 @@ export class FlatItemNode {
     this.parent = data.parent || null;
     this.original = data.original || null;
     this.originalParent = data.originalParent || null;
+    this.isExpanded = data.isExpanded || function() { return false };
+    this.collapse = data.collapse || function() { };
+    this.expand = data.expand || function() { };
+    this.hidden = this.isExpanded();
   }
 
 }

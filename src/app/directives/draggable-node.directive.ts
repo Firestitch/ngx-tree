@@ -18,9 +18,10 @@ import { takeUntil } from 'rxjs/operators';
 import { Draggable } from '../class/draggable';
 import { FsDraggableNodeContentDirective } from './draggable-node-content.directive';
 import { FsDraggableNodeTargetDirective } from './draggable-node-target.directive';
-import { FsTreeService } from '../services/tree.service';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
+import { FsTreeService } from '../services/tree.service';
+import { LoggerService } from '../services/logger.service';
 
 
 @Directive({
@@ -52,9 +53,10 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
 
   constructor(
     private _db: FsTreeService,
+    private _logger: LoggerService,
     private _el: ElementRef,
     private _cdRef: ChangeDetectorRef,
-    private _zone: NgZone
+    private _zone: NgZone,
   ) {}
 
   public ngOnInit() {
@@ -64,7 +66,8 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
         this.draggableContent,
         this.draggableTarget,
         this._db.nestedNodeMap,
-        { canDrop: this.candDrop }
+        { canDrop: this.candDrop },
+        this._logger,
       );
     });
 
@@ -102,14 +105,6 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
       )
       .subscribe((data) => {
         this.drop.emit(data);
-      });
-
-    this._draggable.expandNode$
-      .pipe(
-        takeUntil(this._destroy),
-      )
-      .subscribe((data) => {
-        this._db.treeControl.expand(data);
       });
   }
 }

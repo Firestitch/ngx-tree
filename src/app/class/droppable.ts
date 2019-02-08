@@ -7,6 +7,7 @@ import { lookupNearPoint, lower } from '../helpers/binary';
 import { IOrderedNode } from '../interfaces/draggable.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
+import { LoggerService } from '../services/logger.service';
 
 
 export class Droppable {
@@ -60,6 +61,7 @@ export class Droppable {
    * @param _dragDims
    * @param _expandNode$
    * @param _canDrop
+   * @param _logger
    */
   constructor(
     private _node: FlatItemNode,
@@ -69,8 +71,9 @@ export class Droppable {
     private _dragDims,
     private _expandNode$: Subject<FlatItemNode>,
     private _canDrop = null,
+    private _logger: LoggerService,
   ) {
-    this._orderNodesByCoords();
+    this.orderNodesByCoords();
     this._initDroppableElement();
     this._getRootPosition(this._node);
   }
@@ -105,6 +108,7 @@ export class Droppable {
 
     this._dropPosition = this._getPositionByIsec(isec);
 
+    // console.log(element, this._dropPosition);
     switch (this._dropPosition) {
       case 'above': {
         this._cancelExpandTimer();
@@ -207,6 +211,28 @@ export class Droppable {
     }
   }
 
+  /**
+   * Strong order visible nodes by X coord
+   */
+  public orderNodesByCoords() {
+    this._logger.log('ORDER', 'order started');
+    this._orderedNodes = [];
+
+    this._nodes.forEach((node) => {
+      if (node.el && !node.hidden) {
+        const dimentions = node.el.getBoundingClientRect();
+        const insertIndex = lower(this._orderedNodes, dimentions.y, (item) => item.dimentions.y);
+
+        this._orderedNodes.splice(
+          insertIndex,
+          0,
+          { dimentions: dimentions, node: node }
+        );
+      }
+    });
+
+    this._logger.log('ORDER', [this._orderedNodes, this._nodes]);
+  }
 
   public destroy() {
     this._orderedNodes = [];
@@ -419,27 +445,6 @@ export class Droppable {
   }
 
   /**
-   * Strong order visible nodes by X coord
-   * @private
-   */
-  private _orderNodesByCoords() {
-    this._orderedNodes = [];
-
-    this._nodes.forEach((node) => {
-      if (node.el && !node.hidden) {
-        const dimentions = node.el.getBoundingClientRect();
-        const insertIndex = lower(this._orderedNodes, dimentions.y, (item) => item.dimentions.y);
-
-        this._orderedNodes.splice(
-          insertIndex,
-          0,
-          { dimentions: dimentions, node: node }
-        );
-      }
-    });
-  }
-
-  /**
    * Lookup above now with same level as target
    * @param element
    * @private
@@ -503,7 +508,6 @@ export class Droppable {
       )
       .subscribe(() => {
         this._expandNode$.next(node);
-        this._orderNodesByCoords();
       })
   }
 

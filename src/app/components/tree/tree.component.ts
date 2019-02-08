@@ -13,7 +13,8 @@ import {
 } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { FsTreeService } from '../../services/tree.service';
 
@@ -28,15 +29,15 @@ import { getChildren } from '../../helpers/get-children';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { ITreeConfig } from '../../interfaces/config.interface';
-import { takeUntil } from 'rxjs/operators';
 import { IDragEnd } from '../../interfaces/draggable.interface';
+import { LoggerService } from '../../services/logger.service';
 
 
 @Component({
   selector: 'fs-tree',
   templateUrl: 'tree.component.html',
   styleUrls: [ 'tree.component.scss' ],
-  providers: [ FsTreeService ],
+  providers: [FsTreeService, LoggerService ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FsTreeComponent<T> implements OnInit, OnDestroy {
@@ -73,10 +74,12 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private _database: FsTreeService, private _cd: ChangeDetectorRef) {
+  constructor(private _database: FsTreeService, private _logger: LoggerService, private _cd: ChangeDetectorRef) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+
+    // this._logger.enabled = true;
   }
 
   public ngOnInit() {
@@ -121,6 +124,9 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     flatNode.originalParent = this._database.flatNodeMap.get(flatNode.parent);
     flatNode.level = level;
     flatNode.expandable = (node.children && node.children.length > 0);
+    flatNode.isExpanded = () => this.treeControl.isExpanded(flatNode);
+    flatNode.collapse = () => this.treeControl.collapse(flatNode);
+    flatNode.expand = () => this.treeControl.expand(flatNode);
 
     this._database.flatNodeMap.set(flatNode, node);
     this._database.nestedNodeMap.set(node, flatNode);
@@ -154,24 +160,9 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
    * Setup drag
    * @param node
    */
-  public onDragStart(node: FlatItemNode) {
-    if (this.treeControl.isExpanded(node)) {
-      this._expandedBeforeDrag = true;
-    }
-
-    this.treeControl.collapse(node);
-  }
-
-  public expandNode(node: FlatItemNode) {
-    this.treeControl.expand(node);
-  }
+  public onDragStart(node: FlatItemNode) {}
 
   public onDrop(data: IDragEnd) {
-
-    if (this._expandedBeforeDrag) {
-      this.treeControl.expand(data.node);
-      this._expandedBeforeDrag = false;
-    }
 
     if (data.dropInto === data.node) { return; }
 
