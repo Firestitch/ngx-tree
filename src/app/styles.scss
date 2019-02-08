@@ -1,0 +1,100 @@
+@import '~@angular/material/theming';
+
+@mixin fs-tree($theme) {
+
+  $primary: mat-palette($theme);
+
+  body.block-selection {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+  }
+
+
+  fs-tree {
+
+    .droppable-area {
+      display: block;
+      position: fixed;
+      z-index: 99999;
+      background: mat-color($primary);
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .draggable-item {
+      .container {
+        .content {
+          cursor: copy !important;
+        }
+      }
+    }
+
+    .no-drop {
+      .container {
+        .content {
+          cursor: no-drop !important;
+        }
+      }
+    }
+
+    .mat-checkbox {
+      margin-right: 10px;
+    }
+
+    .blocked {
+      opacity: 0.5;
+    }
+
+    .node {
+      width: 100%;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      border-radius: 2px;
+
+      .container {
+        display: flex;
+        align-items: center;
+
+        .content {
+          align-self: stretch;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          cursor: grab;
+        }
+      }
+    }
+
+    .mat-tree-node {
+      overflow: visible;
+      flex-direction: column;
+
+      &.draggable-elem .container {
+        opacity: .5;
+      }
+
+      &.drag-over .node {
+        background-color: mat-color($primary);
+      }
+
+      .draggable-item {
+        position: fixed;
+        z-index: 999999;
+        border: 1px #ccc solid;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.5);
+        min-height: 40px;
+        padding: 0 15px;
+        color: rgba(71, 71, 71, 0.5);
+
+        button, .checklist-leaf-node {
+          display: none;
+        }
+      }
+    }
+  }
+}

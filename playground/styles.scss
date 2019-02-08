@@ -1,3 +1,8 @@
 @import '../tools/assets/playground.scss';
 @import '~ngx-toastr/toastr.css';
 @import '../src/app/styles.scss';
+
+
+@include mat-core();
+
+@include fs-tree($mat-blue);
