@@ -18,7 +18,6 @@
 
 .node {
   width: 100%;
-  position: relative;
   display: flex;
   flex: 1;
   align-items: center;
@@ -32,7 +31,25 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      //cursor: grab;
+      cursor: grab;
+    }
+  }
+}
+
+::ng-deep {
+  .draggable-item {
+    .container {
+      .content {
+        cursor: copy !important;
+      }
+    }
+  }
+
+  .no-drop {
+    .container {
+      .content {
+        cursor: no-drop !important;
+      }
     }
   }
 }
@@ -57,11 +74,6 @@
     border: 1px dashed;
     background: #fff;
     opacity: 0.6;
-    cursor: copy;
-
-    &.no-drop {
-      cursor: no-drop;
-    }
   }
 
   ::ng-deep {
