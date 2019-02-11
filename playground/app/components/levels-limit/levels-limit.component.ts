@@ -42,6 +42,24 @@ export class LevelsLimitComponent {
             }
           },
           {
+            label: 'Create Object Above',
+            show: (node) => {
+              return node.level === 1;
+            },
+            click: (node) => {
+              this.tree.insertElementAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
+            }
+          },
+          {
+            label: 'Create Object Below',
+            show: (node) => {
+              return node.level === 1;
+            },
+            click: (node) => {
+              this.tree.insertElementBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
+            }
+          },
+          {
             label: 'Delete',
             click: (node) => {
               this.tree.removeNode(node)

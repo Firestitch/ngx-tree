@@ -232,6 +232,28 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
+   * Insert element above target
+   * @param data
+   * @param target
+   */
+  public insertElementAbove(data: any = {}, target: FlatItemNode = null) {
+    const originalParent = target && target.original || null;
+    const node = this._database.createNode(data, target);
+    this._database.insertNodeAbove(originalParent, node.original);
+  }
+
+  /**
+   * Insert element below target
+   * @param data
+   * @param target
+   */
+  public insertElementBelow(data: any = {}, target: FlatItemNode = null) {
+    const originalParent = target && target.original || null;
+    const node = this._database.createNode(data, target);
+    this._database.insertNodeBelow(originalParent, node.original);
+  }
+
+  /**
    * Insert element as child element for target node
    * @param data
    * @param parent
