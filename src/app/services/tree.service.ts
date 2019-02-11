@@ -1,11 +1,14 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { FlatTreeControl } from '@angular/cdk/tree';
+
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { ItemNode } from '../models/item-node.model';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { treeBuilder } from '../helpers/tree-builder';
-import { FlatTreeControl } from '@angular/cdk/tree';
+import { FsTreeChange } from '../enums/tree-change.enum';
+import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
 
 @Injectable()
@@ -19,17 +22,18 @@ export class FsTreeService implements OnDestroy {
 
   public treeControl: FlatTreeControl<FlatItemNode>;
 
-  private _dataChange = new BehaviorSubject<ItemNode[]>([]);
+  private _data: ItemNode[] = [];
+  private _dataChange = new Subject<ITreeDataChange>();
   private _destroy$ = new Subject<void>();
 
   constructor() {}
 
-  get dataChange(): Observable<ItemNode[]> {
+  get dataChange(): Observable<ITreeDataChange> {
     return this._dataChange.pipe(takeUntil(this._destroy$));
   }
 
   get data(): ItemNode[] {
-    return this._dataChange.value;
+    return this._data;
   }
 
   public ngOnDestroy() {
@@ -46,14 +50,10 @@ export class FsTreeService implements OnDestroy {
     this.treeControl = treeControl;
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
-    const data = treeBuilder(treeData, 0, null, childrenName, maxLevel);
+    this._data = treeBuilder(treeData, 0, null, childrenName, maxLevel);
 
     // Notify the change.
-    this._dataChange.next(data);
-  }
-
-  public changeData() {
-    this._dataChange.next(this.data);
+    this.updateData(FsTreeChange.Init, this._data);
   }
 
   // Create new fresh node which is ready to be insterted into tree
@@ -72,48 +72,52 @@ export class FsTreeService implements OnDestroy {
     });
   }
 
-  public insertNodeAbove(target: ItemNode, node: ItemNode) {
+  public insertNodeAbove(target: ItemNode, node: ItemNode): number {
 
     const parent = target.parent;
 
     this.removeItem(node);
 
+    let nodeIndex = null;
+
     if (parent) {
-      const nodeIndex = parent.children.indexOf(target);
+      nodeIndex = parent.children.indexOf(target);
       parent.children.splice(nodeIndex, 0, node);
     } else {
-      const nodeIndex = this.data.indexOf(target);
+      nodeIndex = this.data.indexOf(target);
       this.data.splice(nodeIndex, 0, node);
     }
 
     node.parent = target.parent;
 
-    this.changeData();
+    return nodeIndex;
   }
 
-  public insertNodeBelow(target: ItemNode, node: ItemNode) {
+  public insertNodeBelow(target: ItemNode, node: ItemNode): number {
 
     const parent = target.parent;
 
     this.removeItem(node);
 
+    let nodeIndex = null;
     if (parent) {
-      const nodeIndex = parent.children.indexOf(target);
+      nodeIndex = parent.children.indexOf(target);
       parent.children.splice(nodeIndex + 1, 0, node);
     } else {
-      const nodeIndex = this.data.indexOf(target);
+      nodeIndex = this.data.indexOf(target);
       this.data.splice(nodeIndex + 1, 0, node);
     }
 
     node.parent = target.parent;
 
-    this.changeData();
+    return nodeIndex;
   }
 
   public insertNode(target: ItemNode, node: ItemNode) {
 
     this.removeItem(node);
 
+    let nodeIndex = null;
     if (target) {
       if (!target.children) {
         target.children = [];
@@ -122,11 +126,14 @@ export class FsTreeService implements OnDestroy {
       target.children.push(node);
 
       node.parent = target;
+
+      nodeIndex = target.children.indexOf(node);
     } else {
       this.data.push(node);
+      nodeIndex = this.data.indexOf(node);
     }
 
-    this.changeData();
+    return nodeIndex;
   }
 
 
@@ -144,5 +151,12 @@ export class FsTreeService implements OnDestroy {
         this.data.splice(nodeIndex, 1);
       }
     }
+  }
+
+  public updateData(type: FsTreeChange, payload: any) {
+    this._dataChange.next({
+      type: type,
+      payload: payload
+    });
   }
 }

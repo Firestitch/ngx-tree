@@ -31,6 +31,8 @@ import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { ITreeConfig } from '../../interfaces/config.interface';
 import { IDragEnd } from '../../interfaces/draggable.interface';
 import { LoggerService } from '../../services/logger.service';
+import { ITreeDataChange } from '../../interfaces/tree-data-change.interface';
+import { FsTreeChange } from '../../enums/tree-change.enum';
 
 
 @Component({
@@ -70,8 +72,6 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   /** The selection for checklist */
   public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
 
-  private _expandedBeforeDrag = false;
-
   private _destroy$ = new Subject<void>();
 
   constructor(private _database: FsTreeService, private _logger: LoggerService, private _cd: ChangeDetectorRef) {
@@ -83,21 +83,10 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
+    this._subscribeToDataChnage();
+
     this._database.initialize(this.treeControl, this.config.data, this.config.childrenName, this.config.levels);
     this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
-
-    this._database.dataChange
-      .pipe(
-        takeUntil(this._destroy$),
-      )
-      .subscribe(data => {
-        this.dataSource.data = [];
-        this.dataSource.data = data;
-
-        if (this.config.changed) {
-          this.config.changed(this.getData());
-        }
-      });
   }
 
   public ngOnDestroy() {
@@ -168,14 +157,25 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
     const dropInto = this._database.flatNodeMap.get(data.dropInto);
     const node = this._database.flatNodeMap.get(data.node);
+    const fromParent = node.parent;
+    let insertIndex = null;
 
     if (data.dropPosition === 'above') {
-      this._database.insertNodeAbove(dropInto, node);
+      insertIndex = this._database.insertNodeAbove(dropInto, node);
     } else if (data.dropPosition === 'below') {
-      this._database.insertNodeBelow(dropInto, node);
+      insertIndex = this._database.insertNodeBelow(dropInto, node);
     } else {
-      this._database.insertNode(dropInto, node);
+      insertIndex = this._database.insertNode(dropInto, node);
     }
+
+    // Notify about data change
+    const payload = {
+      fromParent: fromParent,
+      toParent: node.parent,
+      node: node,
+      index: insertIndex,
+    };
+    this._database.updateData(FsTreeChange.Reorder, payload);
   }
 
   /**
@@ -239,7 +239,16 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public insertElementAbove(data: any = {}, target: FlatItemNode = null) {
     const originalParent = target && target.original || null;
     const node = this._database.createNode(data, target);
-    this._database.insertNodeAbove(originalParent, node.original);
+    const insertIndex = this._database.insertNodeAbove(originalParent, node.original);
+
+    // Notify about data change
+    const payload = {
+      position: 'above',
+      parent: target,
+      node: node,
+      index: insertIndex,
+    };
+    this._database.updateData(FsTreeChange.Insert, payload);
   }
 
   /**
@@ -250,7 +259,16 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public insertElementBelow(data: any = {}, target: FlatItemNode = null) {
     const originalParent = target && target.original || null;
     const node = this._database.createNode(data, target);
-    this._database.insertNodeBelow(originalParent, node.original);
+    const insertIndex = this._database.insertNodeBelow(originalParent, node.original);
+
+    // Notify about data change
+    const payload = {
+      position: 'below',
+      parent: target,
+      node: node,
+      index: insertIndex,
+    };
+    this._database.updateData(FsTreeChange.Insert, payload);
   }
 
   /**
@@ -265,6 +283,15 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     if (!parent.isExpanded()) {
       parent.expand();
     }
+
+    // Notify about data change
+    const payload = {
+      position: 'into',
+      parent: parent,
+      node: node,
+      index: 0,
+    };
+    this._database.updateData(FsTreeChange.Insert, payload);
   }
 
   /**
@@ -273,7 +300,11 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
    */
   public removeNode(item: FlatItemNode) {
     this._database.removeItem(item.original);
-    this._database.changeData();
+
+    const payload = {
+      target: item.original,
+    };
+    this._database.updateData(FsTreeChange.Remove, payload);
   }
 
   /**
@@ -294,5 +325,21 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     this.blocked = false;
 
     this._cd.markForCheck();
+  }
+
+  private _subscribeToDataChnage() {
+    this._database.dataChange
+      .pipe(
+        takeUntil(this._destroy$),
+      )
+      .subscribe((event: ITreeDataChange) => {
+        console.log(event);
+        this.dataSource.data = [];
+        this.dataSource.data = this._database.data;
+
+        if (this.config.changed) {
+          this.config.changed(this.getData());
+        }
+      });
   }
 }
