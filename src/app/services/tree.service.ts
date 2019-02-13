@@ -9,10 +9,12 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { treeBuilder } from '../helpers/tree-builder';
 import { FsTreeChange } from '../enums/tree-change.enum';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+import { ITreeConfig } from '../interfaces/config.interface';
+import { sortDataBy, treeSort } from '../helpers/tree-sort';
 
 
 @Injectable()
-export class FsTreeService implements OnDestroy {
+export class FsTreeService<T> implements OnDestroy {
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   public flatNodeMap = new Map<FlatItemNode, ItemNode>();
@@ -23,6 +25,7 @@ export class FsTreeService implements OnDestroy {
   public treeControl: FlatTreeControl<FlatItemNode>;
 
   private _data: ItemNode[] = [];
+  private _config: ITreeConfig<T>;
   private _dataChange = new Subject<ITreeDataChange>();
   private _destroy$ = new Subject<void>();
 
@@ -43,14 +46,21 @@ export class FsTreeService implements OnDestroy {
 
   public initialize(
     treeControl: FlatTreeControl<FlatItemNode>,
-    treeData: any,
-    childrenName,
-    maxLevel: number
+    config: ITreeConfig<T>,
   ) {
     this.treeControl = treeControl;
+    this._config = config;
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
-    this._data = treeBuilder(treeData, 0, null, childrenName, maxLevel);
+    this._data = treeBuilder(
+      config.data,
+      0,
+      null,
+      config.childrenName,
+      config.levels
+    );
+
+    this._data = treeSort(this._data, config.sortBy);
 
     // Notify the change.
     this.updateData(FsTreeChange.Init, this._data);
@@ -78,19 +88,23 @@ export class FsTreeService implements OnDestroy {
 
     this.removeItem(node);
 
-    let nodeIndex = null;
+    let insertedIndex = null;
 
     if (parent) {
-      nodeIndex = parent.children.indexOf(target);
-      parent.children.splice(nodeIndex, 0, node);
+      const targetIndex = parent.children.indexOf(target);
+      parent.children.splice(targetIndex, 0, node);
+      parent.children = sortDataBy(parent.children, this._config.sortBy, parent);
+      insertedIndex = parent.children.indexOf(node);
     } else {
-      nodeIndex = this.data.indexOf(target);
-      this.data.splice(nodeIndex, 0, node);
+      const targetIndex = this._data.indexOf(target);
+      this._data.splice(targetIndex, 0, node);
+      this._data = sortDataBy(this._data, this._config.sortBy);
+      insertedIndex = this._data.indexOf(node);
     }
 
     node.parent = target.parent;
 
-    return nodeIndex;
+    return insertedIndex;
   }
 
   public insertNodeBelow(target: ItemNode, node: ItemNode): number {
@@ -99,25 +113,31 @@ export class FsTreeService implements OnDestroy {
 
     this.removeItem(node);
 
-    let nodeIndex = null;
+    let insertedIndex = null;
     if (parent) {
-      nodeIndex = parent.children.indexOf(target);
-      parent.children.splice(nodeIndex + 1, 0, node);
+      const targetIndex = parent.children.indexOf(target);
+      parent.children.splice(targetIndex + 1, 0, node);
+      parent.children = sortDataBy(parent.children, this._config.sortBy, parent);
+
+      insertedIndex = parent.children.indexOf(node);
     } else {
-      nodeIndex = this.data.indexOf(target);
-      this.data.splice(nodeIndex + 1, 0, node);
+      const targetIndex = this._data.indexOf(target);
+      this._data.splice(targetIndex + 1, 0, node);
+      this._data = sortDataBy(this._data, this._config.sortBy);
+
+      insertedIndex = this._data.indexOf(node);
     }
 
     node.parent = target.parent;
 
-    return nodeIndex;
+    return insertedIndex;
   }
 
   public insertNode(target: ItemNode, node: ItemNode) {
 
     this.removeItem(node);
 
-    let nodeIndex = null;
+    let insertedIndex = null;
     if (target) {
       if (!target.children) {
         target.children = [];
@@ -127,13 +147,17 @@ export class FsTreeService implements OnDestroy {
 
       node.parent = target;
 
-      nodeIndex = target.children.indexOf(node);
+      target.children = sortDataBy(target.children, this._config.sortBy, target);
+
+      insertedIndex = target.children.indexOf(node);
     } else {
       this.data.push(node);
-      nodeIndex = this.data.indexOf(node);
+
+      this._data = sortDataBy(this._data, this._config.sortBy);
+      insertedIndex = this.data.indexOf(node);
     }
 
-    return nodeIndex;
+    return insertedIndex;
   }
 
 

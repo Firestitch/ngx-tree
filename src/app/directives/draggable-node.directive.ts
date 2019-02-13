@@ -27,7 +27,7 @@ import { LoggerService } from '../services/logger.service';
 @Directive({
   selector: '[fsDraggableNode]',
 })
-export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestroy {
+export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDestroy {
 
   @Input('fsDraggableNode')
   public node: FlatItemNode;
@@ -52,7 +52,7 @@ export class FsDraggableNodeDirective implements OnInit, AfterViewInit, OnDestro
   private _destroy = new Subject<void>();
 
   constructor(
-    private _db: FsTreeService,
+    private _db: FsTreeService<T>,
     private _logger: LoggerService,
     private _el: ElementRef,
     private _cdRef: ChangeDetectorRef,

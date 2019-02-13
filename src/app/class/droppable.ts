@@ -136,7 +136,7 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        if (!this._checkIfCanDrop(this._dropTarget && this._dropTarget.parent)) {
+        if (!this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent)) {
           this._droppableEl.style.display = 'none';
           this._draggableEl.classList.add('no-drop');
         } else {
@@ -154,7 +154,7 @@ export class Droppable {
 
         this._droppableEl.style.display = 'none';
 
-        if (this._checkIfCanDrop(this._dropTarget) && element.node !== this._node) {
+        if (this._checkIfCanDrop(element, this._dropTarget) && element.node !== this._node) {
           // Add marked element for unmark in feature
           this._cacheOfDragOveredElements.add(element.node.el);
 
@@ -201,7 +201,7 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        if (!this._checkIfCanDrop(this._dropTarget && this._dropTarget.parent)) {
+        if (!this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent)) {
           this._droppableEl.style.display = 'none';
           this._draggableEl.classList.add('no-drop');
         } else {
@@ -486,11 +486,54 @@ export class Droppable {
    * If can drop function passed - do call for result
    * @private
    */
-  private _checkIfCanDrop(toParent) {
+  private _checkIfCanDrop(element, toParent) {
     if (!this._canDrop) {
       return true
     } else {
-      this._canDropHere = this._canDrop(this._node, this._node.parent, toParent);
+
+      // Lookup prev and next elements at the same level
+      let prevElem = null;
+      let nextElem = null;
+
+      // Index of target element (over)
+      const targetIndex = this._orderedNodes.indexOf(element);
+
+
+      if (this._dropPosition === 'above') {
+        const el = this._orderedNodes[targetIndex - 1];
+
+        if (el && el.node !== this._node) {
+          const sameLevelWithTarget = el.node.level === this._dropTarget.level;
+
+          if (sameLevelWithTarget) {
+            prevElem = el.node;
+          }
+        }
+
+        nextElem = this._dropTarget;
+      } else if (this._dropPosition === 'below') {
+        const el = this._orderedNodes[targetIndex + 1];
+
+        if (el && el.node !== this._node) {
+          const sameLevelWithTarget = el.node.level === this._dropTarget.level;
+
+          if (sameLevelWithTarget) {
+            nextElem = el.node;
+          }
+        }
+
+        prevElem = this._dropTarget;
+      }
+
+      this._canDropHere = this._canDrop(
+        this._node,
+        this._node.parent,
+        toParent,
+        this._dropPosition,
+        prevElem,
+        nextElem
+      );
+
       return this._canDropHere;
     }
   }

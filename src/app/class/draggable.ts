@@ -85,15 +85,23 @@ export class Draggable {
    */
   public dragStart(event) {
 
+    if (!this._node.canDrag) { return; }
+
+    // Emit event that drag started
     this._dragStart$.next();
 
+    // Store information about expand status. If node has been expanded, then we should expand it after drag
     this._expandedBeforeDrag = this._node.isExpanded();
+
+    // Collapse node before drag
     if (this._expandedBeforeDrag) {
       this._node.collapse();
       this._hideChildrenNodes(this._node);
     }
 
     this._logger.timeStart('DRAG_START');
+
+    // Update level 0 statuses
     this._nodes.forEach((node) => {
       if (node.level === 0) {
 

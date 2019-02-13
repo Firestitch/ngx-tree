@@ -6,10 +6,10 @@ import { TreeActionType } from '../../../../src/app/models/action.model';
 
 
 @Component({
-  selector: 'levels-limit',
-  templateUrl: 'levels-limit.component.html'
+  selector: 'fixed-fixed-ordering',
+  templateUrl: 'fixed-fixed-ordering.component.html'
 })
-export class LevelsLimitComponent {
+export class FixedFixedOrderingComponent {
   @ViewChild('tree')
   public tree: FsTreeComponent<any>;
 
@@ -18,8 +18,29 @@ export class LevelsLimitComponent {
     levels: 2,
     selection: false,
     childrenName: 'accounts',
-    canDrop: (node, fromParent, toParent) => {
-      return fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
+    changed: (data) => {
+      console.log('Data was changed: ', data);
+    },
+    sortBy: (data) => {
+      return data.sort((a, b) => {
+        if (a.id < b.id) { return -1; }
+        if (b.id < b.id) { return 1; }
+
+        return 0;
+      });
+    },
+    canDrag: (node) => {
+      return node.level > 0;
+    },
+    canDrop: (node, fromParent, toParent, dropPosition, prevElem, nextElem) => {
+      const cantDropToRootLevel = !!toParent; // should be not equal null
+
+      // Sorting Rule
+      const prevElSortCoimplied = prevElem && prevElem.data.id < node.data.id || !prevElem;
+      const nextElSortCoimplied = nextElem && node.data.id < nextElem.data.id || !nextElem;
+      const compliedWithSort = prevElSortCoimplied && nextElSortCoimplied;
+
+      return compliedWithSort && cantDropToRootLevel;
     },
     actions: [
       {

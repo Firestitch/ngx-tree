@@ -1,6 +1,6 @@
 export class ItemNode {
   public children: ItemNode[];
-  public data: string;
+  public data: any;
   public parent: ItemNode;
 
   constructor(data: any = {}) {

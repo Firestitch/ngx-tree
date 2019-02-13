@@ -15,7 +15,7 @@
                       [checked]="checklistSelection.isSelected(node)"
                       (change)="checklistSelection.toggle(node);">
         </mat-checkbox>
-        <div class="content" fsDraggableNodeTarget>
+        <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.data"
@@ -48,7 +48,7 @@
           [indeterminate]="descendantsPartiallySelected(node)"
           (change)="todoItemSelectionToggle(node)">
         </mat-checkbox>
-        <div class="content" fsDraggableNodeTarget>
+        <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.data"

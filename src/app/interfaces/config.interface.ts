@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { IAction } from './action.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 
@@ -8,7 +7,20 @@ export interface ITreeConfig<T> {
   selection?: boolean;
   data?: T;
   changed?: (data: T) => void;
+  sortBy?: (data: T[], parent?: FlatItemNode) => T[];
   childrenName?: string;
   actions?: IAction[];
-  canDrop?: (node?: FlatItemNode, fromParent?: FlatItemNode, toParent?: FlatItemNode) => boolean;
+  canDrag?: canDrag;
+  canDrop?: CanDrop;
 }
+
+export type canDrag = (node: FlatItemNode) => boolean;
+
+export type CanDrop = (
+  node?: FlatItemNode,
+  fromParent?: FlatItemNode,
+  toParent?: FlatItemNode,
+  dropPosition?: any,
+  prevElement?: FlatItemNode,
+  nextElement?: FlatItemNode,
+) => boolean;

@@ -3,7 +3,7 @@ import { ItemNode } from './item-node.model';
 
 export class FlatItemNode {
   public el: any;
-  public data: string;
+  public data: any;
   public level: number;
   public expandable: boolean;
   public parent: FlatItemNode;
@@ -13,6 +13,7 @@ export class FlatItemNode {
   public isExpanded;
   public collapse;
   public expand;
+  public canDrag = true;
 
   constructor(data: any = {}) {
     this.data = data.data || null;
@@ -24,6 +25,7 @@ export class FlatItemNode {
     this.isExpanded = data.isExpanded || function() { return false };
     this.collapse = data.collapse || function() { };
     this.expand = data.expand || function() { };
+    this.canDrag = data.canDrag === void 0 ? true : data.canDrag;
     this.hidden = this.isExpanded();
   }
 

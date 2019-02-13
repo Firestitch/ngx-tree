@@ -6,7 +6,8 @@ import {
   Component,
   ContentChild,
   ElementRef,
-  Input, OnDestroy,
+  Input,
+  OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild
@@ -74,7 +75,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private _database: FsTreeService, private _logger: LoggerService, private _cd: ChangeDetectorRef) {
+  constructor(private _database: FsTreeService<T>, private _logger: LoggerService, private _cd: ChangeDetectorRef) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
@@ -85,7 +86,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public ngOnInit() {
     this._subscribeToDataChnage();
 
-    this._database.initialize(this.treeControl, this.config.data, this.config.childrenName, this.config.levels);
+    this._database.initialize(this.treeControl, this.config);
     this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
   }
 
@@ -116,6 +117,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     flatNode.isExpanded = () => this.treeControl.isExpanded(flatNode);
     flatNode.collapse = () => this.treeControl.collapse(flatNode);
     flatNode.expand = () => this.treeControl.expand(flatNode);
+    flatNode.canDrag = this.config.canDrag ? this.config.canDrag(flatNode) : true;
 
     this._database.flatNodeMap.set(flatNode, node);
     this._database.nestedNodeMap.set(node, flatNode);
@@ -280,7 +282,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     const originalParent = parent && parent.original || null;
     const node = this._database.createNode(data, parent);
     this._database.insertNode(originalParent, node.original);
-    if (!parent.isExpanded()) {
+    if (parent && !parent.isExpanded()) {
       parent.expand();
     }
 

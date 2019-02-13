@@ -65,6 +65,10 @@
           flex-direction: row;
           align-items: center;
           cursor: grab;
+
+          &.no-drag {
+            cursor: default !important;
+          }
         }
       }
     }
