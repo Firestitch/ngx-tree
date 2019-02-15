@@ -145,6 +145,60 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     this.checklistSelection.isSelected(node)
       ? this.checklistSelection.select(...descendants)
       : this.checklistSelection.deselect(...descendants);
+
+    descendants.every(child =>
+      this.checklistSelection.isSelected(child)
+    );
+    this.checkAllParentsSelection(node);
+  }
+
+  /** Toggle a leaf to-do item selection. Check all the parents to see if they changed */
+  public todoLeafItemSelectionToggle(node: FlatItemNode): void {
+    this.checklistSelection.toggle(node);
+    this.checkAllParentsSelection(node);
+  }
+
+  /** Checks all the parents when a leaf node is selected/unselected **/
+  public checkAllParentsSelection(node: FlatItemNode): void {
+    let parent: FlatItemNode | null = this.getParentNode(node);
+    while (parent) {
+      this.checkRootNodeSelection(parent);
+      parent = this.getParentNode(parent);
+    }
+  }
+
+  /** Get the parent node of a node **/
+  public getParentNode(node: FlatItemNode): FlatItemNode | null {
+    const currentLevel = getLevel(node);
+
+    if (currentLevel < 1) {
+      return null;
+    }
+
+    const startIndex = this.treeControl.dataNodes.indexOf(node) - 1;
+
+    for (let i = startIndex; i >= 0; i--) {
+      const currentNode = this.treeControl.dataNodes[i];
+
+      if (getLevel(currentNode) < currentLevel) {
+        return currentNode;
+      }
+    }
+    return null;
+  }
+
+  /** Check root node checked state and change it accordingly */
+  public checkRootNodeSelection(node: FlatItemNode): void {
+    const nodeSelected = this.checklistSelection.isSelected(node);
+    const descendants = this.treeControl.getDescendants(node);
+    const descAllSelected = descendants.every(child =>
+      this.checklistSelection.isSelected(child)
+    );
+    if (nodeSelected && !descAllSelected) {
+      this.checklistSelection.deselect(node);
+    } else if (!nodeSelected && descAllSelected) {
+      this.checklistSelection.select(node);
+    }
   }
 
   /**

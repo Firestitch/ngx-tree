@@ -13,7 +13,7 @@
         <mat-checkbox class="checklist-leaf-node"
                       *ngIf="config.selection"
                       [checked]="checklistSelection.isSelected(node)"
-                      (change)="checklistSelection.toggle(node);">
+                      (change)="todoLeafItemSelectionToggle(node)">
         </mat-checkbox>
         <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
           <ng-template
