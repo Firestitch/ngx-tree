@@ -66,6 +66,14 @@ export class FsTreeService<T> implements OnDestroy {
     this.updateData(FsTreeChange.Init, this._data);
   }
 
+  public updateSort(target: ItemNode = null) {
+    if (target && target.children) {
+      target.children = treeSort(target.children, this._config.sortBy);
+    } else {
+      this._data = treeSort(this._data, this._config.sortBy);
+    }
+  }
+
   // Create new fresh node which is ready to be insterted into tree
   public createNode(data: any, parent: FlatItemNode = null) {
     const forLevel = parent ? parent.level + 1 : 0;

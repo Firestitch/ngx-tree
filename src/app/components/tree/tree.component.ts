@@ -366,6 +366,19 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
+   * Do reorder for target
+   * @param target
+   */
+  public updateSort(target: ItemNode) {
+    this._database.updateSort(target);
+
+    const payload = {
+      node: target,
+    };
+    this._database.updateData(FsTreeChange.ManualReorder, payload);
+  }
+
+  /**
    * Disabled reorder and block tree
    */
   public lockTree() {
