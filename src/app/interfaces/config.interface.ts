@@ -8,7 +8,7 @@ export interface ITreeConfig<T> {
   selection?: boolean;
   data?: T;
   changed?: (data: ITreeDataChange) => void;
-  sortBy?: (data: T[], parent?: FlatItemNode) => T[];
+  sortBy?: (data: T[], parent?: T ) => T[];
   childrenName?: string;
   actions?: IAction[];
   canDrag?: canDrag;

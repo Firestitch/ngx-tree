@@ -19,7 +19,7 @@ export function treeSort(
       }
     });
 
-    return sortDataBy(target, sortFn, target.parent);
+    return sortDataBy(target, sortFn);
   }
 }
 
@@ -34,6 +34,12 @@ export function sortDataBy(data: ItemNode[], sortFn, parent?) {
 
     return node.data;
   });
+
+  if (!parent && data.length > 0) {
+    parent = data[0].parent && data[0].parent.data;
+  } else if (parent) {
+    parent = parent.data;
+  }
 
   const sortedData = sortFn(cleanData, parent);
 

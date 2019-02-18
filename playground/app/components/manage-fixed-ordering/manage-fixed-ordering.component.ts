@@ -22,7 +22,6 @@ export class ManageFixedOrderingComponent {
       console.log('Data was changed: ', data);
     },
     sortBy: (data, parent) => {
-      debugger;
       if (!parent) { return data; }
 
       return data.sort((a, b) => {
