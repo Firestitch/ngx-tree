@@ -335,7 +335,9 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public appendElement(data: any = {}, parent: FlatItemNode = null) {
     const originalParent = parent && parent.original || null;
     const node = this._database.createNode(data, parent);
+
     this._database.insertNode(originalParent, node.original);
+
     if (parent && !parent.isExpanded()) {
       parent.expand();
     }
