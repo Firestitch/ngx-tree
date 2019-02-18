@@ -389,12 +389,11 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
         takeUntil(this._destroy$),
       )
       .subscribe((event: ITreeDataChange) => {
-        console.log(event);
         this.dataSource.data = [];
         this.dataSource.data = this._database.data;
 
         if (this.config.changed) {
-          this.config.changed(this.getData());
+          this.config.changed(event);
         }
       });
   }

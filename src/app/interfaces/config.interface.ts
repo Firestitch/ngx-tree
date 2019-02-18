@@ -1,12 +1,13 @@
 import { IAction } from './action.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
+import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
 
 export interface ITreeConfig<T> {
   levels?: number;
   selection?: boolean;
   data?: T;
-  changed?: (data: T) => void;
+  changed?: (data: ITreeDataChange) => void;
   sortBy?: (data: T[], parent?: FlatItemNode) => T[];
   childrenName?: string;
   actions?: IAction[];
