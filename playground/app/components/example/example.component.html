@@ -1,7 +1,7 @@
 <div style="float: right">
-  <button mat-raised-button color="primary" (click)="collapseAll()">Collapse All</button>
+  <button mat-raised-button (click)="expandAll()">Expand All</button>
   &nbsp;
-  <button mat-raised-button color="primary" (click)="expandAll()">Expand All</button>
+  <button mat-raised-button (click)="collapseAll()">Collapse All</button>
 </div>
 <fs-tree [config]="config" #tree>
   <ng-template fsTreeNode let-id="id" let-name="name">
