@@ -18,7 +18,7 @@
         <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
-            [ngTemplateOutletContext]="node.data"
+            [ngTemplateOutletContext]="node.templateContext"
           ></ng-template>
         </div>
         <fs-node-actions [actions]="actions" [node]="node">
@@ -51,7 +51,7 @@
         <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
-            [ngTemplateOutletContext]="node.data"
+            [ngTemplateOutletContext]="node.templateContext"
           ></ng-template>
         </div>
         <fs-node-actions *ngIf="actions.length > 0" [actions]="actions" [node]="node">

@@ -3,10 +3,7 @@ import { ItemNode } from './item-node.model';
 
 export class FlatItemNode {
   public el: any;
-  public data: any;
-  public level: number;
   public expandable: boolean;
-  public parent: FlatItemNode;
   public original: ItemNode;
   public originalParent: ItemNode;
   public hidden = false; // Need for droppable orderNodesByCoords
@@ -14,6 +11,12 @@ export class FlatItemNode {
   public collapse;
   public expand;
   public canDrag = true;
+  public templateContext: any = {};
+
+  private _dataStoredKeys = [];
+  private _data: any;
+  private _level: number;
+  private _parent: FlatItemNode;
 
   constructor(data: any = {}) {
     this.data = data.data || null;
@@ -27,6 +30,60 @@ export class FlatItemNode {
     this.expand = data.expand || function() { };
     this.canDrag = data.canDrag === void 0 ? true : data.canDrag;
     this.hidden = this.isExpanded();
+  }
+
+  get data() {
+    return this._data;
+  }
+
+  set data(value) {
+    this._data = value;
+    this._updateContext();
+  }
+
+  get level() {
+    return this._level;
+  }
+
+  set level(value) {
+    this._level = value;
+    this.templateContext.level = this.level;
+  }
+
+  get parent() {
+    return this._parent;
+  }
+
+  set parent(value) {
+    this._parent = value;
+    this.templateContext.parent = this.parent;
+  }
+
+  /**
+   * Do update for template Context
+   * @private
+   */
+  private _updateContext() {
+    // Remove previously stored data keys (deduplicate)
+    this._dataStoredKeys.forEach((key) => {
+      delete this.templateContext[key];
+    });
+
+    // Store new data keys
+    if (this.data) {
+      this._dataStoredKeys = Object.keys(this.data);
+    }
+
+    for (const key in this.data) {
+      const item = this.data[key];
+
+      if (this.data.hasOwnProperty(key)) {
+        this.templateContext[key] = item;
+      }
+    }
+
+    this.templateContext.level = this.level;
+    this.templateContext.parent = this.parent;
   }
 
 }

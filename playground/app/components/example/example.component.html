@@ -4,7 +4,7 @@
   <button mat-raised-button (click)="collapseAll()">Collapse All</button>
 </div>
 <fs-tree [config]="config" #tree>
-  <ng-template fsTreeNode let-id="id" let-name="name">
-    {{ name }} (ID: {{ id }})
+  <ng-template fsTreeNode let-id="id" let-name="name" let-level="level">
+    {{ name }} (ID: {{ id }}) {{level}}
   </ng-template>
 </fs-tree>
