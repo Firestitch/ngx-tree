@@ -38,6 +38,11 @@ export class FlatItemNode {
 
   set data(value) {
     this._data = value;
+
+    if (this.original) {
+      this.original.data = value
+    }
+
     this._updateContext();
   }
 

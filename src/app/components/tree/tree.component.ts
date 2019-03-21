@@ -304,6 +304,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
       node: node,
       index: insertIndex,
     };
+
     this._database.updateData(FsTreeChange.Insert, payload);
   }
 
@@ -324,6 +325,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
       node: node,
       index: insertIndex,
     };
+
     this._database.updateData(FsTreeChange.Insert, payload);
   }
 
@@ -349,6 +351,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
       node: node,
       index: 0,
     };
+
     this._database.updateData(FsTreeChange.Insert, payload);
   }
 
@@ -359,6 +362,13 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
    */
   public updateElementData(data: any = {}, target: FlatItemNode) {
     target.data = data;
+
+    // Notify about data change
+    const payload = {
+      node: target
+    };
+
+    this._database.updateData(FsTreeChange.Update, payload);
   }
 
   /**
