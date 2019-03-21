@@ -15,7 +15,7 @@ import {
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { Draggable } from '../class/draggable';
+import { Draggable } from '../classes/draggable';
 import { FsDraggableNodeContentDirective } from './draggable-node-content.directive';
 import { FsDraggableNodeTargetDirective } from './draggable-node-target.directive';
 import { FlatItemNode } from '../models/flat-item-node.model';

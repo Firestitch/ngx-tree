@@ -353,6 +353,15 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   }
 
   /**
+   * Update internal data for target
+   * @param data
+   * @param target
+   */
+  public updateElementData(data: any = {}, target: FlatItemNode) {
+    target.data = data;
+  }
+
+  /**
    * Remove node from DB
    * @param item
    */
