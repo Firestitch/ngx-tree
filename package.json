@@ -1,7 +1,7 @@
 {
   "name": "@firestitch/tree",
   "description": "@firestitch/tree",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/Firestitch/ngx-tree"
@@ -63,8 +63,7 @@
   "engines": {
     "node": ">=6.0.0"
   },
-  "peerDependencies": {},
-  "dependencies": {
-    "@firestitch/menu": "^0.1.6"
+  "peerDependencies": {
+    "@firestitch/menu": ">=7.0.0"
   }
 }
