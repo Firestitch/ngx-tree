@@ -6,7 +6,7 @@ import {
   Component,
   ContentChild,
   ElementRef,
-  Input,
+  Input, NgZone,
   OnDestroy,
   OnInit,
   TemplateRef,
@@ -75,7 +75,12 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private _database: FsTreeService<T>, private _logger: LoggerService, private _cd: ChangeDetectorRef) {
+  constructor(
+    private _database: FsTreeService<T>,
+    private _logger: LoggerService,
+    private _cd: ChangeDetectorRef,
+    private _zone: NgZone,
+  ) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
@@ -224,14 +229,18 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
       insertIndex = this._database.insertNode(dropInto, node);
     }
 
-    // Notify about data change
-    const payload = {
-      fromParent: fromParent,
-      toParent: node.parent,
-      node: node,
-      index: insertIndex,
-    };
-    this._database.updateData(FsTreeChange.Reorder, payload);
+    // Run in zone back because before it was ran outside angular
+    this._zone.run(() => {
+      // Notify about data change
+      const payload = {
+        fromParent: fromParent,
+        toParent: node.parent,
+        node: node,
+        index: insertIndex,
+      };
+
+      this._database.updateData(FsTreeChange.Reorder, payload);
+    });
   }
 
   /**
