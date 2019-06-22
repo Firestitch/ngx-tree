@@ -94,6 +94,8 @@ export class Draggable {
 
     if (!this._node.canDrag) { return; }
 
+    this._touchFix(event);
+
     this.calcAutoScrollParams();
 
     // Emit event that drag started
@@ -368,7 +370,11 @@ export class Draggable {
     const containerSizes = this._containerElement.nativeElement.getBoundingClientRect();
     this._containerHeight = containerSizes.height;
 
-    this._screenHeight = screen.availHeight || screen.height;
+    if (window.matchMedia('(orientation: landscape)').matches) {
+      this._screenHeight = screen.availWidth || screen.width;
+    } else {
+      this._screenHeight = screen.availHeight || screen.height;
+    }
 
     this._limitToScroll = this._screenHeight * 0.15;
     if (this._limitToScroll > 100) {
