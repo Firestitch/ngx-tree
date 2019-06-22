@@ -76,6 +76,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
 
   constructor(
+    private _el: ElementRef,
     private _database: FsTreeService<T>,
     private _logger: LoggerService,
     private _cd: ChangeDetectorRef,
@@ -90,6 +91,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   public ngOnInit() {
     this._subscribeToDataChnage();
+    this._database.containerElement = this._el;
 
     this._database.initialize(this.treeControl, this.config);
     this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];

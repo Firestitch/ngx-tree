@@ -119,7 +119,7 @@ export class Droppable {
         //   this._droppableEl.style.display = 'none';
         //   return;
         // }
-        this._droppableEl.style.display = 'block';
+        this.show();
         const top = element.dimentions.top - this._droppableHalfHeight;
         this._droppableEl.style.top = top + 'px';
 
@@ -137,7 +137,7 @@ export class Droppable {
 
         // Hide drop area if can't drop
         if (!this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent)) {
-          this._droppableEl.style.display = 'none';
+          this.hide();
           this._draggableEl.classList.add('no-drop');
         } else {
           this._draggableEl.classList.remove('no-drop');
@@ -152,7 +152,7 @@ export class Droppable {
 
         this._dropTarget = element.node;
 
-        this._droppableEl.style.display = 'none';
+        this.hide();
 
         if (this._checkIfCanDrop(element, this._dropTarget) && element.node !== this._node) {
           // Add marked element for unmark in feature
@@ -176,7 +176,7 @@ export class Droppable {
         //   this._droppableEl.style.display = 'none';
         //   return;
         // }
-        this._droppableEl.style.display = 'block';
+        this.show();
         const top = element.dimentions.top + element.dimentions.height - this._droppableHalfHeight;
         this._droppableEl.style.top = top + 'px';
 
@@ -202,7 +202,7 @@ export class Droppable {
 
         // Hide drop area if can't drop
         if (!this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent)) {
-          this._droppableEl.style.display = 'none';
+          this.hide();
           this._draggableEl.classList.add('no-drop');
         } else {
           this._draggableEl.classList.remove('no-drop');
@@ -232,6 +232,20 @@ export class Droppable {
     });
 
     this._logger.log('ORDER', [this._orderedNodes, this._nodes]);
+  }
+
+  /**
+   * Show droppable element
+   */
+  public show() {
+    this._droppableEl.style.display = 'block';
+  }
+
+  /**
+   * Hide droppable element
+   */
+  public hide() {
+    this._droppableEl.style.display = 'none';
   }
 
   public destroy() {

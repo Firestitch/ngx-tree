@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { ElementRef, Injectable, OnDestroy } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 
 import { Observable, Subject } from 'rxjs';
@@ -15,6 +15,8 @@ import { sortDataBy, treeSort } from '../helpers/tree-sort';
 
 @Injectable()
 export class FsTreeService<T> implements OnDestroy {
+
+  public containerElement: ElementRef;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   public flatNodeMap = new Map<FlatItemNode, ItemNode>();

@@ -62,6 +62,7 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   public ngOnInit() {
     this._zone.runOutsideAngular(() => {
       this._draggable = new Draggable(
+        this._db.containerElement,
         this.node,
         this.draggableContent,
         this.draggableTarget,

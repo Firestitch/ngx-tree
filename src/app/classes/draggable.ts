@@ -15,6 +15,7 @@ export class Draggable {
   public dragging = false;
 
   private _droppable: Droppable;
+  private _scrolled = false;
 
   // Drag
   // Draggable target from event.target when drag started
@@ -36,6 +37,10 @@ export class Draggable {
   // Dimentions for dragTarget for future calculations
   private _dragDims;
 
+  private _containerHeight = 0;
+  private _screenHeight = 0;
+  private _limitToScroll = 0;
+
   // Handlers for remove listeners in feature
   private _dragStartHandler = this.dragStart.bind(this);
   private _moveHandler = this.dragTo.bind(this);
@@ -43,6 +48,7 @@ export class Draggable {
 
   /**
    * Class for control mouse/touch drag
+   * @param _containerElement
    * @param _node
    * @param _el
    * @param _target
@@ -51,6 +57,7 @@ export class Draggable {
    * @param _logger
    */
   constructor(
+    private _containerElement: ElementRef,
     private _node: FlatItemNode,
     private _el: ElementRef,
     private _target: ElementRef,
@@ -86,6 +93,8 @@ export class Draggable {
   public dragStart(event) {
 
     if (!this._node.canDrag) { return; }
+
+    this.calcAutoScrollParams();
 
     // Emit event that drag started
     this._dragStart$.next();
@@ -136,20 +145,7 @@ export class Draggable {
 
     this._initDraggableElement(event);
 
-    this._droppable = new Droppable(
-      this._node,
-      this._el,
-      this._draggableEl,
-      this._nodes,
-      this._dragDims,
-      this._expandNode$,
-      this._restrictions.canDrop,
-      this._logger,
-    );
-
-    this._droppable.shift((event.x || event.clientX) - this._dragDims.left);
-
-    this._node.el.classList.add('draggable-elem');
+    this._initDroppable(event);
 
     window.document.addEventListener('mousemove', this._moveHandler);
     window.document.addEventListener('touchmove', this._moveHandler, { passive: false } as any);
@@ -168,13 +164,38 @@ export class Draggable {
   public dragTo(event) {
     this._touchFix(event);
 
-    this._droppable.moveDroppable(event);
-
     const topOffset = (event.y || event.clientY) - (this._dragDims.height / 2);
     const leftOffset = (event.x || event.pageX) - this._shiftX;
 
     this._draggableEl.style.top =  topOffset + 'px';
     this._draggableEl.style.left =  leftOffset + 'px';
+
+    if (event.clientY < this._limitToScroll) {
+      this._scrolled = true;
+
+      window.scrollTo(event.clientX, window.pageYOffset - 2);
+
+      this.destroyDroppable();
+
+      return;
+    }
+
+    if (this._screenHeight - this._limitToScroll < event.clientY) {
+      this._scrolled = true;
+
+      window.scrollTo(event.clientX, window.pageYOffset + 2);
+
+      this.destroyDroppable();
+
+      return;
+    }
+
+    if (this._scrolled) {
+      this._initDroppable(event);
+      this._scrolled = false;
+    }
+
+    this._droppable.moveDroppable(event);
   }
 
   /**
@@ -206,10 +227,9 @@ export class Draggable {
     window.document.body.classList.remove('block-selection');
     this._node.el.classList.remove('draggable-elem');
 
-    this._draggableEl.remove();
-    this._droppable.destroy();
+    this.destroyDroppable();
 
-    this._droppable = null;
+    this._draggableEl.remove();
     this._draggableEl = null;
   }
 
@@ -222,6 +242,13 @@ export class Draggable {
 
     this._destroy$.next();
     this._destroy$.complete();
+  }
+
+  public destroyDroppable() {
+    if (this._droppable) {
+      this._droppable.destroy();
+      this._droppable = null;
+    }
   }
 
   /**
@@ -261,6 +288,23 @@ export class Draggable {
     this._el.nativeElement.append(el);
 
     this._draggableEl = el;
+  }
+
+  private _initDroppable(event) {
+    this._droppable = new Droppable(
+      this._node,
+      this._el,
+      this._draggableEl,
+      this._nodes,
+      this._dragDims,
+      this._expandNode$,
+      this._restrictions.canDrop,
+      this._logger,
+    );
+
+    this._droppable.shift((event.x || event.clientX) - this._dragDims.left);
+
+    this._node.el.classList.add('draggable-elem');
   }
 
   /**
@@ -317,6 +361,18 @@ export class Draggable {
         childNode.hidden = true;
         this._hideChildrenNodes(childNode);
       });
+    }
+  }
+
+  private calcAutoScrollParams() {
+    const containerSizes = this._containerElement.nativeElement.getBoundingClientRect();
+    this._containerHeight = containerSizes.height;
+
+    this._screenHeight = screen.availHeight || screen.height;
+
+    this._limitToScroll = this._screenHeight * 0.15;
+    if (this._limitToScroll > 100) {
+      this._limitToScroll = 100;
     }
   }
 
