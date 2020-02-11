@@ -17,3 +17,6 @@ export { FlatItemNode} from './app/models/flat-item-node.model';
 export { ItemNode } from './app/models/item-node.model';
 
 export { FsTreeChange } from './app/enums/tree-change.enum';
+
+
+export { FsTreeNodeDirective } from './app/directives/tree-node.directive';

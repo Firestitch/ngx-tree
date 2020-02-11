@@ -41,10 +41,10 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   @Output()
   public drop = new EventEmitter<IDragEnd>();
 
-  @ContentChild(FsDraggableNodeContentDirective, { read: ElementRef })
+  @ContentChild(FsDraggableNodeContentDirective, { read: ElementRef, static: true })
   public draggableContent: ElementRef;
 
-  @ContentChild(FsDraggableNodeTargetDirective, { read: ElementRef })
+  @ContentChild(FsDraggableNodeTargetDirective, { read: ElementRef, static: true })
   public draggableTarget: ElementRef;
 
   private _draggable: Draggable;

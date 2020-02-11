@@ -66,7 +66,6 @@ export class FlatItemNode {
 
   /**
    * Do update for template Context
-   * @private
    */
   private _updateContext() {
     // Remove previously stored data keys (deduplicate)

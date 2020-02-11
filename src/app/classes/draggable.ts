@@ -255,7 +255,6 @@ export class Draggable {
 
   /**
    * Subscribe to events
-   * @private
    */
   private _subscribe() {
     this._expandNode$
@@ -313,7 +312,6 @@ export class Draggable {
    * Do check and update hidden status for all children for target node
    * @param node
    * @param showFirstLevel
-   * @private
    */
   private _checkChildrenExpandedStatus(node: FlatItemNode, showFirstLevel = false) {
     if (node.original.children) {
@@ -351,7 +349,6 @@ export class Draggable {
   /**
    * Mark all children nodes as hidden
    * @param node
-   * @private
    */
   private _hideChildrenNodes(node: FlatItemNode) {
     if (node.original.children) {

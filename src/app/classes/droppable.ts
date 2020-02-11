@@ -302,7 +302,6 @@ export class Droppable {
   /**
    * Return X coordinate for parent with level 0
    * @param node
-   * @private
    */
   private _getRootPosition(node) {
     if (!node.parent) {
@@ -383,7 +382,6 @@ export class Droppable {
   /**
    * Return drop position based on persentage of overlap
    * @param isec
-   * @private
    */
   private _getPositionByIsec(isec) {
     if (isec < 0.30) {
@@ -397,7 +395,6 @@ export class Droppable {
 
   /**
    * Remove classes for elements which were under our drag
-   * @private
    */
   private _cancelDragOverSelections() {
     this._cacheOfDragOveredElements.forEach((element) => {
@@ -410,7 +407,6 @@ export class Droppable {
    * Update padding for drop area when position is above
    * @param currentEl
    * @param eventX
-   * @private
    */
   private _updateLevelPaddingAbove(currentEl, eventX) {
     const elIndex = this._orderedNodes.indexOf(currentEl);
@@ -434,7 +430,6 @@ export class Droppable {
    * Update padding for drop area when position is below
    * @param currentEl
    * @param eventX
-   * @private
    */
   private _updateLevelPaddingBelow(currentEl: IOrderedNode, eventX: number) {
     const elIndex = this._orderedNodes.indexOf(currentEl);
@@ -461,7 +456,6 @@ export class Droppable {
   /**
    * Lookup above now with same level as target
    * @param element
-   * @private
    */
   private _lookupNodeWithLevelAbove(element: IOrderedNode) {
     let dropTarget = null;
@@ -480,7 +474,6 @@ export class Droppable {
   /**
    * Lookup below now with same level as target
    * @param element
-   * @private
    */
   private _lookupNodeWithLevelBelow(element) {
     let dropTarget = null;
@@ -498,7 +491,6 @@ export class Droppable {
 
   /**
    * If can drop function passed - do call for result
-   * @private
    */
   private _checkIfCanDrop(element, toParent) {
     if (!this._canDrop) {
@@ -555,7 +547,6 @@ export class Droppable {
   /**
    * Starts timer for expand current node
    * @param node
-   * @private
    */
   private _startExpandTimer(node) {
     this._timerStarted = true;
@@ -570,7 +561,6 @@ export class Droppable {
 
   /**
    * Cancel timer for expand
-   * @private
    */
   private _cancelExpandTimer() {
     this._timerDestroy$.next();

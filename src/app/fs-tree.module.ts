@@ -1,14 +1,14 @@
-import { ModuleWithProviders, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import {
-  MatButtonModule,
-  MatCheckboxModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule,
-  MatTreeModule
-} from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatInputModule } from '@angular/material/input';
+import { MatTreeModule } from '@angular/material/tree';
+
 import { FsMenuModule } from '@firestitch/menu';
 
 import { FsTreeComponent } from './components/tree/tree.component';
@@ -22,6 +22,7 @@ import { FsDraggableNodeContentDirective } from './directives/draggable-node-con
 @NgModule({
   imports: [
     CommonModule,
+    RouterModule,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -33,8 +34,6 @@ import { FsDraggableNodeContentDirective } from './directives/draggable-node-con
   exports: [
     FsTreeComponent,
     FsTreeNodeDirective,
-  ],
-  entryComponents: [
   ],
   declarations: [
     FsTreeComponent,
@@ -48,11 +47,4 @@ import { FsDraggableNodeContentDirective } from './directives/draggable-node-con
     // FsComponentService,
   ],
 })
-export class FsTreeModule {
-  static forRoot(): ModuleWithProviders {
-    return {
-      ngModule: FsTreeModule,
-      // providers: [FsComponentService]
-    };
-  }
-}
+export class FsTreeModule {}
