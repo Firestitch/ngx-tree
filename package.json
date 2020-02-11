@@ -24,7 +24,8 @@
     "package:test": "cd tools && npm run cli:package:test",
     "package:publish": "cd tools && npm run cli:package:publish",
     "demo:build": "cd tools && npm run cli:demo",
-    "serve": "cd tools && npm run cli:serve"
+    "serve": "cd tools && npm run cli:serve",
+    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.900.1",
