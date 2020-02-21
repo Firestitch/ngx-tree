@@ -6,7 +6,7 @@ export { FsTreeModule } from './app/fs-tree.module';
 
 export { FsTreeComponent} from './app/components/tree/tree.component';
 
-export { ITreeConfig } from './app/interfaces/config.interface';
+export { CanDrop, ITreeConfig, canDrag } from './app/interfaces/config.interface';
 export { IAction, IActionItem } from './app/interfaces/action.interface';
 export { IDragEnd, IOrderedNode } from './app/interfaces/draggable.interface';
 export { ITreeDataChange } from './app/interfaces/tree-data-change.interface';
