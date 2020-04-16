@@ -6,7 +6,8 @@ import {
   KeyValueDiffers,
   OnInit
 } from '@angular/core';
-import { FsTreeAction } from '@firestitch/tree';
+
+import { FsTreeAction } from '../../interfaces/action.interface';
 
 import { Action } from '../../models/action.model';
 import { FlatItemNode } from '../../models/flat-item-node.model';
