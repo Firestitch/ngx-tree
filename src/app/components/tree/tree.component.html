@@ -21,7 +21,7 @@
             [ngTemplateOutletContext]="node.templateContext"
           ></ng-template>
         </div>
-        <fs-node-actions [actions]="actions" [node]="node">
+        <fs-node-actions [rawActions]="actions" [node]="node">
         </fs-node-actions>
       </div>
     </div>
@@ -54,7 +54,7 @@
             [ngTemplateOutletContext]="node.templateContext"
           ></ng-template>
         </div>
-        <fs-node-actions *ngIf="actions.length > 0" [actions]="actions" [node]="node">
+        <fs-node-actions *ngIf="actions.length > 0" [rawActions]="actions" [node]="node">
         </fs-node-actions>
       </div>
     </div>

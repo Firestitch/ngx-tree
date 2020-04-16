@@ -21,7 +21,6 @@ import { FsTreeService } from '../../services/tree.service';
 
 import { ItemNode } from '../../models/item-node.model';
 import { FlatItemNode } from '../../models/flat-item-node.model';
-import { Action } from '../../models/action.model';
 
 import { getLevel } from '../../helpers/get-level';
 import { isExpandable } from '../../helpers/is-expandable';
@@ -34,6 +33,7 @@ import { IDragEnd } from '../../interfaces/draggable.interface';
 import { LoggerService } from '../../services/logger.service';
 import { ITreeDataChange } from '../../interfaces/tree-data-change.interface';
 import { FsTreeChange } from '../../enums/tree-change.enum';
+import { FsTreeAction } from '../../interfaces/action.interface';
 
 
 @Component({
@@ -62,7 +62,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public dataSource: MatTreeFlatDataSource<ItemNode, FlatItemNode>;
 
   // List of actions for tree
-  public actions: Action[] = [];
+  public actions: FsTreeAction[] = [];
 
   // Nodes can be dragged&dropped. Draggable flag
   public reorder = true;
@@ -94,7 +94,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     this._database.containerElement = this._el;
 
     this._database.initialize(this.treeControl, this.config);
-    this.actions = this.config.actions ? this.config.actions.map((action) => new Action(action)) : [];
+    this.actions = this.config.actions || [];
   }
 
   public ngOnDestroy() {

@@ -27,6 +27,23 @@ export class LevelsLimitComponent {
         icon: 'move_vert',
         items: [
           {
+            label: 'Actions Group',
+            items: [
+              {
+                label: 'Action 1',
+                click: (node) => {
+                  console.log('action 1 clicked');
+                },
+              },
+              {
+                label: 'Action 2',
+                click: (node) => {
+                  console.log('action 2 clicked');
+                }
+              }
+            ],
+          },
+          {
             label: 'Create Level 2 Object',
             show: (node) => {
               return node.level === 0;

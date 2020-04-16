@@ -1,4 +1,4 @@
-import { IAction } from './action.interface';
+import { FsTreeAction } from './action.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
@@ -10,7 +10,7 @@ export interface ITreeConfig<T> {
   changed?: (data: ITreeDataChange) => void;
   sortBy?: (data: T[], parent?: T ) => T[];
   childrenName?: string;
-  actions?: IAction[];
+  actions?: FsTreeAction[];
   canDrag?: canDrag;
   canDrop?: CanDrop;
 }

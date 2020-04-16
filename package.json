@@ -48,7 +48,7 @@
     "@firestitch/drawer": "^8.0.4",
     "@firestitch/example": "^9.0.0",
     "@firestitch/iframe": "^8.0.0",
-    "@firestitch/menu": "^9.0.2",
+    "@firestitch/menu": "^9.1.0",
     "@firestitch/message": "^8.1.0",
     "codelyzer": "^5.2.1",
     "cpx": "^1.5.0",
