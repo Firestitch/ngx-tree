@@ -53,7 +53,7 @@ export class FixedFixedOrderingComponent {
               return node.level === 0;
             },
             click: (node) => {
-              this.tree.appendElement({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node)
+              this.tree.append({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node)
             }
           },
           {
@@ -62,7 +62,7 @@ export class FixedFixedOrderingComponent {
               return node.level === 1;
             },
             click: (node) => {
-              this.tree.insertElementAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
+              this.tree.insertAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
             }
           },
           {
@@ -71,13 +71,13 @@ export class FixedFixedOrderingComponent {
               return node.level === 1;
             },
             click: (node) => {
-              this.tree.insertElementBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
+              this.tree.insertBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
             }
           },
           {
             label: 'Delete',
             click: (node) => {
-              this.tree.removeNode(node)
+              this.tree.remove(node)
             }
           }
         ],
@@ -95,7 +95,7 @@ export class FixedFixedOrderingComponent {
   }
 
   public createRootNode() {
-    this.tree.appendElement({ name: 'Root Object', id: this.getRandomId(100, 999) })
+    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) })
   }
 
   private getRandomId(min, max) {

@@ -1,44 +1,76 @@
-import { ElementRef, Injectable, OnDestroy } from '@angular/core';
-import { FlatTreeControl } from '@angular/cdk/tree';
+import {
+  ChangeDetectorRef,
+  ElementRef,
+  Injectable,
+  NgZone,
+  OnDestroy,
+} from '@angular/core';
 
-import { Observable, Subject } from 'rxjs';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
+import { SelectionModel } from '@angular/cdk/collections';
+
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
+import { LoggerService } from './logger.service';
+import { FsTreeDatabaseService } from './tree-database.service';
 
 import { ItemNode } from '../models/item-node.model';
 import { FlatItemNode } from '../models/flat-item-node.model';
-import { treeBuilder } from '../helpers/tree-builder';
-import { FsTreeChange } from '../enums/tree-change.enum';
-import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+
+import { getLevel } from '../helpers/get-level';
+import { isExpandable } from '../helpers/is-expandable';
+import { dataBuilder } from '../helpers/data-builder';
+import { getChildren } from '../helpers/get-children';
+
 import { ITreeConfig } from '../interfaces/config.interface';
-import { sortDataBy, treeSort } from '../helpers/tree-sort';
+import { IDragEnd } from '../interfaces/draggable.interface';
+import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+
+import { FsTreeChange } from '../enums/tree-change.enum';
+
 
 
 @Injectable()
 export class FsTreeService<T> implements OnDestroy {
 
-  public containerElement: ElementRef;
-
-  /** Map from flat node to nested node. This helps us finding the nested node to be modified */
-  public flatNodeMap = new Map<FlatItemNode, ItemNode>();
-
-  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-  public nestedNodeMap = new Map<ItemNode, FlatItemNode>();
+  public config: ITreeConfig<T> = {};
 
   public treeControl: FlatTreeControl<FlatItemNode>;
+  public treeFlattener: MatTreeFlattener<ItemNode, FlatItemNode>;
+  public dataSource: MatTreeFlatDataSource<ItemNode, FlatItemNode>;
 
-  private _data: ItemNode[] = [];
-  private _config: ITreeConfig<T>;
-  private _dataChange = new Subject<ITreeDataChange>();
+  // Nodes can be dragged&dropped. Draggable flag
+  public reorder = true;
+
+  // Possibility to expand/collapse for nodes
+  public blocked = false;
+
+  /** The selection for checklist */
+  public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
+
   private _destroy$ = new Subject<void>();
 
-  constructor() {}
+  constructor(
+    private _database: FsTreeDatabaseService<T>,
+    private _logger: LoggerService,
+    private _cd: ChangeDetectorRef,
+    private _zone: NgZone,
+  ) {
+    this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
+    this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
+    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-  get dataChange(): Observable<ITreeDataChange> {
-    return this._dataChange.pipe(takeUntil(this._destroy$));
+    // this._logger.enabled = true;
   }
 
-  get data(): ItemNode[] {
-    return this._data;
+  public init(el: ElementRef, config) {
+    this._subscribeToDataChnage();
+    this._database.containerElement = el;
+    this.config = config;
+
+    this._database.initialize(this.treeControl, this.config);
   }
 
   public ngOnDestroy() {
@@ -46,149 +78,340 @@ export class FsTreeService<T> implements OnDestroy {
     this._destroy$.complete();
   }
 
-  public initialize(
-    treeControl: FlatTreeControl<FlatItemNode>,
-    config: ITreeConfig<T>,
-  ) {
-    this.treeControl = treeControl;
-    this._config = config;
-    // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
-    // file node as children.
-    this._data = treeBuilder(
-      config.data,
-      0,
-      null,
-      config.childrenName,
-      config.levels
+  /**
+   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
+   */
+  public transformer = (node: ItemNode, level: number) => {
+    const existingNode = this._database.nestedNodeMap.get(node);
+    const flatNode = existingNode && existingNode.data === node.data
+      ? existingNode
+      : new FlatItemNode();
+
+    flatNode.data = node.data;
+    flatNode.original = node;
+    flatNode.parent = this._database.nestedNodeMap.get(node.parent);
+    flatNode.originalParent = this._database.flatNodeMap.get(flatNode.parent);
+    flatNode.level = level;
+    flatNode.expandable = (node.children && node.children.length > 0);
+    flatNode.isExpanded = () => this.treeControl.isExpanded(flatNode);
+    flatNode.collapse = () => this.treeControl.collapse(flatNode);
+    flatNode.expand = () => this.treeControl.expand(flatNode);
+    flatNode.canDrag = this.config.canDrag ? this.config.canDrag(flatNode) : true;
+
+    this._database.flatNodeMap.set(flatNode, node);
+    this._database.nestedNodeMap.set(node, flatNode);
+
+    return flatNode;
+  };
+
+  /** Whether all the descendants of the node are selected */
+  public descendantsAllSelected(node: FlatItemNode): boolean {
+    const descendants = this.treeControl.getDescendants(node);
+    return descendants.every(child => this.checklistSelection.isSelected(child));
+  }
+
+  /** Whether part of the descendants are selected */
+  public descendantsPartiallySelected(node: FlatItemNode): boolean {
+    const descendants = this.treeControl.getDescendants(node);
+    const result = descendants.some(child => this.checklistSelection.isSelected(child));
+    return result && !this.descendantsAllSelected(node);
+  }
+
+  /** Toggle the to-do item selection. Select/deselect all the descendants node */
+  public todoItemSelectionToggle(node: FlatItemNode): void {
+    this.checklistSelection.toggle(node);
+    const descendants = this.treeControl.getDescendants(node);
+    this.checklistSelection.isSelected(node)
+      ? this.checklistSelection.select(...descendants)
+      : this.checklistSelection.deselect(...descendants);
+
+    descendants.every(child =>
+      this.checklistSelection.isSelected(child)
     );
-
-    this._data = treeSort(this._data, config.sortBy);
-
-    // Notify the change.
-    this.updateData(FsTreeChange.Init, this._data);
+    this.checkAllParentsSelection(node);
   }
 
-  public updateSort(target: ItemNode = null) {
-    if (target && target.children) {
-      target.children = treeSort(target.children, this._config.sortBy);
-    } else {
-      this._data = treeSort(this._data, this._config.sortBy);
+  /** Toggle a leaf to-do item selection. Check all the parents to see if they changed */
+  public todoLeafItemSelectionToggle(node: FlatItemNode): void {
+    this.checklistSelection.toggle(node);
+    this.checkAllParentsSelection(node);
+  }
+
+  /** Checks all the parents when a leaf node is selected/unselected **/
+  public checkAllParentsSelection(node: FlatItemNode): void {
+    let parent: FlatItemNode | null = this.getParentNode(node);
+    while (parent) {
+      this.checkRootNodeSelection(parent);
+      parent = this.getParentNode(parent);
     }
   }
 
-  // Create new fresh node which is ready to be insterted into tree
-  public createNode(data: any, parent: FlatItemNode = null) {
-    const forLevel = parent ? parent.level + 1 : 0;
-    const node = treeBuilder(data, forLevel, parent, this._config.childrenName);
+  /** Get the parent node of a node **/
+  public getParentNode(node: FlatItemNode): FlatItemNode | null {
+    const currentLevel = getLevel(node);
 
-    return new FlatItemNode({
-      data: data,
-      original: node,
+    if (currentLevel < 1) {
+      return null;
+    }
+
+    const startIndex = this.treeControl.dataNodes.indexOf(node) - 1;
+
+    for (let i = startIndex; i >= 0; i--) {
+      const currentNode = this.treeControl.dataNodes[i];
+
+      if (getLevel(currentNode) < currentLevel) {
+        return currentNode;
+      }
+    }
+    return null;
+  }
+
+  /** Check root node checked state and change it accordingly */
+  public checkRootNodeSelection(node: FlatItemNode): void {
+    const nodeSelected = this.checklistSelection.isSelected(node);
+    const descendants = this.treeControl.getDescendants(node);
+    const descAllSelected = descendants.every(child =>
+      this.checklistSelection.isSelected(child)
+    );
+    if (nodeSelected && !descAllSelected) {
+      this.checklistSelection.deselect(node);
+    } else if (!nodeSelected && descAllSelected) {
+      this.checklistSelection.select(node);
+    }
+  }
+
+  /**
+   * Setup drag
+   * @param node
+   */
+  public onDragStart(node: FlatItemNode) {}
+
+  public onDrop(data: IDragEnd) {
+
+    if (data.dropInto === data.node) { return; }
+
+    const dropInto = this._database.flatNodeMap.get(data.dropInto);
+    const node = this._database.flatNodeMap.get(data.node);
+    const fromParent = node.parent;
+    let insertIndex = null;
+
+    if (data.dropPosition === 'above') {
+      insertIndex = this._database.insertNodeAbove(dropInto, node);
+    } else if (data.dropPosition === 'below') {
+      insertIndex = this._database.insertNodeBelow(dropInto, node);
+    } else {
+      insertIndex = this._database.insertNode(dropInto, node);
+    }
+
+    // Run in zone back because before it was ran outside angular
+    this._zone.run(() => {
+      // Notify about data change
+      const payload = {
+        fromParent: fromParent,
+        toParent: node.parent,
+        node: node,
+        index: insertIndex,
+      };
+
+      this._database.updateData(FsTreeChange.Reorder, payload);
+    });
+  }
+
+  /**
+   * Custom method for expand/collapse, because we must check blocked flag before
+   * @param node
+   */
+  public toggleNode(node) {
+    if (!this.blocked) {
+      if (this.treeControl.isExpanded(node)) {
+        this.treeControl.collapse(node);
+      } else {
+        this.treeControl.expand(node);
+      }
+    }
+  }
+
+  /**
+   * Transform tree to object
+   */
+  public getData() {
+    return dataBuilder(this.dataSource.data, this.config.childrenName);
+  }
+
+  /**
+   * Collapse nodes
+   */
+  public collapseAll() {
+    this.treeControl.collapseAll();
+  }
+
+  /**
+   * Expand nodes
+   */
+  public expandAll() {
+    this.treeControl.expandAll();
+  }
+
+  /**
+   * Enable drag&drop
+   */
+  public enableReorder() {
+    this.reorder = true;
+
+    this._cd.markForCheck();
+  }
+
+  /**
+   * Disable drag&drop
+   */
+  public disableReorder() {
+    this.reorder = false;
+
+    this._cd.markForCheck();
+  }
+
+  /**
+   * Insert element above target
+   * @param data
+   * @param target
+   */
+  public insertNodeAbove(data: any = {}, target: FlatItemNode = null) {
+    const originalParent = target && target.original || null;
+    const node = this._database.createNode(data, target);
+    const insertIndex = this._database.insertNodeAbove(originalParent, node.original);
+
+    // Notify about data change
+    const payload = {
+      position: 'above',
+      parent: target,
+      node: node,
+      index: insertIndex,
+    };
+
+    this._database.updateData(FsTreeChange.Insert, payload);
+  }
+
+  /**
+   * Insert element below target
+   * @param data
+   * @param target
+   */
+  public insertNodeBelow(data: any = {}, target: FlatItemNode = null) {
+    const originalParent = target && target.original || null;
+    const node = this._database.createNode(data, target);
+    const insertIndex = this._database.insertNodeBelow(originalParent, node.original);
+
+    // Notify about data change
+    const payload = {
+      position: 'below',
+      parent: target,
+      node: node,
+      index: insertIndex,
+    };
+
+    this._database.updateData(FsTreeChange.Insert, payload);
+  }
+
+  /**
+   * Insert element as child element for target node
+   * @param data
+   * @param parent
+   */
+  public appendNode(data: any = {}, parent: FlatItemNode = null) {
+    const originalParent = parent && parent.original || null;
+    const node = this._database.createNode(data, parent);
+
+    this._database.insertNode(originalParent, node.original);
+
+    if (parent && !parent.isExpanded()) {
+      parent.expand();
+    }
+
+    // Notify about data change
+    const payload = {
+      position: 'into',
       parent: parent,
-      originalParent: parent ? parent.original : null,
-      level: parent ? parent.level + 1 : 0
-    });
+      node: node,
+      index: 0,
+    };
+
+    this._database.updateData(FsTreeChange.Insert, payload);
   }
 
-  public insertNodeAbove(target: ItemNode, node: ItemNode): number {
+  /**
+   * Update internal data for target
+   * @param data
+   * @param target
+   */
+  public updateNodeData(data: any = {}, target: FlatItemNode) {
+    target.data = data;
 
-    const parent = target.parent;
+    // Notify about data change
+    const payload = {
+      node: target
+    };
 
-    this.removeItem(node);
-
-    let insertedIndex = null;
-
-    if (parent) {
-      const targetIndex = parent.children.indexOf(target);
-      parent.children.splice(targetIndex, 0, node);
-      parent.children = sortDataBy(parent.children, this._config.sortBy, parent);
-      insertedIndex = parent.children.indexOf(node);
-    } else {
-      const targetIndex = this._data.indexOf(target);
-      this._data.splice(targetIndex, 0, node);
-      this._data = sortDataBy(this._data, this._config.sortBy);
-      insertedIndex = this._data.indexOf(node);
-    }
-
-    node.parent = target.parent;
-
-    return insertedIndex;
+    this._database.updateData(FsTreeChange.Update, payload);
   }
 
-  public insertNodeBelow(target: ItemNode, node: ItemNode): number {
+  /**
+   * Remove node from DB
+   * @param item
+   */
+  public removeNode(item: FlatItemNode) {
+    this._database.removeItem(item.original);
 
-    const parent = target.parent;
-
-    this.removeItem(node);
-
-    let insertedIndex = null;
-    if (parent) {
-      const targetIndex = parent.children.indexOf(target);
-      parent.children.splice(targetIndex + 1, 0, node);
-      parent.children = sortDataBy(parent.children, this._config.sortBy, parent);
-
-      insertedIndex = parent.children.indexOf(node);
-    } else {
-      const targetIndex = this._data.indexOf(target);
-      this._data.splice(targetIndex + 1, 0, node);
-      this._data = sortDataBy(this._data, this._config.sortBy);
-
-      insertedIndex = this._data.indexOf(node);
-    }
-
-    node.parent = target.parent;
-
-    return insertedIndex;
+    const payload = {
+      target: item.original,
+    };
+    this._database.updateData(FsTreeChange.Remove, payload);
   }
 
-  public insertNode(target: ItemNode, node: ItemNode) {
+  /**
+   * Do reorder for target
+   * @param target
+   */
+  public updateSort(target: ItemNode) {
+    this._database.updateSort(target);
 
-    this.removeItem(node);
-
-    let insertedIndex = null;
-    if (target) {
-      if (!target.children) {
-        target.children = [];
-      }
-
-      target.children.push(node);
-
-      node.parent = target;
-
-      target.children = sortDataBy(target.children, this._config.sortBy, target);
-
-      insertedIndex = target.children.indexOf(node);
-    } else {
-      this.data.push(node);
-
-      this._data = sortDataBy(this._data, this._config.sortBy);
-      insertedIndex = this.data.indexOf(node);
-    }
-
-    return insertedIndex;
+    const payload = {
+      node: target,
+    };
+    this._database.updateData(FsTreeChange.ManualReorder, payload);
   }
 
+  /**
+   * Disabled reorder and block tree
+   */
+  public lockTree() {
+    this.disableReorder();
+    this.blocked = true;
 
-  public removeItem(node: ItemNode) {
-    const parent = node.parent;
-
-    if (parent && parent.children) {
-      const nodeIndex = parent.children.indexOf(node);
-      if (nodeIndex > -1) {
-        parent.children.splice(nodeIndex, 1);
-      }
-    } else {
-      const nodeIndex = this.data.indexOf(node);
-      if (nodeIndex > -1) {
-        this.data.splice(nodeIndex, 1);
-      }
-    }
+    this._cd.markForCheck();
   }
 
-  public updateData(type: FsTreeChange, payload: any) {
-    this._dataChange.next({
-      type: type,
-      payload: payload
-    });
+  /**
+   * Enable reorder back and unlock tree
+   */
+  public unlockTree() {
+    this.enableReorder();
+    this.blocked = false;
+
+    this._cd.markForCheck();
+  }
+
+  private _subscribeToDataChnage() {
+    this._database.dataChange
+      .pipe(
+        takeUntil(this._destroy$),
+      )
+      .subscribe((event: ITreeDataChange) => {
+        this.dataSource.data = [];
+        this.dataSource.data = this._database.data;
+
+        if (this.config.changed) {
+          this.config.changed(event);
+        }
+      });
   }
 }

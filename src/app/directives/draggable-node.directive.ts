@@ -20,7 +20,7 @@ import { FsDraggableNodeContentDirective } from './draggable-node-content.direct
 import { FsDraggableNodeTargetDirective } from './draggable-node-target.directive';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
-import { FsTreeService } from '../services/tree.service';
+import { FsTreeDatabaseService } from '../services/tree-database.service';
 import { LoggerService } from '../services/logger.service';
 
 
@@ -52,7 +52,7 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   private _destroy = new Subject<void>();
 
   constructor(
-    private _db: FsTreeService<T>,
+    private _db: FsTreeDatabaseService<T>,
     private _logger: LoggerService,
     private _el: ElementRef,
     private _cdRef: ChangeDetectorRef,

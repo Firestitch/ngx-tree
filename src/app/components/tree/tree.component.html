@@ -1,19 +1,21 @@
-<mat-tree [dataSource]="dataSource" [treeControl]="treeControl" [ngClass]="{ 'blocked': blocked }">
+<mat-tree [dataSource]="tree.dataSource"
+          [treeControl]="tree.treeControl"
+          [ngClass]="{ 'blocked': blocked }">
   <mat-tree-node *matTreeNodeDef="let node"
                  matTreeNodeToggle
                  matTreeNodePadding
                  [fsDraggableNode]="node"
-                 [fsCanDrop]="config.canDrop"
-                 (dragStart)="onDragStart($event)"
-                 (drop)="onDrop($event)">
+                 [fsCanDrop]="tree.config.canDrop"
+                 (dragStart)="tree.onDragStart($event)"
+                 (drop)="tree.onDrop($event)">
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button disabled></button>
 
         <mat-checkbox class="checklist-leaf-node"
-                      *ngIf="config.selection"
-                      [checked]="checklistSelection.isSelected(node)"
-                      (change)="todoLeafItemSelectionToggle(node)">
+                      *ngIf="tree.config.selection"
+                      [checked]="tree.checklistSelection.isSelected(node)"
+                      (change)="tree.todoLeafItemSelectionToggle(node)">
         </mat-checkbox>
         <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
           <ng-template
@@ -30,25 +32,25 @@
   <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
                  matTreeNodePadding
                  [fsDraggableNode]="node"
-                 [fsCanDrop]="config.canDrop"
-                 (dragStart)="onDragStart($event)"
-                 (drop)="onDrop($event)">
+                 [fsCanDrop]="tree.config.canDrop"
+                 (dragStart)="tree.onDragStart($event)"
+                 (drop)="tree.onDrop($event)">
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button
-                (click)="toggleNode(node)"
+                (click)="tree.toggleNode(node)"
                 [attr.aria-label]="'toggle ' + node.filename">
           <mat-icon class="mat-icon-rtl-mirror">
-            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            {{ tree.treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
           </mat-icon>
         </button>
         <mat-checkbox
-          *ngIf="config.selection"
-          [checked]="descendantsAllSelected(node)"
-          [indeterminate]="descendantsPartiallySelected(node)"
-          (change)="todoItemSelectionToggle(node)">
+          *ngIf="tree.config.selection"
+          [checked]="tree.descendantsAllSelected(node)"
+          [indeterminate]="tree.descendantsPartiallySelected(node)"
+          (change)="tree.todoItemSelectionToggle(node)">
         </mat-checkbox>
-        <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
+        <div class="content" [ngClass]="{ 'no-drag': !node.canDrag }" fsDraggableNodeTarget>
           <ng-template
             [ngTemplateOutlet]="nodeTemplate || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.templateContext"
