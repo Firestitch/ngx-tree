@@ -72,6 +72,7 @@ export class FlatItemNode {
     this._dataStoredKeys.forEach((key) => {
       delete this.templateContext[key];
     });
+    delete this.templateContext.node;
 
     // Store new data keys
     if (this.data) {
@@ -88,6 +89,7 @@ export class FlatItemNode {
 
     this.templateContext.level = this.level;
     this.templateContext.parent = this.parent;
+    this.templateContext.node = this._data;
   }
 
 }
