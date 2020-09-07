@@ -43,8 +43,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public emptyItem: ElementRef;
 
   // Template for node
-  @ContentChild(FsTreeNodeDirective, { read: TemplateRef })
-  public nodeTemplate: TemplateRef<any>;
+  @ContentChild(FsTreeNodeDirective)
+  public treeNodeData: FsTreeNodeDirective;
 
   // List of actions for tree
   public actions: FsTreeAction[] = [];
