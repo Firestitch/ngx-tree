@@ -10,7 +10,7 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { LoggerService } from './logger.service';
@@ -50,6 +50,8 @@ export class FsTreeService<T> implements OnDestroy {
   /** The selection for checklist */
   public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
 
+  private _updateClasses$ = new Subject<void>();
+
   private _destroy$ = new Subject<void>();
 
   constructor(
@@ -63,6 +65,10 @@ export class FsTreeService<T> implements OnDestroy {
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
     // this._logger.enabled = true;
+  }
+
+  public get updateClasses$(): Observable<void> {
+    return this._updateClasses$.asObservable();
   }
 
   public init(el: ElementRef, config) {
@@ -398,6 +404,10 @@ export class FsTreeService<T> implements OnDestroy {
     this.blocked = false;
 
     this._cd.markForCheck();
+  }
+
+  public updateNodesClasses() {
+    this._updateClasses$.next();
   }
 
   private _subscribeToDataChnage() {

@@ -17,6 +17,7 @@ import { FsTreeNodeDirective } from './directives/tree-node.directive';
 import { FsDraggableNodeDirective } from './directives/draggable-node.directive';
 import { FsDraggableNodeTargetDirective } from './directives/draggable-node-target.directive';
 import { FsDraggableNodeContentDirective } from './directives/draggable-node-content.directive';
+import { FsTreeNodeClassDirective } from './directives/tree-node-class.directive';
 
 
 @NgModule({
@@ -41,7 +42,8 @@ import { FsDraggableNodeContentDirective } from './directives/draggable-node-con
     FsNodeActionsComponent,
     FsDraggableNodeDirective,
     FsDraggableNodeContentDirective,
-    FsDraggableNodeTargetDirective
+    FsDraggableNodeTargetDirective,
+    FsTreeNodeClassDirective,
   ],
   providers: [
     // FsComponentService,

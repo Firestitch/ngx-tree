@@ -18,6 +18,15 @@ export class FixedFixedOrderingComponent {
     levels: 2,
     selection: false,
     childrenName: 'accounts',
+    nodeClass: (node) => {
+      if (node.level === 0) {
+        return ['my-class-0', 'level-0'];
+      } else if (node.level === 1) {
+        return 'my-class-1 level-1';
+      } else {
+        return ['my-class-other', 'level-other'];
+      }
+    },
     changed: (data) => {
       console.log('Data was changed: ', data);
     },

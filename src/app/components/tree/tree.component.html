@@ -4,6 +4,7 @@
   <mat-tree-node *matTreeNodeDef="let node"
                  matTreeNodeToggle
                  matTreeNodePadding
+                 fsTreeNodeClass
                  [ngClass]="treeNodeData?.klass"
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
@@ -32,6 +33,7 @@
 
   <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
                  matTreeNodePadding
+                 fsTreeNodeClass
                  [ngClass]="treeNodeData?.klass"
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"

@@ -179,4 +179,11 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
     this._cd.markForCheck();
   }
+
+  /**
+   * Update classes for all nodes
+   */
+  public updateNodesClasses(): void {
+    this.tree.updateNodesClasses();
+  }
 }

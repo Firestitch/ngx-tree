@@ -13,9 +13,11 @@ export interface ITreeConfig<T> {
   actions?: FsTreeAction[];
   canDrag?: canDrag;
   canDrop?: CanDrop;
+  nodeClass?: nodeClass;
 }
 
 export type canDrag = (node: FlatItemNode) => boolean;
+export type nodeClass = (node: FlatItemNode) => string | string[];
 
 export type CanDrop = (
   node?: FlatItemNode,
