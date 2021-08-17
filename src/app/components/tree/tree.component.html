@@ -12,7 +12,7 @@
                  (drop)="tree.onDrop($event)">
     <div class="node" fsDraggableNodeContent>
       <div class="container">
-        <button mat-icon-button disabled></button>
+        <button mat-icon-button disabled type="button"></button>
 
         <mat-checkbox class="checklist-leaf-node"
                       *ngIf="tree.config.selection"
@@ -42,6 +42,7 @@
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button
+                type="button"
                 (click)="tree.toggleNode(node)"
                 [attr.aria-label]="'toggle ' + node.filename">
           <mat-icon class="mat-icon-rtl-mirror">
