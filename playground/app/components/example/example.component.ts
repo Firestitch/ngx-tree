@@ -1,5 +1,7 @@
+import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ViewChild } from '@angular/core';
-import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
+import { FsTreeChange, FsTreeComponent, ItemNode, ITreeConfig, ITreeDataChange } from '@firestitch/tree';
+import { of } from 'rxjs';
 import { TREE_DATA } from '../../data';
 
 
@@ -14,10 +16,18 @@ export class ExampleComponent {
 
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
-    changed: (data) => {
-      console.log('Data was changed: ', data);
+    change: (data: ITreeDataChange) => {
+      console.log('Data Change: ', data);
     },
-    selection: true,
+    selection: {
+      selected: (node: ItemNode) => {
+        return node.data.id <= 10;
+      },      
+      change: (selected: ItemNode[]) => {
+        console.log('Selection Change', selected);
+        return of(null);
+      }
+    },
     childrenName: 'accounts',
   };
 

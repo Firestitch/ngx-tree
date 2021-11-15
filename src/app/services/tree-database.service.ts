@@ -77,7 +77,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   }
 
   // Create new fresh node which is ready to be insterted into tree
-  public createNode(data: any, parent: FlatItemNode = null) {
+  public createNode(data: any, parent: FlatItemNode = null): FlatItemNode {
     const forLevel = parent ? parent.level + 1 : 0;
     const node = treeBuilder(data, forLevel, parent, this._config.childrenName);
 

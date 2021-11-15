@@ -13,7 +13,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { LoggerService } from './logger.service';
 import { FsTreeDatabaseService } from './tree-database.service';
 
 import { ItemNode } from '../models/item-node.model';
@@ -29,7 +28,6 @@ import { IDragEnd } from '../interfaces/draggable.interface';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
 import { FsTreeChange } from '../enums/tree-change.enum';
-
 
 
 @Injectable()
@@ -56,15 +54,12 @@ export class FsTreeService<T> implements OnDestroy {
 
   constructor(
     private _database: FsTreeDatabaseService<T>,
-    private _logger: LoggerService,
     private _cd: ChangeDetectorRef,
     private _zone: NgZone,
   ) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
     this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-
-    // this._logger.enabled = true;
   }
 
   public get updateClasses$(): Observable<void> {
@@ -72,11 +67,19 @@ export class FsTreeService<T> implements OnDestroy {
   }
 
   public init(el: ElementRef, config) {
-    this._subscribeToDataChnage();
+    this._subscribeToDataChange();
     this._database.containerElement = el;
     this.config = config;
 
     this._database.initialize(this.treeControl, this.config);
+
+    if(this.config.selection?.selected) {
+      this.treeControl.dataNodes.forEach((node: FlatItemNode) => {
+        if(this.config.selection.selected(node.original)) {
+          this.checklistSelection.select(node);
+        }
+      });
+    }
   }
 
   public ngOnDestroy() {
@@ -134,6 +137,7 @@ export class FsTreeService<T> implements OnDestroy {
     descendants.every(child =>
       this.checklistSelection.isSelected(child)
     );
+
     this.checkAllParentsSelection(node);
   }
 
@@ -150,6 +154,16 @@ export class FsTreeService<T> implements OnDestroy {
       this.checkRootNodeSelection(parent);
       parent = this.getParentNode(parent);
     }
+
+    if(this.config.selection.change) {
+      const selected: ItemNode[] = this.checklistSelection.selected
+      .map((node) => {
+        return this._database.flatNodeMap.get(node);
+      });
+
+      
+      this.config.selection.change(selected);
+    }    
   }
 
   /** Get the parent node of a node **/
@@ -193,7 +207,6 @@ export class FsTreeService<T> implements OnDestroy {
   public onDragStart(node: FlatItemNode) {}
 
   public onDrop(data: IDragEnd) {
-
     if (data.dropInto === data.node) { return; }
 
     const dropInto = this._database.flatNodeMap.get(data.dropInto);
@@ -410,7 +423,7 @@ export class FsTreeService<T> implements OnDestroy {
     this._updateClasses$.next();
   }
 
-  private _subscribeToDataChnage() {
+  private _subscribeToDataChange() {
     this._database.dataChange
       .pipe(
         takeUntil(this._destroy$),
@@ -419,8 +432,8 @@ export class FsTreeService<T> implements OnDestroy {
         this.dataSource.data = [];
         this.dataSource.data = this._database.data;
 
-        if (this.config.changed) {
-          this.config.changed(event);
+        if (this.config.change) {
+          this.config.change(event);
         }
       });
   }

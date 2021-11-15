@@ -7,7 +7,6 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  TemplateRef,
   ViewChild
 } from '@angular/core';
 

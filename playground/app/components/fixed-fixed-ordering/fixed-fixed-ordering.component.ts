@@ -16,7 +16,6 @@ export class FixedFixedOrderingComponent {
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
     levels: 2,
-    selection: false,
     childrenName: 'accounts',
     nodeClass: (node) => {
       if (node.level === 0) {
@@ -27,7 +26,7 @@ export class FixedFixedOrderingComponent {
         return ['my-class-other', 'level-other'];
       }
     },
-    changed: (data) => {
+    change: (data) => {
       console.log('Data was changed: ', data);
     },
     sortBy: (data) => {

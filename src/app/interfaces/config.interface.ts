@@ -1,13 +1,16 @@
+import { Observable } from 'rxjs';
+
 import { FsTreeAction } from './action.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+import { ItemNode } from '../models/item-node.model';
 
 
 export interface ITreeConfig<T> {
   levels?: number;
-  selection?: boolean;
+  selection?: ITreeSelectionConfig;
   data?: T;
-  changed?: (data: ITreeDataChange) => void;
+  change?: (data: ITreeDataChange) => void;
   sortBy?: (data: T[], parent?: T ) => T[];
   childrenName?: string;
   actions?: FsTreeAction[];
@@ -27,3 +30,8 @@ export type CanDrop = (
   prevElement?: FlatItemNode,
   nextElement?: FlatItemNode,
 ) => boolean;
+
+export interface ITreeSelectionConfig {
+  change?: (selected: ItemNode[]) => Observable<any>;
+  selected?: (node: ItemNode) => boolean;
+}

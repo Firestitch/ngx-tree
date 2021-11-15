@@ -16,9 +16,8 @@ export class ManageFixedOrderingComponent {
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
     levels: 2,
-    selection: false,
     childrenName: 'accounts',
-    changed: (data) => {
+    change: (data) => {
       console.log('Data was changed: ', data);
     },
     sortBy: (data, parent) => {
