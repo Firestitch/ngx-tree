@@ -113,8 +113,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
    * @param data
    * @param target
    */
-  public insertAbove(data: any = {}, target: FlatItemNode = null) {
-    this.tree.insertNodeAbove(data, target);
+  public insertAbove(data: any = {}, target: FlatItemNode = null): FlatItemNode {
+    return this.tree.insertNodeAbove(data, target);
   }
 
   /**
@@ -122,16 +122,16 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
    * @param data
    * @param target
    */
-  public insertBelow(data: any = {}, target: FlatItemNode = null) {
-    this.tree.insertNodeBelow(data, target);
+  public insertBelow(data: any = {}, target: FlatItemNode = null): FlatItemNode {
+    return this.tree.insertNodeBelow(data, target);
   }
   /**
    * Insert node as child element for target node
    * @param data
    * @param parent
    */
-  public append(data: any = {}, parent: FlatItemNode = null) {
-    this.tree.appendNode(data, parent);
+  public append(data: any = {}, parent: FlatItemNode = null): FlatItemNode {
+    return this.tree.appendNode(data, parent);
   }
 
   /**

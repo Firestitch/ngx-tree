@@ -286,7 +286,7 @@ export class FsTreeService<T> implements OnDestroy {
    * @param data
    * @param target
    */
-  public insertNodeAbove(data: any = {}, target: FlatItemNode = null) {
+  public insertNodeAbove(data: any = {}, target: FlatItemNode = null): FlatItemNode {
     const originalParent = target && target.original || null;
     const node = this._database.createNode(data, target);
     const insertIndex = this._database.insertNodeAbove(originalParent, node.original);
@@ -300,6 +300,8 @@ export class FsTreeService<T> implements OnDestroy {
     };
 
     this._database.updateData(FsTreeChange.Insert, payload);
+
+    return node;
   }
 
   /**
@@ -307,7 +309,7 @@ export class FsTreeService<T> implements OnDestroy {
    * @param data
    * @param target
    */
-  public insertNodeBelow(data: any = {}, target: FlatItemNode = null) {
+  public insertNodeBelow(data: any = {}, target: FlatItemNode = null): FlatItemNode {
     const originalParent = target && target.original || null;
     const node = this._database.createNode(data, target);
     const insertIndex = this._database.insertNodeBelow(originalParent, node.original);
@@ -321,6 +323,8 @@ export class FsTreeService<T> implements OnDestroy {
     };
 
     this._database.updateData(FsTreeChange.Insert, payload);
+
+    return node;
   }
 
   /**
@@ -328,7 +332,7 @@ export class FsTreeService<T> implements OnDestroy {
    * @param data
    * @param parent
    */
-  public appendNode(data: any = {}, parent: FlatItemNode = null) {
+  public appendNode(data: any = {}, parent: FlatItemNode = null): FlatItemNode {
     const originalParent = parent && parent.original || null;
     const node = this._database.createNode(data, parent);
 
@@ -347,6 +351,8 @@ export class FsTreeService<T> implements OnDestroy {
     };
 
     this._database.updateData(FsTreeChange.Insert, payload);
+
+    return node;
   }
 
   /**
