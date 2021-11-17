@@ -73,12 +73,12 @@ export class FsTreeService<T> implements OnDestroy {
 
     this._database.initialize(this.treeControl, this.config);
 
-    if(this.config.selection?.selected) {
-      this.treeControl.dataNodes.forEach((node: FlatItemNode) => {
-        if(this.config.selection.selected(node.original)) {
-          this.checklistSelection.select(node);
-        }
-      });
+    if (this.config.selection?.selected) {
+      this.treeControl.dataNodes
+        .filter((node: FlatItemNode) => this.config.selection.selected(node.original))
+        .forEach((node: FlatItemNode) => {
+          this._selectNode(node);
+        });
     }
   }
 
@@ -128,18 +128,16 @@ export class FsTreeService<T> implements OnDestroy {
 
   /** Toggle the to-do item selection. Select/deselect all the descendants node */
   public todoItemSelectionToggle(node: FlatItemNode): void {
+    const nodeSelected = this.checklistSelection.isSelected(node);
     this.checklistSelection.toggle(node);
-    const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
 
-    descendants.every(child =>
-      this.checklistSelection.isSelected(child)
-    );
-
-    this.checkAllParentsSelection(node);
+    if (nodeSelected) {
+      this._deselectNode(node);
+    } else {
+      this._selectNode(node);
+    }
   }
+
 
   /** Toggle a leaf to-do item selection. Check all the parents to see if they changed */
   public todoLeafItemSelectionToggle(node: FlatItemNode): void {
@@ -155,15 +153,15 @@ export class FsTreeService<T> implements OnDestroy {
       parent = this.getParentNode(parent);
     }
 
-    if(this.config.selection.change) {
+    if (this.config.selection.change) {
       const selected: ItemNode[] = this.checklistSelection.selected
       .map((node) => {
         return this._database.flatNodeMap.get(node);
       });
 
-      
+
       this.config.selection.change(selected);
-    }    
+    }
   }
 
   /** Get the parent node of a node **/
@@ -421,6 +419,20 @@ export class FsTreeService<T> implements OnDestroy {
 
   public updateNodesClasses() {
     this._updateClasses$.next();
+  }
+
+  private _selectNode(node: FlatItemNode) {
+    const descendants = this.treeControl.getDescendants(node);
+    this.checklistSelection.select(...descendants);
+
+    this.checkAllParentsSelection(node);
+  }
+
+  private _deselectNode(node: FlatItemNode) {
+    const descendants = this.treeControl.getDescendants(node);
+    this.checklistSelection.deselect(...descendants);
+
+    this.checkAllParentsSelection(node);
   }
 
   private _subscribeToDataChange() {
