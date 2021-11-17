@@ -136,6 +136,8 @@ export class FsTreeService<T> implements OnDestroy {
     } else {
       this._selectNode(node);
     }
+
+    this._emitSelectionChange();
   }
 
 
@@ -143,6 +145,8 @@ export class FsTreeService<T> implements OnDestroy {
   public todoLeafItemSelectionToggle(node: FlatItemNode): void {
     this.checklistSelection.toggle(node);
     this.checkAllParentsSelection(node);
+
+    this._emitSelectionChange();
   }
 
   /** Checks all the parents when a leaf node is selected/unselected **/
@@ -151,16 +155,6 @@ export class FsTreeService<T> implements OnDestroy {
     while (parent) {
       this.checkRootNodeSelection(parent);
       parent = this.getParentNode(parent);
-    }
-
-    if (this.config.selection.change) {
-      const selected: ItemNode[] = this.checklistSelection.selected
-      .map((node) => {
-        return this._database.flatNodeMap.get(node);
-      });
-
-
-      this.config.selection.change(selected);
     }
   }
 
@@ -448,5 +442,17 @@ export class FsTreeService<T> implements OnDestroy {
           this.config.change(event);
         }
       });
+  }
+
+  private _emitSelectionChange() {
+    if (this.config.selection.change) {
+      const selected: ItemNode[] = this.checklistSelection.selected
+        .map((node) => {
+          return this._database.flatNodeMap.get(node);
+        });
+
+
+      this.config.selection.change(selected);
+    }
   }
 }
