@@ -417,14 +417,14 @@ export class FsTreeService<T> implements OnDestroy {
 
   private _selectNode(node: FlatItemNode) {
     const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.select(...descendants);
+    this.checklistSelection.select(node, ...descendants);
 
     this.checkAllParentsSelection(node);
   }
 
   private _deselectNode(node: FlatItemNode) {
     const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.deselect(...descendants);
+    this.checklistSelection.deselect(node, ...descendants);
 
     this.checkAllParentsSelection(node);
   }
