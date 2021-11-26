@@ -17,6 +17,7 @@ export interface ITreeConfig<T> {
   canDrag?: canDrag;
   canDrop?: CanDrop;
   nodeClass?: nodeClass;
+  nodeClick?: (event: IFsTreeNodeClick) => void;
 }
 
 export type canDrag = (node: FlatItemNode) => boolean;
@@ -34,4 +35,8 @@ export type CanDrop = (
 export interface ITreeSelectionConfig {
   change?: (selected: ItemNode[]) => Observable<any>;
   selected?: (node: ItemNode) => boolean;
+}
+
+export interface IFsTreeNodeClick {
+  node?: FlatItemNode;
 }

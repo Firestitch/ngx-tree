@@ -1,6 +1,6 @@
 import { ElementRef } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { EMPTY, fromEvent, merge, Observable, Subject } from 'rxjs';
+import { map, switchMap, takeUntil, timeoutWith } from 'rxjs/operators';
 
 import { Droppable } from './droppable';
 
@@ -8,6 +8,7 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { LoggerService } from '../services/logger.service';
+import { IFsTreeNodeClick } from '../interfaces/config.interface';
 
 
 export class Draggable {
@@ -46,6 +47,29 @@ export class Draggable {
   private _moveHandler = this.dragTo.bind(this);
   private _dropHandler = this.dragEnd.bind(this);
 
+  private _mouseDown$ = merge(
+    fromEvent(this._target.nativeElement, 'mousedown'),
+    fromEvent(this._target.nativeElement, 'touchstart'),
+  );
+
+  private _mouseUp$ = merge(
+    fromEvent(window.document, 'mouseup'),
+    fromEvent(window.document, 'touchend'),
+  );
+
+  private _click$ = this._mouseDown$
+    .pipe(
+      switchMap(() => {
+        return this._mouseUp$
+          .pipe(
+            timeoutWith(200, EMPTY),
+            map(() => {
+              return { node: this._node };
+            })
+          );
+      }),
+    );
+
   /**
    * Class for control mouse/touch drag
    * @param _containerElement
@@ -79,6 +103,10 @@ export class Draggable {
 
   get dragEnd$(): Observable<IDragEnd> {
     return this._dragEnd$.pipe(takeUntil(this._destroy$));
+  }
+
+  get click$(): Observable<IFsTreeNodeClick> {
+    return this._click$;
   }
 
   get expandNode$(): Observable<FlatItemNode> {

@@ -23,7 +23,7 @@ import { isExpandable } from '../helpers/is-expandable';
 import { dataBuilder } from '../helpers/data-builder';
 import { getChildren } from '../helpers/get-children';
 
-import { ITreeConfig } from '../interfaces/config.interface';
+import { IFsTreeNodeClick, ITreeConfig } from '../interfaces/config.interface';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
@@ -226,6 +226,12 @@ export class FsTreeService<T> implements OnDestroy {
 
       this._database.updateData(FsTreeChange.Reorder, payload);
     });
+  }
+
+  public nodeClick(event: IFsTreeNodeClick) {
+    if (this.config.nodeClick) {
+      this.config.nodeClick(event);
+    }
   }
 
   /**

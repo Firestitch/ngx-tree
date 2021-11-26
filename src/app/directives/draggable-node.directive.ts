@@ -22,6 +22,7 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { FsTreeDatabaseService } from '../services/tree-database.service';
 import { LoggerService } from '../services/logger.service';
+import { IFsTreeNodeClick } from '../interfaces/config.interface';
 
 
 @Directive({
@@ -40,6 +41,9 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
 
   @Output()
   public drop = new EventEmitter<IDragEnd>();
+
+  @Output()
+  public draggableClick = new EventEmitter<IFsTreeNodeClick>();
 
   @ContentChild(FsDraggableNodeContentDirective, { read: ElementRef, static: true })
   public draggableContent: ElementRef;
@@ -106,6 +110,14 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
       )
       .subscribe((data) => {
         this.drop.emit(data);
+      });
+
+    this._draggable.click$
+      .pipe(
+        takeUntil(this._destroy),
+      )
+      .subscribe((event) => {
+        this.draggableClick.emit(event);
       });
   }
 }

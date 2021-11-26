@@ -38,7 +38,8 @@
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
                  (dragStart)="tree.onDragStart($event)"
-                 (drop)="tree.onDrop($event)">
+                 (drop)="tree.onDrop($event)"
+                 (draggableClick)="tree.nodeClick($event)">
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button
