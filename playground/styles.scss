@@ -6,3 +6,10 @@
 @include mat-core();
 
 @include fs-tree($mat-blue);
+
+mat-tree {
+  a.primary {
+    font-weight: bold;
+    font-size: 101%;
+  }
+}
