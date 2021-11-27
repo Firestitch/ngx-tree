@@ -42,9 +42,6 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   @Output()
   public drop = new EventEmitter<IDragEnd>();
 
-  @Output()
-  public draggableClick = new EventEmitter<IFsTreeNodeClick>();
-
   @ContentChild(FsDraggableNodeContentDirective, { read: ElementRef, static: true })
   public draggableContent: ElementRef;
 
@@ -110,14 +107,6 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
       )
       .subscribe((data) => {
         this.drop.emit(data);
-      });
-
-    this._draggable.click$
-      .pipe(
-        takeUntil(this._destroy),
-      )
-      .subscribe((event) => {
-        this.draggableClick.emit(event);
       });
   }
 }

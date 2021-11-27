@@ -18,9 +18,11 @@ export interface ITreeConfig<T> {
   canDrop?: CanDrop;
   nodeClass?: nodeClass;
   nodeClick?: (event: IFsTreeNodeClick) => void;
+  canNodeClick?: canNodeClick;
 }
 
 export type canDrag = (node: FlatItemNode) => boolean;
+export type canNodeClick = (node: FlatItemNode) => boolean;
 export type nodeClass = (node: FlatItemNode) => string | string[];
 
 export type CanDrop = (

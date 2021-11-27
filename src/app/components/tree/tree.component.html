@@ -9,18 +9,19 @@
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
                  (dragStart)="tree.onDragStart($event)"
-                 (drop)="tree.onDrop($event)"
-                 (draggableClick)="tree.nodeClick($event)">
+                 (drop)="tree.onDrop($event)">
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button disabled type="button"></button>
-
         <mat-checkbox class="checklist-leaf-node"
                       *ngIf="tree.config.selection"
                       [checked]="tree.checklistSelection.isSelected(node)"
                       (change)="tree.todoLeafItemSelectionToggle(node)">
         </mat-checkbox>
-        <div class="content" [ngClass]="{'no-drag': !node.canDrag}" fsDraggableNodeTarget>
+
+        <mat-icon fsDraggableNodeTarget [ngClass]="{ 'no-drag': !node.canDrag }">drag_handle</mat-icon>
+
+        <div class="content" [ngClass]="{ 'clickable': !!node.canNodeClick }" (click)="tree.nodeClick(node)">
           <ng-template
             [ngTemplateOutlet]="treeNodeData?.templateRef || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.templateContext"
@@ -39,8 +40,7 @@
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
                  (dragStart)="tree.onDragStart($event)"
-                 (drop)="tree.onDrop($event)"
-                 (draggableClick)="tree.nodeClick($event)">
+                 (drop)="tree.onDrop($event)">
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <button mat-icon-button
@@ -57,7 +57,10 @@
           [indeterminate]="tree.descendantsPartiallySelected(node)"
           (change)="tree.todoItemSelectionToggle(node)">
         </mat-checkbox>
-        <div class="content" [ngClass]="{ 'no-drag': !node.canDrag }" fsDraggableNodeTarget>
+
+        <mat-icon fsDraggableNodeTarget [ngClass]="{ 'no-drag': !node.canDrag }">drag_handle</mat-icon>
+
+        <div class="content" [ngClass]="{ 'clickable': !!node.canNodeClick }" (click)="tree.nodeClick(node)">
           <ng-template
             [ngTemplateOutlet]="treeNodeData?.templateRef || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.templateContext"

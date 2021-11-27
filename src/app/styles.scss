@@ -59,15 +59,29 @@
         display: flex;
         align-items: center;
 
+        .fs-tree-draggable-target {
+          cursor: grab;
+          margin-right: 10px;
+
+          &.no-drag {
+            cursor: default !important;
+          }
+        }
         .content {
+          pointer-events: none;
           align-self: stretch;
           display: flex;
           flex-direction: row;
           align-items: center;
-          cursor: grab;
 
-          &.no-drag {
-            cursor: default !important;
+          &.clickable {
+            pointer-events: all;
+            cursor: pointer;
+
+            a {
+              font-weight: bold;
+              font-size: 101%;
+            }
           }
         }
       }

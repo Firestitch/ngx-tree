@@ -11,6 +11,7 @@ export class FlatItemNode {
   public collapse;
   public expand;
   public canDrag = true;
+  public canNodeClick = true;
   public templateContext: any = {};
 
   private _dataStoredKeys = [];
@@ -29,6 +30,7 @@ export class FlatItemNode {
     this.collapse = data.collapse || function() { };
     this.expand = data.expand || function() { };
     this.canDrag = data.canDrag === void 0 ? true : data.canDrag;
+    this.canNodeClick = data.canNodeClick === void 0 ? true : data.canNodeClick;
     this.hidden = this.isExpanded();
   }
 

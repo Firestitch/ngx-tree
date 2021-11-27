@@ -106,6 +106,7 @@ export class FsTreeService<T> implements OnDestroy {
     flatNode.collapse = () => this.treeControl.collapse(flatNode);
     flatNode.expand = () => this.treeControl.expand(flatNode);
     flatNode.canDrag = this.config.canDrag ? this.config.canDrag(flatNode) : true;
+    flatNode.canNodeClick = this.config.canNodeClick ? this.config.canNodeClick(flatNode) : false;
 
     this._database.flatNodeMap.set(flatNode, node);
     this._database.nestedNodeMap.set(node, flatNode);
@@ -228,10 +229,8 @@ export class FsTreeService<T> implements OnDestroy {
     });
   }
 
-  public nodeClick(event: IFsTreeNodeClick) {
-    if (this.config.nodeClick) {
-      this.config.nodeClick(event);
-    }
+  public nodeClick(node: FlatItemNode) {
+    this.config.nodeClick({ node });
   }
 
   /**

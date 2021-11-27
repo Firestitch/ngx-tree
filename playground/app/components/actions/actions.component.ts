@@ -28,32 +28,19 @@ export class ActionsComponent {
       });
     },
     canDrag: (node) => {
-      return node.level > 0;
-    },
-    canDrop: (node, fromParent, toParent, dropPosition, prevElem, nextElem) => {
-      const cantDropToRootLevel = !!toParent; // should be not equal null
-
-      // Sorting Rule
-      const prevElSortCoimplied = prevElem && prevElem.data.id < node.data.id || !prevElem;
-      const nextElSortCoimplied = nextElem && node.data.id < nextElem.data.id || !nextElem;
-      const compliedWithSort = prevElSortCoimplied && nextElSortCoimplied;
-
-      return compliedWithSort && cantDropToRootLevel;
+      return true;
     },
     nodeClick: ({ node }) => {
       this._edit(node);
+    },
+    canNodeClick: (node) => {
+      return true;
     },
     actions: [
       {
         type: TreeActionType.Menu,
         icon: 'move_vert',
         items: [
-          {
-            label: 'Edit',
-            click: (node) => {
-              this._edit(node);
-            }
-          },
           {
             label: 'Delete',
             click: (node) => {
