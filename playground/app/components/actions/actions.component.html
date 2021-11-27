@@ -10,6 +10,6 @@
 
 <fs-tree [config]="config" #tree>
   <ng-template fsTreeNode let-name="name" let-id="id">
-    {{ name }} (ID: {{ id }})
+    <a>{{ name }} (ID: {{ id }})</a>
   </ng-template>
 </fs-tree>
