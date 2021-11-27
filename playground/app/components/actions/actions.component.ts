@@ -1,0 +1,102 @@
+import { Component, ViewChild } from '@angular/core';
+import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
+
+import { TREE_DATA } from '../../data';
+import { TreeActionType } from '../../../../src/app/models/action.model';
+import { MatDialog } from '@angular/material/dialog';
+import { EditDialogComponent } from './edit-dialog';
+
+
+@Component({
+  selector: 'actions',
+  templateUrl: 'actions.component.html'
+})
+export class ActionsComponent {
+  @ViewChild('tree')
+  public tree: FsTreeComponent<any>;
+
+  public config: ITreeConfig<any> = {
+    data: TREE_DATA,
+    levels: 2,
+    childrenName: 'accounts',
+    sortBy: (data) => {
+      return data.sort((a, b) => {
+        if (a.id < b.id) { return -1; }
+        if (b.id < b.id) { return 1; }
+
+        return 0;
+      });
+    },
+    canDrag: (node) => {
+      return node.level > 0;
+    },
+    canDrop: (node, fromParent, toParent, dropPosition, prevElem, nextElem) => {
+      const cantDropToRootLevel = !!toParent; // should be not equal null
+
+      // Sorting Rule
+      const prevElSortCoimplied = prevElem && prevElem.data.id < node.data.id || !prevElem;
+      const nextElSortCoimplied = nextElem && node.data.id < nextElem.data.id || !nextElem;
+      const compliedWithSort = prevElSortCoimplied && nextElSortCoimplied;
+
+      return compliedWithSort && cantDropToRootLevel;
+    },
+    nodeClick: ({ node }) => {
+      this._edit(node);
+    },
+    actions: [
+      {
+        type: TreeActionType.Menu,
+        icon: 'move_vert',
+        items: [
+          {
+            label: 'Edit',
+            click: (node) => {
+              this._edit(node);
+            }
+          },
+          {
+            label: 'Delete',
+            click: (node) => {
+              this.tree.remove(node)
+            }
+          }
+        ],
+
+      }
+    ]
+  };
+
+  constructor(
+    private _dialog: MatDialog,
+  ) {
+  }
+
+  public collapseAll() {
+    this.tree.collapseAll();
+  }
+
+  public expandAll() {
+    this.tree.expandAll();
+  }
+
+  public createRootNode() {
+    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) })
+  }
+
+  private _edit(node: FlatItemNode) {
+    this._dialog
+      .open(EditDialogComponent, {
+        data: { node: node.data }
+      })
+      .afterClosed()
+      .subscribe((data) => {
+        if (data !== undefined) {
+          this.tree.updateNodeData(data, node);
+        }
+      });
+  }
+
+  private getRandomId(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+}

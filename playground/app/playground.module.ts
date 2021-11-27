@@ -17,6 +17,8 @@ import {
   FixedManageOrderingComponent,
   ManageFixedOrderingComponent,
   FixedFixedOrderingComponent,
+  ActionsComponent,
+  EditDialogComponent,
 } from './components';
 import { AppComponent } from './app.component';
 
@@ -43,7 +45,8 @@ import { AppComponent } from './app.component';
     FixedManageOrderingComponent,
     ManageFixedOrderingComponent,
     FixedFixedOrderingComponent,
-
+    ActionsComponent,
+    EditDialogComponent,
   ],
   providers: [
   ],
