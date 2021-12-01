@@ -1,6 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 
 import { Droppable } from './droppable';
 
@@ -24,6 +24,7 @@ export class Draggable {
   private _draggableEl: HTMLDivElement = null;
 
   private _expandedBeforeDrag = false;
+  private _visibleChildren: FlatItemNode[];
 
   // Observables
   private _dragStart$ = new Subject<void>();
@@ -102,13 +103,15 @@ export class Draggable {
     this._dragStart$.next();
 
     // Store information about expand status. If node has been expanded, then we should expand it after drag
-    this._expandedBeforeDrag = this._node.isExpanded();
+    // this._expandedBeforeDrag = this._node.isExpanded();
 
     // Collapse node before drag
-    if (this._expandedBeforeDrag) {
-      this._node.collapse();
-      this._hideChildrenNodes(this._node);
-    }
+    // if (this._expandedBeforeDrag) {
+    //   // this._node.collapse();
+    //   // this._hideChildrenNodes(this._node);
+    // }
+    this._visibleChildren = this._getVisibleChildren(this._node)
+    this._addClassForChildrenNodes();
 
     this._logger.timeStart('DRAG_START');
 
@@ -122,7 +125,7 @@ export class Draggable {
         if (node.isExpanded()) {
           this._checkChildrenExpandedStatus(node, true);
         } else {
-          this._hideChildrenNodes(node);
+          // this._hideChildrenNodes(node);
         }
       }
     });
@@ -229,6 +232,9 @@ export class Draggable {
     window.document.body.classList.remove('block-selection');
     this._node.el.classList.remove('draggable-elem');
 
+    this._removeClassFromChildrenNodes();
+    this._visibleChildren = [];
+
     this.destroyDroppable();
 
     this._draggableEl.remove();
@@ -258,7 +264,12 @@ export class Draggable {
    */
   private _subscribe() {
     this._expandNode$
-      .pipe(takeUntil(this._destroy$))
+      .pipe(
+        filter((node) => {
+          return this._visibleChildren.indexOf(node) === -1;
+        }),
+        takeUntil(this._destroy$),
+      )
       .subscribe((node) => {
         if (this._node !== node) {
           this._logger.log('EXPANDED OVER', node);
@@ -361,6 +372,42 @@ export class Draggable {
         this._hideChildrenNodes(childNode);
       });
     }
+  }
+
+  private _addClassForChildrenNodes() {
+    this._visibleChildren.forEach((child) => {
+      child.el.classList.add('disabled-node');
+    });
+  }
+
+  private _removeClassFromChildrenNodes() {
+    this._visibleChildren.forEach((child) => {
+      child.el.classList.remove('disabled-node');
+    });
+  }
+
+  private _getVisibleChildren(node: FlatItemNode): FlatItemNode[] {
+    if (!node.original.children || !node.isExpanded()) {
+      return [];
+    }
+
+    const result = [];
+    const childrenNodes = node.original.children
+      .map((child) => {
+        return this._nodes.get(child);
+      });
+
+    result.push(...childrenNodes);
+
+    childrenNodes
+      .filter((child) => {
+        return child.isExpanded();
+      })
+      .forEach((child) => {
+        result.push(...this._getVisibleChildren(child));
+      });
+
+    return result;
   }
 
   private calcAutoScrollParams() {

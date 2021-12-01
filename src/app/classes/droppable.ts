@@ -136,7 +136,10 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        if (!this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent)) {
+        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent);
+        const prevNode = this._getNodeAbove(element);
+
+        if (!this.canDropHere || prevNode === this._node) {
           this.hide();
           this._draggableEl.classList.add('no-drop');
         } else {
@@ -154,7 +157,9 @@ export class Droppable {
 
         this.hide();
 
-        if (this._checkIfCanDrop(element, this._dropTarget) && element.node !== this._node) {
+        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent);
+
+        if (this.canDropHere) {
           // Add marked element for unmark in feature
           this._cacheOfDragOveredElements.add(element.node.el);
 
@@ -201,7 +206,10 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        if (!this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent)) {
+        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent);
+        const nextNode = this._getNodeBelow(element);
+
+        if (!this._canDropHere || nextNode === this._node) {
           this.hide();
           this._draggableEl.classList.add('no-drop');
         } else {
@@ -489,10 +497,38 @@ export class Droppable {
     return dropTarget;
   }
 
+  private _getNodeAbove(element): FlatItemNode {
+    const elIndex = this._orderedNodes.indexOf(element);
+    const el = this._orderedNodes[elIndex];
+    const prevEl = this._orderedNodes[elIndex - 1];
+
+    if (!el || !prevEl || el.node.level !== prevEl.node.level) {
+      return null;
+    }
+
+    return prevEl.node;
+  }
+
+  private _getNodeBelow(element): FlatItemNode {
+    const elIndex = this._orderedNodes.indexOf(element);
+    const el = this._orderedNodes[elIndex];
+    const nextEl = this._orderedNodes[elIndex + 1];
+
+    if (!el || !nextEl || el.node.level !== nextEl.node.level) {
+      return null;
+    }
+
+    return nextEl.node;
+  }
+
   /**
    * If can drop function passed - do call for result
    */
   private _checkIfCanDrop(element, toParent) {
+    if (!this._dropNotIntoItSelf(element.node)) {
+      return false;
+    }
+
     if (!this._canDrop) {
       return true
     } else {
@@ -531,7 +567,7 @@ export class Droppable {
         prevElem = this._dropTarget;
       }
 
-      this._canDropHere = this._canDrop(
+      return this._canDrop(
         this._node,
         this._node.parent,
         toParent,
@@ -539,9 +575,28 @@ export class Droppable {
         prevElem,
         nextElem
       );
-
-      return this._canDropHere;
     }
+  }
+
+  private _dropNotIntoItSelf(targetParent): boolean {
+    const sameNode = targetParent === this._node;
+    let childOfDraggableNode = sameNode;
+
+    if (!sameNode) {
+      let parent = targetParent?.parent;
+
+      while (parent && !sameNode) {
+        if (this._node === parent) {
+          childOfDraggableNode = true;
+
+          return;
+        }
+
+        parent = parent?.parent;
+      }
+    }
+
+    return !childOfDraggableNode;
   }
 
   /**

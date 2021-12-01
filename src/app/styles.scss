@@ -86,7 +86,11 @@
       overflow: visible;
       flex-direction: column;
 
-      &.draggable-elem .container {
+      &.disabled-node .container{
+        opacity: .5;
+      }
+
+      &.draggable-elem > .node > .container {
         opacity: .5;
       }
 
@@ -97,12 +101,12 @@
       .draggable-item {
         position: fixed;
         z-index: 999999;
-        border: 1px #ccc solid;
-        border-radius: 2px;
-        background: rgba(255, 255, 255, 0.5);
+        //border: 1px #ccc solid;
+        //border-radius: 2px;
+        //background: rgba(255, 255, 255, 0.5);
         min-height: 40px;
         padding: 0 15px;
-        color: rgba(71, 71, 71, 0.5);
+        //color: rgba(71, 71, 71, 0.5);
 
         button, .checklist-leaf-node {
           display: none;

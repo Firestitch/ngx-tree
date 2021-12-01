@@ -11,7 +11,7 @@ export class LoggerService {
 
   public log(type, message) {
     if (this._enabled) {
-      console.warn(`Type: ${type}`, ...message);
+      console.warn(`Type: ${type}`, message);
     }
   }
 
