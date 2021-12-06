@@ -136,7 +136,7 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent);
+        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget?.parent);
         const prevNode = this._getNodeAbove(element);
 
         if (!this.canDropHere || prevNode === this._node) {
@@ -157,7 +157,7 @@ export class Droppable {
 
         this.hide();
 
-        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent);
+        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget);
 
         if (this.canDropHere) {
           // Add marked element for unmark in feature
@@ -206,7 +206,7 @@ export class Droppable {
         }
 
         // Hide drop area if can't drop
-        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget && this._dropTarget.parent);
+        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget?.parent);
         const nextNode = this._getNodeBelow(element);
 
         if (!this._canDropHere || nextNode === this._node) {
@@ -525,7 +525,7 @@ export class Droppable {
    * If can drop function passed - do call for result
    */
   private _checkIfCanDrop(element, toParent) {
-    if (!this._dropNotIntoItSelf(element.node)) {
+    if (this._dropIntoItSelf(toParent)) {
       return false;
     }
 
@@ -578,25 +578,23 @@ export class Droppable {
     }
   }
 
-  private _dropNotIntoItSelf(targetParent): boolean {
+  private _dropIntoItSelf(targetParent): boolean {
     const sameNode = targetParent === this._node;
-    let childOfDraggableNode = sameNode;
+    let childOfDraggableNode = false;
 
     if (!sameNode) {
       let parent = targetParent?.parent;
 
-      while (parent && !sameNode) {
+      while (parent && !childOfDraggableNode) {
         if (this._node === parent) {
           childOfDraggableNode = true;
-
-          return;
         }
 
         parent = parent?.parent;
       }
     }
 
-    return !childOfDraggableNode;
+    return sameNode || childOfDraggableNode;
   }
 
   /**
