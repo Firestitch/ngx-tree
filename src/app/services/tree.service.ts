@@ -69,7 +69,10 @@ export class FsTreeService<T> implements OnDestroy {
   public init(el: ElementRef, config) {
     this._subscribeToDataChange();
     this._database.containerElement = el;
-    this.config = config;
+    this.config = {
+      ...config,
+      draggable: config.draggable ?? true,
+    };
 
     this._database.initialize(this.treeControl, this.config);
 

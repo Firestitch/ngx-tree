@@ -62,9 +62,14 @@
         .fs-tree-draggable-target {
           cursor: grab;
           margin-right: 10px;
+          display: none;
 
           &.no-drag {
             cursor: default !important;
+          }
+
+          &.draggable {
+            display: inline;
           }
         }
         .content {

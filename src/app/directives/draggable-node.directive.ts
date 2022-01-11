@@ -22,7 +22,7 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { FsTreeDatabaseService } from '../services/tree-database.service';
 import { LoggerService } from '../services/logger.service';
-import { IFsTreeNodeClick } from '../interfaces/config.interface';
+import { FsTreeService } from '../services/tree.service';
 
 
 @Directive({
@@ -56,24 +56,26 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
     private _db: FsTreeDatabaseService<T>,
     private _logger: LoggerService,
     private _el: ElementRef,
-    private _cdRef: ChangeDetectorRef,
     private _zone: NgZone,
+    private _tree: FsTreeService<T>,
   ) {}
 
   public ngOnInit() {
-    this._zone.runOutsideAngular(() => {
-      this._draggable = new Draggable(
-        this._db.containerElement,
-        this.node,
-        this.draggableContent,
-        this.draggableTarget,
-        this._db.nestedNodeMap,
-        { canDrop: this.candDrop },
-        this._logger,
-      );
-    });
+    if(this._tree.config.draggable) {
+      this._zone.runOutsideAngular(() => {
+        this._draggable = new Draggable(
+          this._db.containerElement,
+          this.node,
+          this.draggableContent,
+          this.draggableTarget,
+          this._db.nestedNodeMap,
+          { canDrop: this.candDrop },
+          this._logger,
+        );
+      });
 
-    this._initSubscriptions();
+      this._initSubscriptions();
+    }
   }
 
   public ngAfterViewInit() {
@@ -86,7 +88,9 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   }
 
   public ngOnDestroy() {
-    this._draggable.destroy();
+    if(this._tree.config.draggable) {
+      this._draggable.destroy();
+    }
 
     this._destroy.next();
     this._destroy.complete();

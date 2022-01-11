@@ -14,6 +14,7 @@ export interface ITreeConfig<T> {
   sortBy?: (data: T[], parent?: T ) => T[];
   childrenName?: string;
   actions?: FsTreeAction[];
+  draggable?: boolean,
   canDrag?: canDrag;
   canDrop?: CanDrop;
   nodeClass?: nodeClass;
