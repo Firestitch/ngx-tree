@@ -1,8 +1,8 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 
 @mixin fs-tree($theme) {
 
-  $primary: mat-palette($theme);
+  $primary: mat.define-palette($theme);
 
   body.block-selection {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -19,7 +19,7 @@
       display: block;
       position: fixed;
       z-index: 99999;
-      background: mat-color($primary);
+      background: mat.get-color-from-palette($primary);
       height: 10px;
       border-radius: 2px;
     }
@@ -100,7 +100,7 @@
       }
 
       &.drag-over .node {
-        background-color: mat-color($primary);
+        background-color: mat.get-color-from-palette($primary);
       }
 
       .draggable-item {

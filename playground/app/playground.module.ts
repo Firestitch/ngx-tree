@@ -31,7 +31,7 @@ import { AppComponent } from './app.component';
     BrowserAnimationsModule,
     AppMaterialModule,
     FormsModule,
-    RouterModule.forRoot([]),
+    RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
     FsExampleModule.forRoot(),
     FsMessageModule.forRoot(),
     ToastrModule.forRoot({ preventDuplicates: true }),

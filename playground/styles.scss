@@ -1,11 +1,12 @@
+@use '~@angular/material' as mat;
 @import '../tools/assets/playground.scss';
 @import '~ngx-toastr/toastr.css';
 @import '../src/app/styles.scss';
 
 
-@include mat-core();
+@include mat.core();
 
-@include fs-tree($mat-blue);
+@include fs-tree(mat.$blue-palette);
 
 mat-tree {
   a.primary {
