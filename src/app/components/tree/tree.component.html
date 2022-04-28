@@ -5,6 +5,7 @@
                  matTreeNodeToggle
                  matTreeNodePadding
                  fsTreeNodeClass
+                 class="fs-tree-level-{{node.level}}"
                  [ngClass]="treeNodeData?.klass"
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
@@ -22,6 +23,7 @@
         </mat-checkbox>
         <mat-icon
             fsDraggableNodeTarget
+            class="fs-tree-draggable-handle"
             [ngClass]="{ 'draggable': tree.config.draggable, 'no-drag': !node.canDrag }">
           drag_handle
         </mat-icon>
@@ -40,6 +42,7 @@
   <mat-tree-node *matTreeNodeDef="let node; when: hasChild"
                  matTreeNodePadding
                  fsTreeNodeClass
+                 class="fs-tree-level-{{node.level}}"
                  [ngClass]="treeNodeData?.klass"
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
@@ -50,6 +53,7 @@
         <ng-container *ngIf="rootChildrenExist$ | async">
           <button mat-icon-button
                   type="button"
+                  class="fs-tree-expand-toggle-button"
                   (click)="tree.toggleNode(node)"
                   [attr.aria-label]="'toggle ' + node.filename">
             <mat-icon class="mat-icon-rtl-mirror">
@@ -67,6 +71,7 @@
 
         <mat-icon
             fsDraggableNodeTarget
+            class="fs-tree-draggable-handle"
             [ngClass]="{ 'draggable': tree.config.draggable, 'no-drag': !node.canDrag }">
           drag_handle
         </mat-icon>

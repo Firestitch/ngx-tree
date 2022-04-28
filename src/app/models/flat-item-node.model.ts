@@ -14,6 +14,10 @@ export class FlatItemNode {
   public canNodeClick = true;
   public templateContext: any = {};
 
+  private _lastNode = false;
+  private _firstNode = false;
+  private _index: number = null;
+
   private _dataStoredKeys = [];
   private _data: any;
   private _level: number;
@@ -66,6 +70,22 @@ export class FlatItemNode {
     this.templateContext.parent = this.parent;
   }
 
+  set index(value: number) {
+    this._index = value;
+  }
+
+  get index(): number {
+    return this._index;
+  }
+
+  set first(value: boolean) {
+    this._firstNode = value;
+  }
+
+  set last(value: boolean) {
+    this._lastNode = value;
+  }
+
   /**
    * Do update for template Context
    */
@@ -92,6 +112,9 @@ export class FlatItemNode {
     this.templateContext.level = this.level;
     this.templateContext.parent = this.parent;
     this.templateContext.node = this._data;
+    this.templateContext.index = this._index;
+    this.templateContext.last = this._lastNode;
+    this.templateContext.first = this._firstNode;
   }
 
 }

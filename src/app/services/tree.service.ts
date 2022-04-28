@@ -104,7 +104,6 @@ export class FsTreeService<T> implements OnDestroy {
       ? existingNode
       : new FlatItemNode();
 
-    flatNode.data = node.data;
     flatNode.original = node;
     flatNode.parent = this._database.nestedNodeMap.get(node.parent);
     flatNode.originalParent = this._database.flatNodeMap.get(flatNode.parent);
@@ -115,6 +114,18 @@ export class FsTreeService<T> implements OnDestroy {
     flatNode.expand = () => this.treeControl.expand(flatNode);
     flatNode.canDrag = this.config.canDrag ? this.config.canDrag(flatNode) : true;
     flatNode.canNodeClick = this.config.canNodeClick ? this.config.canNodeClick(flatNode) : false;
+
+    const nodesList = level === 0
+      ? this._database.data
+      : flatNode.originalParent.children;
+
+    flatNode.index = level === 0
+      ? nodesList.indexOf(node)
+      : nodesList.indexOf(node);
+    flatNode.first = nodesList.indexOf(node) === 0;
+    flatNode.last = nodesList.length - 1 === flatNode.index;
+
+    flatNode.data = node.data;
 
     this._database.flatNodeMap.set(flatNode, node);
     this._database.nestedNodeMap.set(node, flatNode);
