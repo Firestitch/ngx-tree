@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 
 import { Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 
@@ -53,6 +54,13 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   // Possibility to expand/collapse for nodes
   public blocked = false;
+
+  public rootChildrenExist$ = this.tree.dataChange$.pipe(
+    map((value) => {
+      return value
+        .some((node) => !!node.children && node.children.length > 0);
+    })
+  )
 
   private _destroy$ = new Subject<void>();
 

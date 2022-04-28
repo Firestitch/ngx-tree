@@ -1,7 +1,7 @@
 import { ElementRef, Injectable, OnDestroy } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { ItemNode } from '../models/item-node.model';
@@ -26,7 +26,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
 
   public treeControl: FlatTreeControl<FlatItemNode>;
 
-  private _data: ItemNode[] = [];
+  private _data$ = new BehaviorSubject<ItemNode[]>([]);
   private _config: ITreeConfig<T>;
   private _dataChange = new Subject<ITreeDataChange>();
   private _destroy$ = new Subject<void>();
@@ -34,11 +34,19 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   constructor() {}
 
   get dataChange(): Observable<ITreeDataChange> {
-    return this._dataChange.pipe(takeUntil(this._destroy$));
+    return this._dataChange.asObservable();
   }
 
   get data(): ItemNode[] {
-    return this._data;
+    return this._data$.getValue();
+  }
+
+  get data$(): Observable<ItemNode[]> {
+    return this._data$.asObservable();
+  }
+
+  set data(value: ItemNode[]) {
+    this._data$.next(value);
   }
 
   public ngOnDestroy() {
@@ -54,7 +62,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
     this._config = config;
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
-    this._data = treeBuilder(
+    this.data = treeBuilder(
       config.data,
       0,
       null,
@@ -62,17 +70,17 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
       config.levels
     );
 
-    this._data = treeSort(this._data, config.sortBy);
+    this.data = treeSort(this.data, config.sortBy);
 
     // Notify the change.
-    this.updateData(FsTreeChange.Init, this._data);
+    this.updateData(FsTreeChange.Init, this.data);
   }
 
   public updateSort(target: ItemNode = null) {
     if (target && target.children) {
       target.children = treeSort(target.children, this._config.sortBy);
     } else {
-      this._data = treeSort(this._data, this._config.sortBy);
+      this.data = treeSort(this.data, this._config.sortBy);
     }
   }
 
@@ -104,10 +112,10 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
       parent.children = sortDataBy(parent.children, this._config.sortBy, parent);
       insertedIndex = parent.children.indexOf(node);
     } else {
-      const targetIndex = this._data.indexOf(target);
-      this._data.splice(targetIndex, 0, node);
-      this._data = sortDataBy(this._data, this._config.sortBy);
-      insertedIndex = this._data.indexOf(node);
+      const targetIndex = this.data.indexOf(target);
+      this.data.splice(targetIndex, 0, node);
+      this.data = sortDataBy(this.data, this._config.sortBy);
+      insertedIndex = this.data.indexOf(node);
     }
 
     node.parent = target.parent;
@@ -129,11 +137,11 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
 
       insertedIndex = parent.children.indexOf(node);
     } else {
-      const targetIndex = this._data.indexOf(target);
-      this._data.splice(targetIndex + 1, 0, node);
-      this._data = sortDataBy(this._data, this._config.sortBy);
+      const targetIndex = this.data.indexOf(target);
+      this.data.splice(targetIndex + 1, 0, node);
+      this.data = sortDataBy(this.data, this._config.sortBy);
 
-      insertedIndex = this._data.indexOf(node);
+      insertedIndex = this.data.indexOf(node);
     }
 
     node.parent = target.parent;
@@ -161,7 +169,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
     } else {
       this.data.push(node);
 
-      this._data = sortDataBy(this._data, this._config.sortBy);
+      this.data = sortDataBy(this.data, this._config.sortBy);
       insertedIndex = this.data.indexOf(node);
     }
 

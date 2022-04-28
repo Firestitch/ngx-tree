@@ -23,7 +23,7 @@ import { isExpandable } from '../helpers/is-expandable';
 import { dataBuilder } from '../helpers/data-builder';
 import { getChildren } from '../helpers/get-children';
 
-import { IFsTreeNodeClick, ITreeConfig } from '../interfaces/config.interface';
+import { ITreeConfig } from '../interfaces/config.interface';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
@@ -65,6 +65,11 @@ export class FsTreeService<T> implements OnDestroy {
   public get updateClasses$(): Observable<void> {
     return this._updateClasses$.asObservable();
   }
+
+  public get dataChange$(): Observable<ItemNode[]> {
+    return this._database.data$;
+  }
+
 
   public init(el: ElementRef, config) {
     this._subscribeToDataChange();
