@@ -71,6 +71,7 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
           this._db.nestedNodeMap,
           { canDrop: this.candDrop },
           this._logger,
+          this._tree.config.dragAxis,
         );
       });
 

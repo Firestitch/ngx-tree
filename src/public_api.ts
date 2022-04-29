@@ -37,6 +37,6 @@ export { FlatItemNode } from './app/models/flat-item-node.model';
 export { ItemNode } from './app/models/item-node.model';
 
 export { FsTreeChange } from './app/enums/tree-change.enum';
-
+export { TreeDragAxis } from './app/enums/drag-axis.enum';
 
 export { FsTreeNodeDirective } from './app/directives/tree-node.directive';

@@ -28,6 +28,7 @@ import { IDragEnd } from '../interfaces/draggable.interface';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
 import { FsTreeChange } from '../enums/tree-change.enum';
+import { TreeDragAxis } from '../enums/drag-axis.enum';
 
 
 @Injectable()
@@ -77,6 +78,7 @@ export class FsTreeService<T> implements OnDestroy {
     this.config = {
       ...config,
       draggable: config.draggable ?? true,
+      dragAxis: config.dragAxis ?? TreeDragAxis.XY,
     };
 
     this._database.initialize(this.treeControl, this.config);

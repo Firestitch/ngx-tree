@@ -4,6 +4,7 @@ import { FsTreeAction } from './action.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 import { ItemNode } from '../models/item-node.model';
+import { TreeDragAxis } from '../enums/drag-axis.enum';
 
 
 export interface ITreeConfig<T> {
@@ -28,6 +29,7 @@ export interface ITreeConfig<T> {
   nodeClass?: TreeNodeClass;
   nodeClick?: (event: ITreeNodeClick) => void;
   canNodeClick?: TreeCanNodeClick;
+  dragAxis?: TreeDragAxis;
 }
 
 export type TreeCanDrag = (node: FlatItemNode) => boolean;

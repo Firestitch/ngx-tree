@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { FsTreeComponent, ItemNode, ITreeConfig, ITreeDataChange } from '@firestitch/tree';
+import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitch/tree';
 import { of } from 'rxjs';
 import { TREE_DATA } from '../../data';
 
@@ -15,6 +15,7 @@ export class ExampleComponent {
 
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
+    dragAxis: TreeDragAxis.Y,
     init: (data) => {
       console.log('== Init Callback', data);
     },

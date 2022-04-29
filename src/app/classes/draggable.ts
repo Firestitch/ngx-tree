@@ -8,6 +8,7 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { LoggerService } from '../services/logger.service'
+import { TreeDragAxis } from '../enums/drag-axis.enum';
 
 
 export class Draggable {
@@ -56,15 +57,17 @@ export class Draggable {
    * @param _nodes
    * @param _restrictions
    * @param _logger
+   * @param _dragAxis
    */
   constructor(
-    private _containerElement: ElementRef,
-    private _node: FlatItemNode,
-    private _el: ElementRef,
-    private _target: ElementRef,
-    private _nodes: Map<ItemNode, FlatItemNode>,
-    private _restrictions: any,
-    private _logger: LoggerService,
+    private readonly _containerElement: ElementRef,
+    private readonly _node: FlatItemNode,
+    private readonly _el: ElementRef,
+    private readonly _target: ElementRef,
+    private readonly _nodes: Map<ItemNode, FlatItemNode>,
+    private readonly _restrictions: any,
+    private readonly _logger: LoggerService,
+    private readonly _dragAxis: TreeDragAxis,
   ) {
 
     // Listen mouse or touch events
@@ -173,7 +176,10 @@ export class Draggable {
     const leftOffset = (event.x || event.pageX) - this._shiftX;
 
     this._draggableEl.style.top =  topOffset + 'px';
-    this._draggableEl.style.left =  leftOffset + 'px';
+
+    if (this._dragAxis === TreeDragAxis.XY) {
+      this._draggableEl.style.left =  leftOffset + 'px';
+    }
 
     if (event.clientY < this._limitToScroll) {
       this._scrolled = true;
