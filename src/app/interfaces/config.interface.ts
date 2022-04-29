@@ -10,21 +10,29 @@ export interface ITreeConfig<T> {
   levels?: number;
   selection?: ITreeSelectionConfig;
   data?: T;
+  init?: (data: ItemNode[]) => void;
+  changeReorder?: (data: ITreeChangeReorder) => void;
+  changeInsert?: (data: ITreeChangeInsert) => void;
+  changeRemove?: (data: ITreeChangeRemove) => void;
+  changeUpdate?: (data: ITreeChangeUpdate) => void;
+  /**
+   * @deprecated Use separated callbacks instead
+   */
   change?: (data: ITreeDataChange) => void;
   sortBy?: (data: T[], parent?: T ) => T[];
   childrenName?: string;
   actions?: FsTreeAction[];
   draggable?: boolean,
-  canDrag?: canDrag;
+  canDrag?: TreeCanDrag;
   canDrop?: CanDrop;
-  nodeClass?: nodeClass;
-  nodeClick?: (event: IFsTreeNodeClick) => void;
-  canNodeClick?: canNodeClick;
+  nodeClass?: TreeNodeClass;
+  nodeClick?: (event: ITreeNodeClick) => void;
+  canNodeClick?: TreeCanNodeClick;
 }
 
-export type canDrag = (node: FlatItemNode) => boolean;
-export type canNodeClick = (node: FlatItemNode) => boolean;
-export type nodeClass = (node: FlatItemNode) => string | string[];
+export type TreeCanDrag = (node: FlatItemNode) => boolean;
+export type TreeCanNodeClick = (node: FlatItemNode) => boolean;
+export type TreeNodeClass = (node: FlatItemNode) => string | string[];
 
 export type CanDrop = (
   node?: FlatItemNode,
@@ -40,6 +48,28 @@ export interface ITreeSelectionConfig {
   selected?: (node: ItemNode) => boolean;
 }
 
-export interface IFsTreeNodeClick {
+export interface ITreeNodeClick {
   node?: FlatItemNode;
+}
+
+export interface ITreeChangeUpdate {
+  node: ItemNode;
+}
+
+export interface ITreeChangeInsert {
+  position: 'into' | 'above' | 'below',
+  parent: ItemNode;
+  node: ItemNode;
+  index: number;
+}
+
+export interface ITreeChangeRemove {
+  target: ItemNode;
+}
+
+export interface ITreeChangeReorder {
+  fromParent: ItemNode;
+  toParent: ItemNode;
+  node: ItemNode;
+  index: number;
 }

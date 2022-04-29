@@ -471,6 +471,26 @@ export class FsTreeService<T> implements OnDestroy {
         if (this.config.change) {
           this.config.change(event);
         }
+
+        if (event.type === FsTreeChange.Init && this.config.init) {
+          this.config.init(event.payload);
+        }
+
+        if (event.type === FsTreeChange.Insert && this.config.changeInsert) {
+          this.config.changeInsert(event.payload);
+        }
+
+        if (event.type === FsTreeChange.Remove && this.config.changeRemove) {
+          this.config.changeRemove(event.payload);
+        }
+
+        if (event.type === FsTreeChange.Update && this.config.changeUpdate) {
+          this.config.changeUpdate(event.payload);
+        }
+
+        if (event.type === FsTreeChange.Reorder && this.config.changeReorder) {
+          this.config.changeReorder(event.payload);
+        }
       });
   }
 

@@ -20,6 +20,18 @@ export class LevelsLimitComponent {
     canDrop: (node, fromParent, toParent) => {
       return fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);
     },
+    changeUpdate: (data) => {
+      console.log('== Update Callback', data);
+    },
+    changeRemove: (data) => {
+      console.log('== Remove Callback', data);
+    },
+    changeInsert: (data) => {
+      console.log('== Insert Callback', data);
+    },
+    changeReorder: (data) => {
+      console.log('== Reorder Callback', data);
+    },
     actions: [
       {
         type: TreeActionType.Menu,
