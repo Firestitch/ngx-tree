@@ -7,6 +7,8 @@
                  fsTreeNodeClass
                  class="fs-tree-level-{{node.level}}"
                  [ngClass]="treeNodeData?.klass"
+                 [class.fs-tree-node-first]="node.templateContext?.first"
+                 [class.fs-tree-node-last]="node.templateContext?.last"
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
                  (dragStart)="tree.onDragStart($event)"
@@ -44,6 +46,8 @@
                  fsTreeNodeClass
                  class="fs-tree-level-{{node.level}}"
                  [ngClass]="treeNodeData?.klass"
+                 [class.fs-tree-node-first]="node.templateContext?.first"
+                 [class.fs-tree-node-last]="node.templateContext?.last"
                  [fsDraggableNode]="node"
                  [fsCanDrop]="tree.config.canDrop"
                  (dragStart)="tree.onDragStart($event)"
