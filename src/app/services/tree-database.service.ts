@@ -76,6 +76,21 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
     this.updateData(FsTreeChange.Init, this.data);
   }
 
+  public setData(data: unknown): void {
+    this.data = treeBuilder(
+      data,
+      0,
+      null,
+      this._config.childrenName,
+      this._config.levels
+    );
+
+    this.data = treeSort(this.data, this._config.sortBy);
+
+    // Notify the change.
+    this.updateData(FsTreeChange.UpdateData, this.data);
+  }
+
   public updateSort(target: ItemNode = null) {
     if (target && target.children) {
       target.children = treeSort(target.children, this._config.sortBy);

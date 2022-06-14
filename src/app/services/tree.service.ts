@@ -82,14 +82,7 @@ export class FsTreeService<T> implements OnDestroy {
     };
 
     this._database.initialize(this.treeControl, this.config);
-
-    if (this.config.selection?.selected) {
-      this.treeControl.dataNodes
-        .filter((node: FlatItemNode) => this.config.selection.selected(node.original))
-        .forEach((node: FlatItemNode) => {
-          this._selectNode(node);
-        });
-    }
+    this._updateSelected();
   }
 
   public ngOnDestroy() {
@@ -273,6 +266,13 @@ export class FsTreeService<T> implements OnDestroy {
    */
   public getData() {
     return dataBuilder(this.dataSource.data, this.config.childrenName);
+  }
+
+  public setData(data: unknown): void {
+    this.checklistSelection.clear();
+
+    this._database.setData(data);
+    this._updateSelected();
   }
 
   /**
@@ -505,6 +505,16 @@ export class FsTreeService<T> implements OnDestroy {
 
 
       this.config.selection.change(selected);
+    }
+  }
+
+  private _updateSelected(): void {
+    if (this.config.selection?.selected) {
+      this.treeControl.dataNodes
+        .filter((node: FlatItemNode) => this.config.selection.selected(node.original))
+        .forEach((node: FlatItemNode) => {
+          this._selectNode(node);
+        });
     }
   }
 }

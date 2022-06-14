@@ -197,4 +197,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public getData() {
     return this.tree.getData();
   }
+
+  public setData(data: unknown): void {
+    this.tree.setData(data);
+  }
 }
