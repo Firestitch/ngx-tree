@@ -21,5 +21,6 @@
         "src/public_api.ts"
       ]
     }
-  }
+  },
+  "extends": "./node_modules/@firestitch/component-tools/config/tsconfig.cli.json"
 }
