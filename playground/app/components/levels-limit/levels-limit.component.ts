@@ -7,7 +7,7 @@ import { TreeActionType } from '../../../../src/app/models/action.model';
 
 @Component({
   selector: 'levels-limit',
-  templateUrl: 'levels-limit.component.html'
+  templateUrl: './levels-limit.component.html'
 })
 export class LevelsLimitComponent {
   @ViewChild('tree')

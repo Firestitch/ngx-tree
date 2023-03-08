@@ -1,0 +1,26 @@
+{
+  "name": "@firestitch/tree",
+  "version": "12.2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Firestitch/ngx-tree"
+  },
+  "author": {
+    "name": "Firestitch",
+    "email": "admin@firestitch.com"
+  },
+  "keywords": [
+    "angular"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Firestitch/ngx-tree/issues"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
+  "sideEffects": false,
+  "esm2015": "esm2015/firestitch-tree.js",
+  "fesm2015": "fesm2015/firestitch-tree.js",
+  "typings": "firestitch-tree.d.ts"
+}

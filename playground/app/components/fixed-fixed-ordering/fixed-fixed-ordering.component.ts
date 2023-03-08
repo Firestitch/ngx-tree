@@ -7,7 +7,7 @@ import { TreeActionType } from '../../../../src/app/models/action.model';
 
 @Component({
   selector: 'fixed-fixed-ordering',
-  templateUrl: 'fixed-fixed-ordering.component.html'
+  templateUrl: './fixed-fixed-ordering.component.html'
 })
 export class FixedFixedOrderingComponent {
   @ViewChild('tree')

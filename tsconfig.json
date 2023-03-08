@@ -1,26 +1,13 @@
 {
-  "compileOnSave": false,
+  "extends": "./node_modules/@firestitch/component-tools/config/tsconfig.cli.json",
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": false,
-    "module": "es2020",
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "target": "es2015",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2017",
-      "dom"
-    ],
     "paths": {
       "@firestitch/tree": [
         "src/public_api.ts"
       ]
     }
   },
-  "extends": "./node_modules/@firestitch/component-tools/config/tsconfig.cli.json"
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
 }
