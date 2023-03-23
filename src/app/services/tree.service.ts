@@ -243,7 +243,7 @@ export class FsTreeService<T> implements OnDestroy {
   }
 
   public nodeClick(node: FlatItemNode) {
-    this.config.nodeClick({ node });
+    this.config?.nodeClick({ node });
   }
 
   /**
