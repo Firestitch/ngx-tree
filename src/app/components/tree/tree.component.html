@@ -32,7 +32,7 @@
             [ngClass]="{ 'draggable': tree.config.draggable, 'no-drag': !node.canDrag }">
           drag_handle
         </mat-icon>
-        <div class="content" [ngClass]="{ 'clickable': !!node.canNodeClick }" (click)="tree.nodeClick(node)">
+        <div class="content" [ngClass]="{ 'clickable': !!node.canNodeClick }" (click)="nodeClick(node)">
           <ng-template
             [ngTemplateOutlet]="treeNodeData?.templateRef || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.templateContext">
@@ -85,7 +85,7 @@
           drag_handle
         </mat-icon>
 
-        <div class="content" [ngClass]="{ 'clickable': !!node.canNodeClick }" (click)="tree.nodeClick(node)">
+        <div class="content" [ngClass]="{ 'clickable': !!node.canNodeClick }" (click)="nodeClick(node)">
           <ng-template
             [ngTemplateOutlet]="treeNodeData?.templateRef || defaultNodeTemplate"
             [ngTemplateOutletContext]="node.templateContext">
