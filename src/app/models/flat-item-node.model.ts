@@ -111,7 +111,9 @@ export class FlatItemNode {
 
     this.templateContext.level = this.level;
     this.templateContext.parent = this.parent;
+    this.templateContext.data = this._data;
     this.templateContext.node = this._data;
+    this.templateContext.flatItemNode = this;
     this.templateContext.index = this._index;
     this.templateContext.last = this._lastNode;
     this.templateContext.first = this._firstNode;

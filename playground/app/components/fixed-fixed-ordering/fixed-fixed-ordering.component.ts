@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
+import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
 import { TREE_DATA } from '../../data';
 import { TreeActionType } from '../../../../src/app/models/action.model';
@@ -60,7 +60,7 @@ export class FixedFixedOrderingComponent {
             show: (node) => {
               return node.level === 0;
             },
-            click: (node) => {
+            click: (node: FlatItemNode) => {
               this.tree.append({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node)
             }
           },
@@ -69,13 +69,13 @@ export class FixedFixedOrderingComponent {
             show: (node) => {
               return node.level === 1;
             },
-            click: (node) => {
+            click: (node: FlatItemNode) => {
               this.tree.insertAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
             }
           },
           {
             label: 'Create Object Below',
-            show: (node) => {
+            show: (node: FlatItemNode) => {
               return node.level === 1;
             },
             click: (node) => {
@@ -84,7 +84,7 @@ export class FixedFixedOrderingComponent {
           },
           {
             label: 'Delete',
-            click: (node) => {
+            click: (node: FlatItemNode) => {
               this.tree.remove(node)
             }
           }

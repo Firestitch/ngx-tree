@@ -4,14 +4,13 @@
   <button mat-raised-button (click)="collapseAll()">Collapse All</button>
 </div>
 <fs-tree [config]="config" #tree>
-  <ng-template fsTreeNode class="test"
-               let-id="id"
-               let-name="name"
-               let-level="level"
-               let-node="node"
-               let-first="first"
-               let-last="last"
-               let-index="index">
-    {{ name }} (ID: {{ id }})
+  <ng-template 
+      fsTreeNode class="test"
+      let-level="level"
+      let-data="data"
+      let-first="first"
+      let-last="last"
+      let-index="index">
+    {{ data.name }} (ID: {{ data.id }})
   </ng-template>
 </fs-tree>

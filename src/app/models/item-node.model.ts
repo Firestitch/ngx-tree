@@ -1,4 +1,5 @@
 export class ItemNode {
+  
   public children: ItemNode[];
   public data: any;
   public parent: ItemNode;

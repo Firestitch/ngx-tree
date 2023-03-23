@@ -71,7 +71,6 @@ export class FsTreeService<T> implements OnDestroy {
     return this._database.data$;
   }
 
-
   public init(el: ElementRef, config) {
     this._subscribeToDataChange();
     this._database.containerElement = el;
