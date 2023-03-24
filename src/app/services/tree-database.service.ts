@@ -2,7 +2,6 @@ import { ElementRef, Injectable, OnDestroy } from '@angular/core';
 import { FlatTreeControl } from '@angular/cdk/tree';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { ItemNode } from '../models/item-node.model';
 import { FlatItemNode } from '../models/flat-item-node.model';
@@ -114,11 +113,8 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   }
 
   public insertNodeAbove(target: ItemNode, node: ItemNode): number {
-
     const parent = target.parent;
-
     this.removeItem(node);
-
     let insertedIndex = null;
 
     if (parent) {
@@ -139,9 +135,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   }
 
   public insertNodeBelow(target: ItemNode, node: ItemNode): number {
-
     const parent = target.parent;
-
     this.removeItem(node);
 
     let insertedIndex = null;
@@ -165,7 +159,6 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   }
 
   public insertNode(target: ItemNode, node: ItemNode) {
-
     this.removeItem(node);
 
     let insertedIndex = null;
@@ -190,7 +183,6 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
 
     return insertedIndex;
   }
-
 
   public removeItem(node: ItemNode) {
     const parent = node.parent;
