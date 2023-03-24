@@ -15,7 +15,7 @@ export class LevelsLimitComponent {
 
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
-    levels: 2,
+    maxLevel: 2,
     childrenName: 'accounts',
     canDrop: (node, fromParent, toParent) => {
       return fromParent === toParent || (fromParent && toParent && fromParent.level === toParent.level);

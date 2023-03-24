@@ -17,7 +17,7 @@ export class ActionsComponent {
 
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
-    levels: 2,
+    maxLevel: 2,
     childrenName: 'accounts',
     sortBy: (data) => {
       return data.sort((a, b) => {

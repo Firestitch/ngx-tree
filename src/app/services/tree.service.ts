@@ -82,6 +82,7 @@ export class FsTreeService<T> implements OnDestroy {
 
     this._database.initialize(this.treeControl, this.config);
     this._updateSelected();
+    this._updateExpanded();
   }
 
   public ngOnDestroy() {
@@ -274,6 +275,7 @@ export class FsTreeService<T> implements OnDestroy {
 
     this._database.setData(data);
     this._updateSelected();
+    this._updateExpanded();
   }
 
   /**
@@ -515,6 +517,16 @@ export class FsTreeService<T> implements OnDestroy {
         .filter((node: FlatItemNode) => this.config.selection.selected(node.original))
         .forEach((node: FlatItemNode) => {
           this._selectNode(node);
+        });
+    }
+  }
+
+  private _updateExpanded(): void {
+    if (this.config.expandLevel) {
+      this.treeControl.dataNodes
+        .filter((node: FlatItemNode) => this.config.expandLevel === Infinity || this.config.expandLevel > node.level)
+        .forEach((node: FlatItemNode) => {
+          node.expand();
         });
     }
   }

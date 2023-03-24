@@ -16,6 +16,7 @@ export class ExampleComponent {
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
     dragAxis: TreeDragAxis.Y,
+    expandLevel: Infinity,
     init: (data) => {
       console.log('== Init Callback', data);
     },

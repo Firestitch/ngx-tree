@@ -15,7 +15,7 @@ export class FixedFixedOrderingComponent {
 
   public config: ITreeConfig<any> = {
     data: TREE_DATA,
-    levels: 2,
+    maxLevel: 2,
     childrenName: 'accounts',
     nodeClass: (node) => {
       if (node.level === 0) {

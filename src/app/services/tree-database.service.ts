@@ -66,7 +66,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
       0,
       null,
       config.childrenName,
-      config.levels
+      config.maxLevel
     );
 
     this.data = treeSort(this.data, config.sortBy);
@@ -81,7 +81,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
       0,
       null,
       this._config.childrenName,
-      this._config.levels
+      this._config.maxLevel
     );
 
     this.data = treeSort(this.data, this._config.sortBy);

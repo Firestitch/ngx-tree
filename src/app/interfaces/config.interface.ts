@@ -8,7 +8,8 @@ import { TreeDragAxis } from '../enums/drag-axis.enum';
 
 
 export interface ITreeConfig<T> {
-  levels?: number;
+  maxLevel?: number;
+  expandLevel?: number;
   selection?: ITreeSelectionConfig;
   data?: T;
   init?: (data: ItemNode[]) => void;

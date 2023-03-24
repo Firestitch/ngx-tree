@@ -27,7 +27,7 @@ export function treeBuilder(
 
       return acc;
     }, []);
-  } else if (parent && isArray ) {
+  } else if (parent && isArray) {
     target.forEach((item) => {
       if (!parent.children) {
         parent.children = [];
