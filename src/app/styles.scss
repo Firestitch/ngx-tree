@@ -14,7 +14,6 @@
 
 
   fs-tree {
-
     .droppable-area {
       display: block;
       position: fixed;
@@ -73,7 +72,6 @@
           }
         }
         .content {
-          pointer-events: none;
           align-self: stretch;
           display: flex;
           flex-direction: row;
