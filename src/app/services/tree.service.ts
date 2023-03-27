@@ -137,7 +137,9 @@ export class FsTreeService<T> implements OnDestroy {
   /** Whether part of the descendants are selected */
   public descendantsPartiallySelected(node: FlatItemNode): boolean {
     const descendants = this.treeControl.getDescendants(node);
-    const result = descendants.some(child => this.checklistSelection.isSelected(child));
+    const result = descendants
+      .some((child) => this.checklistSelection.isSelected(child));
+      
     return result && !this.descendantsAllSelected(node);
   }
 
@@ -509,6 +511,11 @@ export class FsTreeService<T> implements OnDestroy {
 
       this.config.selection.change(selected);
     }
+  }
+
+  public unselectAll(): void {
+    this.checklistSelection.clear();
+    this._updateSelected();
   }
 
   private _updateSelected(): void {
