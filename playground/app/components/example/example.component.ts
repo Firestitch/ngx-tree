@@ -51,4 +51,8 @@ export class ExampleComponent {
   public expandAll() {
     this.tree.expandAll();
   }
+
+  public consoleDebug() {
+    console.log('Get Nodes', this.tree.getNodes(null));
+  }
 }

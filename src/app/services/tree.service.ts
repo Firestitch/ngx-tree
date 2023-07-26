@@ -451,6 +451,12 @@ export class FsTreeService<T> implements OnDestroy {
   public updateNodesClasses() {
     this._updateClasses$.next();
   }
+  
+  public getNodes(rootNode?: FlatItemNode): FlatItemNode[] {
+    return rootNode ? 
+      this.treeControl.getDescendants(rootNode)
+      : this.treeControl.dataNodes;
+  }
 
   private _selectNode(node: FlatItemNode) {
     const descendants = this.treeControl.getDescendants(node);
