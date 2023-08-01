@@ -226,7 +226,7 @@ export class Draggable {
       this._node.expand();
     }
 
-    if (this._droppable.dropTarget && this._droppable.dropPosition && this._droppable.canDropHere) {
+    if (this._droppable && this._droppable.dropTarget && this._droppable.dropPosition && this._droppable.canDropHere) {
       this._dragEnd$.next({
         node: this._node,
         dropInto: this._droppable.dropTarget,
