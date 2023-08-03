@@ -23,7 +23,7 @@ import { isExpandable } from '../helpers/is-expandable';
 import { dataBuilder } from '../helpers/data-builder';
 import { getChildren } from '../helpers/get-children';
 
-import { ITreeConfig } from '../interfaces/config.interface';
+import { ITreeChangeInsert, ITreeChangeRemove, ITreeChangeReorder, ITreeConfig } from '../interfaces';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 
@@ -100,8 +100,8 @@ export class FsTreeService<T> implements OnDestroy {
       : new FlatItemNode();
 
     flatNode.original = node;
-    flatNode.parent = this._database.nestedNodeMap.get(node.parent);
-    flatNode.originalParent = this._database.flatNodeMap.get(flatNode.parent);
+    flatNode.parent = this.getFlatItemNode(node.parent);
+    flatNode.originalParent = this.getItemNode(flatNode.parent);
     flatNode.level = level;
     flatNode.expandable = (node.children && node.children.length > 0);
     flatNode.isExpanded = () => this.treeControl.isExpanded(flatNode);
@@ -118,7 +118,6 @@ export class FsTreeService<T> implements OnDestroy {
       : nodesList.indexOf(node);
     flatNode.first = nodesList.indexOf(node) === 0;
     flatNode.last = nodesList.length - 1 === flatNode.index;
-
     flatNode.data = node.data;
     flatNode.canNodeClick = this.config.canNodeClick ? this.config.canNodeClick(flatNode) : false;
 
@@ -127,6 +126,14 @@ export class FsTreeService<T> implements OnDestroy {
 
     return flatNode;
   };
+
+  public getFlatItemNode(node): FlatItemNode {
+    return this._database.nestedNodeMap.get(node);
+  }
+
+  public getItemNode(node): ItemNode {
+    return this._database.flatNodeMap.get(node);
+  }
 
   /** Whether all the descendants of the node are selected */
   public descendantsAllSelected(node: FlatItemNode): boolean {
@@ -234,10 +241,10 @@ export class FsTreeService<T> implements OnDestroy {
     // Run in zone back because before it was ran outside angular
     this._zone.run(() => {
       // Notify about data change
-      const payload = {
-        fromParent: fromParent,
-        toParent: node.parent,
-        node: node,
+      const payload: ITreeChangeReorder = {
+        fromParent: this.getFlatItemNode(fromParent),
+        toParent: this.getFlatItemNode(node.parent),
+        node: data.node,
         index: insertIndex,
       };
 
@@ -323,10 +330,10 @@ export class FsTreeService<T> implements OnDestroy {
     const insertIndex = this._database.insertNodeAbove(originalParent, node.original);
 
     // Notify about data change
-    const payload = {
+    const payload: ITreeChangeInsert = {
       position: 'above',
       parent: target,
-      node: node,
+      node,
       index: insertIndex,
     };
 
@@ -346,7 +353,7 @@ export class FsTreeService<T> implements OnDestroy {
     const insertIndex = this._database.insertNodeBelow(originalParent, node.original);
 
     // Notify about data change
-    const payload = {
+    const payload: ITreeChangeInsert = {
       position: 'below',
       parent: target,
       node: node,
@@ -374,7 +381,7 @@ export class FsTreeService<T> implements OnDestroy {
     }
 
     // Notify about data change
-    const payload = {
+    const payload: ITreeChangeInsert= {
       position: 'into',
       parent: parent,
       node: node,
@@ -409,9 +416,10 @@ export class FsTreeService<T> implements OnDestroy {
   public removeNode(item: FlatItemNode) {
     this._database.removeItem(item.original);
 
-    const payload = {
-      target: item.original,
+    const payload: ITreeChangeRemove = {
+      target: this.getFlatItemNode(item.original),
     };
+    
     this._database.updateData(FsTreeChange.Remove, payload);
   }
 
@@ -425,6 +433,7 @@ export class FsTreeService<T> implements OnDestroy {
     const payload = {
       node: target,
     };
+
     this._database.updateData(FsTreeChange.ManualReorder, payload);
   }
 

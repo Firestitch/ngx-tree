@@ -56,23 +56,23 @@ export interface ITreeNodeClick {
 }
 
 export interface ITreeChangeUpdate {
-  node: ItemNode;
+  node: FlatItemNode;
 }
 
 export interface ITreeChangeInsert {
   position: 'into' | 'above' | 'below',
-  parent: ItemNode;
-  node: ItemNode;
+  parent: FlatItemNode;
+  node: FlatItemNode;
   index: number;
 }
 
 export interface ITreeChangeRemove {
-  target: ItemNode;
+  target: FlatItemNode;
 }
 
 export interface ITreeChangeReorder {
-  fromParent: ItemNode;
-  toParent: ItemNode;
-  node: ItemNode;
+  fromParent: FlatItemNode;
+  toParent: FlatItemNode;
+  node: FlatItemNode;
   index: number;
 }
