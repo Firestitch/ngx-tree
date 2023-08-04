@@ -462,9 +462,20 @@ export class FsTreeService<T> implements OnDestroy {
   }
   
   public getNodes(rootNode?: FlatItemNode): FlatItemNode[] {
-    return rootNode ? 
-      this.treeControl.getDescendants(rootNode)
-      : this.treeControl.dataNodes;
+    if(rootNode) {
+      const rootNodeItem = this.getItemNode(rootNode);
+      const children = rootNodeItem.children
+      .map((nodeItem) => {
+        return this.getFlatItemNode(nodeItem);
+      });
+
+      return children;
+    }
+
+  return this.treeControl.dataNodes
+    .filter((nodeItem) => {
+      return !nodeItem.parent;
+    });
   }
 
   private _selectNode(node: FlatItemNode) {

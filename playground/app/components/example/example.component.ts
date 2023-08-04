@@ -53,6 +53,10 @@ export class ExampleComponent {
   }
 
   public consoleDebug() {
-    console.log('Get Nodes', this.tree.getNodes(null));
+    const rootNodes = this.tree.getNodes(null);
+    console.log('Get Root Nodes', rootNodes);
+    
+    const firstRootChildrenNodes = this.tree.getNodes(rootNodes[0]);
+    console.log('First Root Node Children', firstRootChildrenNodes);
   }
 }
