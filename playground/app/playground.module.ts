@@ -8,23 +8,21 @@ import { FsExampleModule } from '@firestitch/example';
 import { FsMessageModule } from '@firestitch/message';
 import { FsTreeModule } from '@firestitch/tree';
 
-import { ToastrModule } from 'ngx-toastr';
-
-import { AppMaterialModule } from './material.module';
+import { AppComponent } from './app.component';
 import {
-  ExampleComponent,
-  LevelsLimitComponent,
-  FixedManageOrderingComponent,
-  ManageFixedOrderingComponent,
-  FixedFixedOrderingComponent,
   ActionsComponent,
   EditDialogComponent,
+  ExampleComponent,
+  FixedFixedOrderingComponent,
+  FixedManageOrderingComponent,
+  LevelsLimitComponent,
+  ManageFixedOrderingComponent,
 } from './components';
-import { AppComponent } from './app.component';
+import { AppMaterialModule } from './material.module';
 
 
 @NgModule({
-  bootstrap: [ AppComponent ],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     FsTreeModule,
@@ -34,7 +32,6 @@ import { AppComponent } from './app.component';
     RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
     FsExampleModule.forRoot(),
     FsMessageModule.forRoot(),
-    ToastrModule.forRoot({ preventDuplicates: true }),
   ],
   entryComponents: [
   ],
