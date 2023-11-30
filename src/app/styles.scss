@@ -6,12 +6,12 @@
 
   fs-tree {
     .droppable-area {
-      background-color: mat.get-color-from-palette($primary) + #{33};
+      background-color: color-mix(in srgb, mat.get-color-from-palette($primary) , transparent 80%);
     }
 
     .mat-tree-node {
       &.drag-over .node {
-        background-color: mat.get-color-from-palette($primary) + #{33};
+        background-color: color-mix(in srgb, mat.get-color-from-palette($primary) , transparent 80%);
       }
     }
   }
