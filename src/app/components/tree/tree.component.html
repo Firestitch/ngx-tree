@@ -18,7 +18,11 @@
     <div class="node" fsDraggableNodeContent>
       <div class="container">
         <ng-container *ngIf="rootChildrenExist$ | async">
-          <button mat-icon-button disabled type="button"></button>
+          <button 
+            mat-icon-button 
+            disabled 
+            type="button">
+          </button>
         </ng-container>
         <mat-checkbox 
           class="checklist-leaf-node"

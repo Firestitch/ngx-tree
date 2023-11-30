@@ -6,29 +6,29 @@ import {
   OnDestroy,
 } from '@angular/core';
 
+import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { SelectionModel } from '@angular/cdk/collections';
 
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { FsTreeDatabaseService } from './tree-database.service';
 
-import { ItemNode } from '../models/item-node.model';
-import { FlatItemNode } from '../models/flat-item-node.model';
-
-import { getLevel } from '../helpers/get-level';
-import { isExpandable } from '../helpers/is-expandable';
+import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { FsTreeChange } from '../enums/tree-change.enum';
 import { dataBuilder } from '../helpers/data-builder';
 import { getChildren } from '../helpers/get-children';
-
-import { ITreeChangeInsert, ITreeChangeRemove, ITreeChangeReorder, ITreeConfig } from '../interfaces';
+import { getLevel } from '../helpers/get-level';
+import { isExpandable } from '../helpers/is-expandable';
+import {
+  ITreeChangeInsert, ITreeChangeRemove, ITreeChangeReorder, ITreeConfig,
+} from '../interfaces';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+import { FlatItemNode } from '../models/flat-item-node.model';
+import { ItemNode } from '../models/item-node.model';
 
-import { FsTreeChange } from '../enums/tree-change.enum';
-import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { FsTreeDatabaseService } from './tree-database.service';
 
 
 @Injectable()
@@ -138,7 +138,8 @@ export class FsTreeService<T> implements OnDestroy {
   /** Whether all the descendants of the node are selected */
   public descendantsAllSelected(node: FlatItemNode): boolean {
     const descendants = this.treeControl.getDescendants(node);
-    return descendants.every(child => this.checklistSelection.isSelected(child));
+
+    return descendants.every((child) => this.checklistSelection.isSelected(child));
   }
 
   /** Whether part of the descendants are selected */
@@ -146,7 +147,7 @@ export class FsTreeService<T> implements OnDestroy {
     const descendants = this.treeControl.getDescendants(node);
     const result = descendants
       .some((child) => this.checklistSelection.isSelected(child));
-      
+
     return result && !this.descendantsAllSelected(node);
   }
 
@@ -199,6 +200,7 @@ export class FsTreeService<T> implements OnDestroy {
         return currentNode;
       }
     }
+
     return null;
   }
 
@@ -206,8 +208,8 @@ export class FsTreeService<T> implements OnDestroy {
   public checkRootNodeSelection(node: FlatItemNode): void {
     const nodeSelected = this.checklistSelection.isSelected(node);
     const descendants = this.treeControl.getDescendants(node);
-    const descAllSelected = descendants.every(child =>
-      this.checklistSelection.isSelected(child)
+    const descAllSelected = descendants.every((child) =>
+      this.checklistSelection.isSelected(child),
     );
     if (nodeSelected && !descAllSelected) {
       this.checklistSelection.deselect(node);
@@ -218,12 +220,15 @@ export class FsTreeService<T> implements OnDestroy {
 
   /**
    * Setup drag
+   *
    * @param node
    */
-  public onDragStart(node: FlatItemNode) {}
+  public onDragStart(node: FlatItemNode) { }
 
   public onDrop(data: IDragEnd) {
-    if (data.dropInto === data.node) { return; }
+    if (data.dropInto === data.node) {
+      return;
+    }
 
     const dropInto = this._database.flatNodeMap.get(data.dropInto);
     const node = this._database.flatNodeMap.get(data.node);
@@ -253,13 +258,14 @@ export class FsTreeService<T> implements OnDestroy {
   }
 
   public nodeClick(node: FlatItemNode) {
-    if(this.config.nodeClick) {
+    if (this.config.nodeClick) {
       this.config.nodeClick({ node });
     }
   }
 
   /**
    * Custom method for expand/collapse, because we must check blocked flag before
+   *
    * @param node
    */
   public toggleNode(node) {
@@ -321,6 +327,7 @@ export class FsTreeService<T> implements OnDestroy {
 
   /**
    * Insert element above target
+   *
    * @param data
    * @param target
    */
@@ -344,6 +351,7 @@ export class FsTreeService<T> implements OnDestroy {
 
   /**
    * Insert element below target
+   *
    * @param data
    * @param target
    */
@@ -356,7 +364,7 @@ export class FsTreeService<T> implements OnDestroy {
     const payload: ITreeChangeInsert = {
       position: 'below',
       parent: target,
-      node: node,
+      node,
       index: insertIndex,
     };
 
@@ -367,6 +375,7 @@ export class FsTreeService<T> implements OnDestroy {
 
   /**
    * Insert element as child element for target node
+   *
    * @param data
    * @param parent
    */
@@ -381,10 +390,10 @@ export class FsTreeService<T> implements OnDestroy {
     }
 
     // Notify about data change
-    const payload: ITreeChangeInsert= {
+    const payload: ITreeChangeInsert = {
       position: 'into',
-      parent: parent,
-      node: node,
+      parent,
+      node,
       index: 0,
     };
 
@@ -395,6 +404,7 @@ export class FsTreeService<T> implements OnDestroy {
 
   /**
    * Update internal data for target
+   *
    * @param data
    * @param target
    */
@@ -403,7 +413,7 @@ export class FsTreeService<T> implements OnDestroy {
 
     // Notify about data change
     const payload = {
-      node: target
+      node: target,
     };
 
     this._database.updateData(FsTreeChange.Update, payload);
@@ -411,6 +421,7 @@ export class FsTreeService<T> implements OnDestroy {
 
   /**
    * Remove node from DB
+   *
    * @param item
    */
   public removeNode(item: FlatItemNode) {
@@ -419,12 +430,13 @@ export class FsTreeService<T> implements OnDestroy {
     const payload: ITreeChangeRemove = {
       target: this.getFlatItemNode(item.original),
     };
-    
+
     this._database.updateData(FsTreeChange.Remove, payload);
   }
 
   /**
    * Do reorder for target
+   *
    * @param target
    */
   public updateSort(target: ItemNode) {
@@ -460,22 +472,22 @@ export class FsTreeService<T> implements OnDestroy {
   public updateNodesClasses() {
     this._updateClasses$.next();
   }
-  
+
   public getNodes(rootNode?: FlatItemNode): FlatItemNode[] {
-    if(rootNode) {
+    if (rootNode) {
       const rootNodeItem = this.getItemNode(rootNode);
       const children = rootNodeItem.children
-      .map((nodeItem) => {
-        return this.getFlatItemNode(nodeItem);
-      });
+        .map((nodeItem) => {
+          return this.getFlatItemNode(nodeItem);
+        });
 
       return children;
     }
 
-  return this.treeControl.dataNodes
-    .filter((nodeItem) => {
-      return !nodeItem.parent;
-    });
+    return this.treeControl.dataNodes
+      .filter((nodeItem) => {
+        return !nodeItem.parent;
+      });
   }
 
   private _selectNode(node: FlatItemNode) {

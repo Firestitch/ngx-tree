@@ -1,7 +1,7 @@
 {
   "name": "@firestitch/tree",
   "description": "@firestitch/tree",
-  "version": "12.3.6",
+  "version": "12.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Firestitch/ngx-tree"

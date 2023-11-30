@@ -1,12 +1,16 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+
 import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitch/tree';
+
 import { of } from 'rxjs';
+
 import { TREE_DATA } from '../../data';
 
 
 @Component({
   selector: 'example',
-  templateUrl: 'example.component.html'
+  templateUrl: './example.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExampleComponent {
 
@@ -38,8 +42,9 @@ export class ExampleComponent {
       },
       change: (selected: ItemNode[]) => {
         console.log('Selection Change', selected);
+
         return of(null);
-      }
+      },
     },
     childrenName: 'accounts',
   };
@@ -55,7 +60,7 @@ export class ExampleComponent {
   public consoleDebug() {
     const rootNodes = this.tree.getNodes(null);
     console.log('Get Root Nodes', rootNodes);
-    
+
     const firstRootChildrenNodes = this.tree.getNodes(rootNodes[0]);
     console.log('First Root Node Children', firstRootChildrenNodes);
   }

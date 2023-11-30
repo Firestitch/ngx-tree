@@ -7,31 +7,28 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
-
-import { LoggerService } from '../../services/logger.service';
-import { FsTreeService } from '../../services/tree.service';
-import { FsTreeDatabaseService } from '../../services/tree-database.service';
-
-import { ItemNode } from '../../models/item-node.model';
-import { FlatItemNode } from '../../models/flat-item-node.model';
-
-import { ITreeConfig } from '../../interfaces/config.interface';
 import { FsTreeAction } from '../../interfaces/action.interface';
+import { ITreeConfig } from '../../interfaces/config.interface';
+import { FlatItemNode } from '../../models/flat-item-node.model';
+import { ItemNode } from '../../models/item-node.model';
+import { LoggerService } from '../../services/logger.service';
+import { FsTreeDatabaseService } from '../../services/tree-database.service';
+import { FsTreeService } from '../../services/tree.service';
 
 
 @Component({
   selector: 'fs-tree',
-  templateUrl: 'tree.component.html',
-  styleUrls: [ 'tree.component.scss' ],
-  providers: [FsTreeDatabaseService, LoggerService ],
-  viewProviders: [FsTreeService ],
+  templateUrl: './tree.component.html',
+  styleUrls: ['./tree.component.scss'],
+  providers: [FsTreeDatabaseService, LoggerService],
+  viewProviders: [FsTreeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FsTreeComponent<T> implements OnInit, OnDestroy {
@@ -59,8 +56,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     map((value) => {
       return value
         .some((node) => !!node.children && node.children.length > 0);
-    })
-  )
+    }),
+  );
 
   private _destroy$ = new Subject<void>();
 
@@ -68,7 +65,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     public tree: FsTreeService<T>,
     private _el: ElementRef,
     private _cd: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   public ngOnInit() {
     this.tree.init(this._el, this.config);
@@ -118,6 +115,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Insert node above target
+   *
    * @param data
    * @param target
    */
@@ -127,6 +125,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Insert node below target
+   *
    * @param data
    * @param target
    */
@@ -136,6 +135,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Insert node as child element for target node
+   *
    * @param data
    * @param parent
    */
@@ -145,6 +145,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Update internal data for target
+   *
    * @param data
    * @param target
    */
@@ -154,6 +155,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Remove node from DB
+   *
    * @param item
    */
   public remove(item: FlatItemNode) {
@@ -162,6 +164,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   /**
    * Do reorder for target
+   *
    * @param target
    */
   public updateSort(target: ItemNode) {
@@ -210,5 +213,5 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public nodeClick(node: FlatItemNode): void {
     this.tree.nodeClick(node);
   }
-  
+
 }
