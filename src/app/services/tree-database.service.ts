@@ -1,15 +1,16 @@
 import { ElementRef, Injectable, OnDestroy } from '@angular/core';
+
 import { FlatTreeControl } from '@angular/cdk/tree';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
-import { ItemNode } from '../models/item-node.model';
-import { FlatItemNode } from '../models/flat-item-node.model';
+import { FsTreeChange } from '../enums/tree-change.enum';
 import { treeBuilder } from '../helpers/tree-builder';
 import { sortDataBy, treeSort } from '../helpers/tree-sort';
-import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
 import { ITreeConfig } from '../interfaces/config.interface';
-import { FsTreeChange } from '../enums/tree-change.enum';
+import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+import { FlatItemNode } from '../models/flat-item-node.model';
+import { ItemNode } from '../models/item-node.model';
 
 
 @Injectable()
@@ -30,22 +31,22 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   private _dataChange = new Subject<ITreeDataChange>();
   private _destroy$ = new Subject<void>();
 
-  constructor() {}
+  constructor() { }
 
-  get dataChange(): Observable<ITreeDataChange> {
+  public get dataChange(): Observable<ITreeDataChange> {
     return this._dataChange.asObservable();
   }
 
-  get data(): ItemNode[] {
+  public get data(): ItemNode[] {
     return this._data$.getValue();
   }
 
-  get data$(): Observable<ItemNode[]> {
-    return this._data$.asObservable();
+  public set data(value: ItemNode[]) {
+    this._data$.next(value);
   }
 
-  set data(value: ItemNode[]) {
-    this._data$.next(value);
+  public get data$(): Observable<ItemNode[]> {
+    return this._data$.asObservable();
   }
 
   public ngOnDestroy() {
@@ -66,7 +67,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
       0,
       null,
       config.childrenName,
-      config.maxLevel
+      config.maxLevel,
     );
 
     this.data = treeSort(this.data, config.sortBy);
@@ -81,7 +82,7 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
       0,
       null,
       this._config.childrenName,
-      this._config.maxLevel
+      this._config.maxLevel,
     );
 
     this.data = treeSort(this.data, this._config.sortBy);
@@ -104,11 +105,11 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
     const node = treeBuilder(data, forLevel, parent, this._config.childrenName);
 
     return new FlatItemNode({
-      data: data,
+      data,
       original: node,
-      parent: parent,
+      parent,
       originalParent: parent ? parent.original : null,
-      level: parent ? parent.level + 1 : 0
+      level: parent ? parent.level + 1 : 0,
     });
   }
 
@@ -202,8 +203,8 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
 
   public updateData(type: FsTreeChange, payload: any) {
     this._dataChange.next({
-      type: type,
-      payload: payload
+      type,
+      payload,
     });
   }
 }

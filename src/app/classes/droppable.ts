@@ -78,16 +78,16 @@ export class Droppable {
     this._getRootPosition(this._node);
   }
 
-  get dropPosition() {
+  public get dropPosition() {
     return this._dropPosition;
   }
 
 
-  get dropTarget() {
+  public get dropTarget() {
     return this._dropTarget;
   }
 
-  get canDropHere() {
+  public get canDropHere() {
     return this._canDropHere;
   }
 
@@ -97,6 +97,7 @@ export class Droppable {
 
   /**
    * Move droppable area and set dropTarget, dropLevel & dropPosition
+   *
    * @param event
    */
   public moveDroppable(event) {
@@ -111,111 +112,122 @@ export class Droppable {
     // console.log(element, this._dropPosition);
     switch (this._dropPosition) {
       case 'above': {
-        this._cancelExpandTimer();
-        this._cancelDragOverSelections();
-
-        // Show droppable area and move it
-        // if (element.node === this._node) {
-        //   this._droppableEl.style.display = 'none';
-        //   return;
-        // }
-        this.show();
-        const top = element.dimentions.top - this._droppableHalfHeight;
-        this._droppableEl.style.top = top + 'px';
-
-        this._updateLevelPaddingAbove(element, eventX);
-
-        // console.log('above, ', this._dropLevel, element.node.level, element.node.data);
-
-        // If target level for drop more than element under our drag
-        if (this._dropLevel > element.node.level) {
-          this._dropTarget = this._lookupNodeWithLevelAbove(element);
-          this._dropPosition = 'below';
-        } else {
-          this._dropTarget = element.node;
-        }
-
-        // Hide drop area if can't drop
-        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget?.parent);
-        const prevNode = this._getNodeAbove(element);
-
-        if (!this.canDropHere || prevNode === this._node) {
-          this.hide();
-          this._draggableEl.classList.add('no-drop');
-        } else {
-          this._draggableEl.classList.remove('no-drop');
-        }
+        this.dropAbove(element, eventX);
 
       } break;
 
       case 'center': {
-        if (!this._timerStarted && element.node !== this._node) {
-          this._startExpandTimer(element.node);
-        }
-
-        this._dropTarget = element.node;
-
-        this.hide();
-
-        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget);
-
-        if (this.canDropHere) {
-          // Add marked element for unmark in feature
-          this._cacheOfDragOveredElements.add(element.node.el);
-
-          // Mark element
-          element.node.el.classList.add('drag-over');
-          this._draggableEl.classList.remove('no-drop');
-        } else {
-          this._draggableEl.classList.add('no-drop');
-        }
+        this.dropCenter(element);
 
       } break;
 
       case 'below': {
-        this._cancelExpandTimer();
-        this._cancelDragOverSelections();
-
-        // Show droppable area and move it
-        // if (element.node === this._node) {
-        //   this._droppableEl.style.display = 'none';
-        //   return;
-        // }
-        this.show();
-        const top = element.dimentions.top + element.dimentions.height - this._droppableHalfHeight;
-        this._droppableEl.style.top = top + 'px';
-
-        this._updateLevelPaddingBelow(element, eventX);
-
-        // console.log('below, ', this._dropLevel, element.node.level, element.node.data);
-
-        // If target level for drop less than element under our drag
-        if (this._dropLevel < element.node.level) {
-          this._dropTarget = this._lookupNodeWithLevelBelow(element);
-          this._dropPosition = 'above';
-          // Когда внизу
-          if (!this._dropTarget) {
-            this._dropTarget = this._lookupNodeWithLevelAbove(element);
-            this._dropPosition = 'below';
-          }
-        } else if (this._dropLevel > element.node.level) {
-          this._dropTarget = this._lookupNodeWithLevelBelow(element);
-          this._dropPosition = 'above';
-        } else {
-          this._dropTarget = element.node;
-        }
-
-        // Hide drop area if can't drop
-        this._canDropHere = this._checkIfCanDrop(element, this._dropTarget?.parent);
-        const nextNode = this._getNodeBelow(element);
-
-        if (!this._canDropHere || nextNode === this._node) {
-          this.hide();
-          this._draggableEl.classList.add('no-drop');
-        } else {
-          this._draggableEl.classList.remove('no-drop');
-        }
+        this.dropBelow(element, eventX);
       } break;
+    }
+  }
+
+
+  public dropCenter(element) {
+    if (!this._timerStarted && element.node !== this._node) {
+      this._startExpandTimer(element.node);
+    }
+
+    this._dropTarget = element.node;
+    this.hide();
+    this._canDropHere = this._checkIfCanDrop(element, this._dropTarget);
+
+    if (this.canDropHere) {
+      // Add marked element for unmark in feature
+      this._cacheOfDragOveredElements.add(element.node.el);
+
+      // Mark element
+      element.node.el.classList.add('drag-over');
+      this._draggableEl.classList.remove('no-drop');
+    } else {
+      this._draggableEl.classList.add('no-drop');
+    }
+  }
+
+  public dropBelow(element, eventX) {
+    this._cancelExpandTimer();
+    this._cancelDragOverSelections();
+
+    // Show droppable area and move it
+    // if (element.node === this._node) {
+    //   this._droppableEl.style.display = 'none';
+    //   return;
+    // }
+    this.show();
+    const top = element.dimentions.top + element.dimentions.height - this._droppableHalfHeight;
+    this._droppableEl.style.top = `${top}px`;
+
+    this._updateLevelPaddingBelow(element, eventX);
+
+    // console.log('below, ', this._dropLevel, element.node.level, element.node.data);
+
+    // If target level for drop less than element under our drag
+    if (this._dropLevel < element.node.level) {
+      this._dropTarget = this._lookupNodeWithLevelBelow(element);
+      this._dropPosition = 'above';
+      // Когда внизу
+      if (!this._dropTarget) {
+        this._dropTarget = this._lookupNodeWithLevelAbove(element);
+        this._dropPosition = 'below';
+      }
+    } else if (this._dropLevel > element.node.level) {
+      this._dropTarget = this._lookupNodeWithLevelBelow(element);
+      this._dropPosition = 'above';
+    } else {
+      this._dropTarget = element.node;
+    }
+
+    // Hide drop area if can't drop
+    this._canDropHere = this._checkIfCanDrop(element, this._dropTarget?.parent);
+    const nextNode = this._getNodeBelow(element);
+
+    if (!this._canDropHere || nextNode === this._node) {
+      this.hide();
+      this._draggableEl.classList.add('no-drop');
+    } else {
+      this._draggableEl.classList.remove('no-drop');
+    }
+  }
+
+  public dropAbove(element, eventX) {
+    this._cancelExpandTimer();
+    this._cancelDragOverSelections();
+
+    // Show droppable area and move it
+    // if (element.node === this._node) {
+    //   this._droppableEl.style.display = 'none';
+    //   return;
+    // }
+    this.show();
+    const top = element.dimentions.top - this._droppableHalfHeight;
+    this._droppableEl.style.top = `${top}px`;
+
+    this._updateLevelPaddingAbove(element, eventX);
+
+    // console.log('above, ', this._dropLevel, element.node.level, element.node.data);
+
+    // If target level for drop more than element under our drag
+    if (this._dropLevel > element.node.level) {
+      this._dropTarget = this._lookupNodeWithLevelAbove(element);
+      this._dropPosition = 'below';
+    } else {
+      this._dropTarget = element.node;
+    }
+
+    // Hide drop area if can't drop
+    this._canDropHere = this._checkIfCanDrop(element, this._dropTarget?.parent);
+    const prevNode = this._getNodeAbove(element);
+
+    if (!this.canDropHere || prevNode === this._node) {
+      this.hide();
+      this._draggableEl.classList.add('no-drop');
+    } else {
+      this._draggableEl.classList.remove('no-drop');
     }
   }
 
@@ -234,7 +246,7 @@ export class Droppable {
         this._orderedNodes.splice(
           insertIndex,
           0,
-          { dimentions: dimentions, node: node }
+          { dimentions, node },
         );
       }
     });
@@ -268,6 +280,7 @@ export class Droppable {
 
   /**
    * Return level for drop based on current X coordinate
+   *
    * @param x
    * @param minLevel
    * @param maxLevel
@@ -279,12 +292,13 @@ export class Droppable {
       const level = Math.round(diff / 40);
 
       if (level > maxLevel) {
-        return maxLevel
+        return maxLevel;
       } else if (level < minLevel) {
         return minLevel;
-      } else {
-        return level;
       }
+
+      return level;
+
     }
 
     return minLevel || 0;
@@ -298,7 +312,7 @@ export class Droppable {
     const dimensions = this._targetEl.nativeElement.getBoundingClientRect();
 
     droppableEl.style.display = 'none';
-    droppableEl.style.width = dimensions.width + 'px';
+    droppableEl.style.width = `${dimensions.width}px`;
 
     droppableEl.classList.add('droppable-area');
     this._defaultDropAreaWidth = parseFloat(droppableEl.style.width);
@@ -309,6 +323,7 @@ export class Droppable {
 
   /**
    * Return X coordinate for parent with level 0
+   *
    * @param node
    */
   private _getRootPosition(node) {
@@ -325,21 +340,25 @@ export class Droppable {
 
   /**
    * Looking by ordered elements element which under draggable
+   *
    * @param event
    */
-  private _lookupElementUnder(event): [ IOrderedNode, number] {
+  private _lookupElementUnder(event): [IOrderedNode, number] {
     const y = event.y || event.clientY;
 
     const topOffset = y;
     const halfOfDragHeight = this._dragDims.height / 2;
 
+    const orderedNodes = this._orderedNodes
+      .filter((orderedNode) => !orderedNode.node.parent || orderedNode.node.parent.isExpanded());
+
     const elIndex = lookupNearPoint(
-      this._orderedNodes,
+      orderedNodes,
       topOffset,
-      (node) => node.dimentions.y + halfOfDragHeight
+      (node) => node.dimentions.y + halfOfDragHeight,
     );
 
-    const el = this._orderedNodes[elIndex];
+    const el = orderedNodes[elIndex];
 
     if (el) {
 
@@ -359,7 +378,7 @@ export class Droppable {
         draggableRect.y2,
       );
 
-      return [el, isec]
+      return [el, isec];
     }
 
     return null;
@@ -367,6 +386,7 @@ export class Droppable {
 
   /**
    * Calculate intersection of rectangles
+   *
    * @param y11
    * @param y12
    * @param y21
@@ -374,8 +394,12 @@ export class Droppable {
    */
   private _calcRectIntersection(y11: number, y12: number, y21: number, y22: number) {
 
-    if (y21 > y12) { return 0; }
-    if (y22 < y12) { return 1; }
+    if (y21 > y12) {
+      return 0;
+    }
+    if (y22 < y12) {
+      return 1;
+    }
 
     const y1Isec = Math.max(y11, y21);
     const y2Isec = Math.min(y12, y22);
@@ -389,6 +413,7 @@ export class Droppable {
 
   /**
    * Return drop position based on persentage of overlap
+   *
    * @param isec
    */
   private _getPositionByIsec(isec) {
@@ -396,9 +421,10 @@ export class Droppable {
       return 'below';
     } else if (isec > 0.70) {
       return 'above';
-    } else {
-      return 'center';
     }
+
+    return 'center';
+
   }
 
   /**
@@ -413,6 +439,7 @@ export class Droppable {
 
   /**
    * Update padding for drop area when position is above
+   *
    * @param currentEl
    * @param eventX
    */
@@ -423,19 +450,16 @@ export class Droppable {
     const currentLevel = currentEl.node.level;
     const prevLevel = prevEl && prevEl.node.level;
 
-    if (prevEl && prevLevel > currentLevel) {
-      this._dropLevel = this._getDropLevel(eventX, currentLevel, prevLevel);
-    } else {
-      this._dropLevel = this._getDropLevel(eventX, currentLevel, currentLevel);
-    }
+    this._dropLevel = prevEl && prevLevel > currentLevel ? this._getDropLevel(eventX, currentLevel, prevLevel) : this._getDropLevel(eventX, currentLevel, currentLevel);
 
     const padding = this._rootLevelPosition + this._extraPadding + (this._dropLevel * this._defaultPadding);
 
-    this._droppableEl.style.left = padding + 'px';
+    this._droppableEl.style.left = `${padding}px`;
   }
 
   /**
    * Update padding for drop area when position is below
+   *
    * @param currentEl
    * @param eventX
    */
@@ -446,23 +470,20 @@ export class Droppable {
     const currentLevel = currentEl.node.level;
     const nextLevel = nextEl && nextEl.node.level;
 
-    if (nextEl && currentLevel > nextLevel) {
-      this._dropLevel = this._getDropLevel(eventX, nextLevel, currentLevel);
-    } else {
-      this._dropLevel = this._getDropLevel(eventX, nextLevel, nextLevel || currentLevel);
-    }
+    this._dropLevel = nextEl && currentLevel > nextLevel ? this._getDropLevel(eventX, nextLevel, currentLevel) : this._getDropLevel(eventX, nextLevel, nextLevel || currentLevel);
 
     // console.log('drop below: ', this._dropLevel, prevLevel, nextLevel);
     const padding = this._extraPadding + (this._dropLevel * this._defaultPadding);
     const leftPosition = this._rootLevelPosition + padding;
     const width = this._defaultDropAreaWidth - this._extraPadding;
 
-    this._droppableEl.style.width = width + 'px';
-    this._droppableEl.style.left = leftPosition + 'px';
+    this._droppableEl.style.width = `${width}px`;
+    this._droppableEl.style.left = `${leftPosition}px`;
   }
 
   /**
    * Lookup above now with same level as target
+   *
    * @param element
    */
   private _lookupNodeWithLevelAbove(element: IOrderedNode) {
@@ -481,6 +502,7 @@ export class Droppable {
 
   /**
    * Lookup below now with same level as target
+   *
    * @param element
    */
   private _lookupNodeWithLevelBelow(element) {
@@ -530,52 +552,52 @@ export class Droppable {
     }
 
     if (!this._canDrop) {
-      return true
-    } else {
+      return true;
+    }
 
-      // Lookup prev and next elements at the same level
-      let prevElem = null;
-      let nextElem = null;
+    // Lookup prev and next elements at the same level
+    let prevElem = null;
+    let nextElem = null;
 
-      // Index of target element (over)
-      const targetIndex = this._orderedNodes.indexOf(element);
+    // Index of target element (over)
+    const targetIndex = this._orderedNodes.indexOf(element);
 
 
-      if (this._dropPosition === 'above') {
-        const el = this._orderedNodes[targetIndex - 1];
+    if (this._dropPosition === 'above') {
+      const el = this._orderedNodes[targetIndex - 1];
 
-        if (el && el.node !== this._node) {
-          const sameLevelWithTarget = el.node.level === this._dropTarget.level;
+      if (el && el.node !== this._node) {
+        const sameLevelWithTarget = el.node.level === this._dropTarget.level;
 
-          if (sameLevelWithTarget) {
-            prevElem = el.node;
-          }
+        if (sameLevelWithTarget) {
+          prevElem = el.node;
         }
-
-        nextElem = this._dropTarget;
-      } else if (this._dropPosition === 'below') {
-        const el = this._orderedNodes[targetIndex + 1];
-
-        if (el && el.node !== this._node) {
-          const sameLevelWithTarget = el.node.level === this._dropTarget.level;
-
-          if (sameLevelWithTarget) {
-            nextElem = el.node;
-          }
-        }
-
-        prevElem = this._dropTarget;
       }
 
-      return this._canDrop(
-        this._node,
-        this._node.parent,
-        toParent,
-        this._dropPosition,
-        prevElem,
-        nextElem
-      );
+      nextElem = this._dropTarget;
+    } else if (this._dropPosition === 'below') {
+      const el = this._orderedNodes[targetIndex + 1];
+
+      if (el && el.node !== this._node) {
+        const sameLevelWithTarget = el.node.level === this._dropTarget.level;
+
+        if (sameLevelWithTarget) {
+          nextElem = el.node;
+        }
+      }
+
+      prevElem = this._dropTarget;
     }
+
+    return this._canDrop(
+      this._node,
+      this._node.parent,
+      toParent,
+      this._dropPosition,
+      prevElem,
+      nextElem,
+    );
+
   }
 
   private _dropIntoItSelf(targetParent): boolean {
@@ -599,6 +621,7 @@ export class Droppable {
 
   /**
    * Starts timer for expand current node
+   *
    * @param node
    */
   private _startExpandTimer(node) {
@@ -609,7 +632,7 @@ export class Droppable {
       )
       .subscribe(() => {
         this._expandNode$.next(node);
-      })
+      });
   }
 
   /**

@@ -1,14 +1,16 @@
 import { ElementRef } from '@angular/core';
+
 import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 
-import { Droppable } from './droppable';
 
+import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { IDragEnd } from '../interfaces/draggable.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
-import { IDragEnd } from '../interfaces/draggable.interface';
-import { LoggerService } from '../services/logger.service'
-import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { LoggerService } from '../services/logger.service';
+
+import { Droppable } from './droppable';
 
 
 export class Draggable {
@@ -48,8 +50,10 @@ export class Draggable {
   private _moveHandler = this.dragTo.bind(this);
   private _dropHandler = this.dragEnd.bind(this);
 
+
   /**
    * Class for control mouse/touch drag
+   *
    * @param _containerElement
    * @param _node
    * @param _el
@@ -77,30 +81,36 @@ export class Draggable {
     this._subscribe();
   }
 
-  get dragStart$(): Observable<void> {
+  public get dragStart$(): Observable<void> {
     return this._dragStart$.pipe(takeUntil(this._destroy$));
   }
 
-  get dragEnd$(): Observable<IDragEnd> {
+  public get dragEnd$(): Observable<IDragEnd> {
     return this._dragEnd$.pipe(takeUntil(this._destroy$));
   }
 
-  get expandNode$(): Observable<FlatItemNode> {
+  public get expandNode$(): Observable<FlatItemNode> {
     return this._expandNode$.pipe(takeUntil(this._destroy$));
   }
 
-
   /**
    * Prepare draggable elements and add events
+   *
    * @param event
    */
   public dragStart(event) {
+    if (!this._node.canDrag || this.dragging) {
+      // If already dragging cancel event
+      if (this.dragging) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
 
-    if (!this._node.canDrag) { return; }
+      return;
+    }
 
     this._touchFix(event);
-
-    this.calcAutoScrollParams();
+    this._calcAutoScrollParams();
 
     // Emit event that drag started
     this._dragStart$.next();
@@ -113,16 +123,16 @@ export class Draggable {
     //   // this._node.collapse();
     //   // this._hideChildrenNodes(this._node);
     // }
-    this._visibleChildren = this._getVisibleChildren(this._node)
+    this._visibleChildren = this._getVisibleChildren(this._node);
     this._addClassForChildrenNodes();
 
-    this._logger.timeStart('DRAG_START');
+    //this._logger.timeStart('DRAG_START');
 
     // Update level 0 statuses
     this._nodes.forEach((node) => {
       if (node.level === 0) {
 
-        this._logger.log('Drag Start Checking', node);
+        //this._logger.log('Drag Start Checking', node);
 
         node.hidden = false;
         if (node.isExpanded()) {
@@ -133,40 +143,24 @@ export class Draggable {
       }
     });
 
-    this._logger.timeStop('DRAG_START');
-
-    // If already dragging cancel event
-    if (this.dragging) {
-      event.preventDefault();
-      event.stopPropagation();
-      return
-    }
+    //this._logger.timeStop('DRAG_START');
+    window.document.body.classList.add('fs-tree-dragging');
 
     this.dragging = true;
-
-    window.document.body.classList.add('block-selection');
-
     this._dragTarget = event.target;
-
     this._dragDims = this._el.nativeElement.getBoundingClientRect();
     this._shiftX = event.clientX - this._dragDims.left;
 
     this._initDraggableElement(event);
-
     this._initDroppable(event);
-
-    window.document.addEventListener('mousemove', this._moveHandler);
-    window.document.addEventListener('touchmove', this._moveHandler, { passive: false } as any);
-    window.document.addEventListener('mouseup', this._dropHandler);
-    window.document.addEventListener('touchend', this._dropHandler);
-    window.document.addEventListener('touchcancel', this._dropHandler);
+    this._addEventListeners();
 
     this._dragStart$.next();
   }
 
-
   /**
    * Move draggable elements and swap items
+   *
    * @param event
    */
   public dragTo(event) {
@@ -175,10 +169,10 @@ export class Draggable {
     const topOffset = (event.y || event.clientY) - (this._dragDims.height / 2);
     const leftOffset = (event.x || event.pageX) - this._shiftX;
 
-    this._draggableEl.style.top =  topOffset + 'px';
+    this._draggableEl.style.top = `${topOffset}px`;
 
     if (this._dragAxis === TreeDragAxis.XY) {
-      this._draggableEl.style.left =  leftOffset + 'px';
+      this._draggableEl.style.left = `${leftOffset}px`;
     }
 
     if (event.clientY < this._limitToScroll) {
@@ -213,20 +207,23 @@ export class Draggable {
    * Remove events and classes after drag finish
    */
   public dragEnd() {
-    this.dragging = false;
+    if (!this.dragging) {
+      return;
+    }
 
-    window.document.removeEventListener('mousemove', this._moveHandler);
-    window.document.removeEventListener('touchmove', this._moveHandler);
-    window.document.removeEventListener('mouseup', this._dropHandler);
-    window.document.removeEventListener('touchend', this._dropHandler);
-    window.document.removeEventListener('touchcancel', this._dropHandler);
+    this.destroyDraggable();
 
     if (this._expandedBeforeDrag) {
       this._expandedBeforeDrag = false;
       this._node.expand();
     }
 
-    if (this._droppable && this._droppable.dropTarget && this._droppable.dropPosition && this._droppable.canDropHere) {
+    if (
+      this._droppable &&
+      this._droppable.dropTarget &&
+      this._droppable.dropPosition &&
+      this._droppable.canDropHere
+    ) {
       this._dragEnd$.next({
         node: this._node,
         dropInto: this._droppable.dropTarget,
@@ -234,16 +231,26 @@ export class Draggable {
       });
     }
 
+    this.destroyDroppable();
+  }
 
-    window.document.body.classList.remove('block-selection');
-    this._node.el.classList.remove('draggable-elem');
+  public destroyDraggable() {
+    this.dragging = false;
+
+    window.document.removeEventListener('mousemove', this._moveHandler);
+    window.document.removeEventListener('touchmove', this._moveHandler);
+    window.document.removeEventListener('mouseup', this._dropHandler);
+    window.document.removeEventListener('touchend', this._dropHandler);
+    window.document.removeEventListener('touchcancel', this._dropHandler);
+    window.document.removeEventListener('keydown', this._escapeHandler);
+
+    window.document.body.classList.remove('fs-tree-dragging');
+    this._node.el.classList.remove('dragging');
 
     this._removeClassFromChildrenNodes();
     this._visibleChildren = [];
 
-    this.destroyDroppable();
-
-    this._draggableEl.remove();
+    this._draggableEl?.remove();
     this._draggableEl = null;
   }
 
@@ -259,10 +266,8 @@ export class Draggable {
   }
 
   public destroyDroppable() {
-    if (this._droppable) {
-      this._droppable.destroy();
-      this._droppable = null;
-    }
+    this._droppable?.destroy();
+    this._droppable = null;
   }
 
   /**
@@ -286,20 +291,37 @@ export class Draggable {
           this._droppable.orderNodesByCoords();
           this._logger.timeStop('EXPANDED_OVER');
         }
-      })
+      });
   }
+
+  private _addEventListeners() {
+    window.document.addEventListener('mousemove', this._moveHandler);
+    window.document.addEventListener('touchmove', this._moveHandler, { passive: false } as any);
+    window.document.addEventListener('mouseup', this._dropHandler);
+    window.document.addEventListener('touchend', this._dropHandler);
+    window.document.addEventListener('touchcancel', this._dropHandler);
+    window.document.addEventListener('keydown', this._escapeHandler);
+  }
+
+  private _escapeHandler = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      this.destroyDraggable();
+      this.destroyDroppable();
+    }
+  };
 
   /**
    * Init draggable element
+   *
    * @param event
    */
   private _initDraggableElement(event) {
     const el = this._el.nativeElement.cloneNode(true);
     const dimentions = this._el.nativeElement.getBoundingClientRect();
 
-    el.style.width = dimentions.width + 'px';
-    el.style.left = dimentions.left + 'px';
-    el.style.top = dimentions.top + 'px';
+    el.style.width = `${dimentions.width}px`;
+    el.style.left = `${dimentions.left}px`;
+    el.style.top = `${dimentions.top}px`;
 
     el.classList.add('draggable-item');
 
@@ -322,11 +344,12 @@ export class Draggable {
 
     this._droppable.shift((event.x || event.clientX) - this._dragDims.left);
 
-    this._node.el.classList.add('draggable-elem');
+    this._node.el.classList.add('dragging');
   }
 
   /**
    * Do check and update hidden status for all children for target node
+   *
    * @param node
    * @param showFirstLevel
    */
@@ -365,6 +388,7 @@ export class Draggable {
 
   /**
    * Mark all children nodes as hidden
+   *
    * @param node
    */
   private _hideChildrenNodes(node: FlatItemNode) {
@@ -416,15 +440,11 @@ export class Draggable {
     return result;
   }
 
-  private calcAutoScrollParams() {
+  private _calcAutoScrollParams() {
     const containerSizes = this._containerElement.nativeElement.getBoundingClientRect();
     this._containerHeight = containerSizes.height;
 
-    if (window.matchMedia('(orientation: landscape)').matches) {
-      this._screenHeight = screen.availWidth || screen.width;
-    } else {
-      this._screenHeight = screen.availHeight || screen.height;
-    }
+    this._screenHeight = window.matchMedia('(orientation: landscape)').matches ? screen.availWidth || screen.width : screen.availHeight || screen.height;
 
     this._limitToScroll = this._screenHeight * 0.15;
     if (this._limitToScroll > 100) {
@@ -434,6 +454,7 @@ export class Draggable {
 
   /**
    * Fix background when mobile
+   *
    * @param e
    */
   private _touchFix(e) {

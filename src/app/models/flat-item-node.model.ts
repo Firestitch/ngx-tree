@@ -30,59 +30,62 @@ export class FlatItemNode {
     this.parent = data.parent || null;
     this.original = data.original || null;
     this.originalParent = data.originalParent || null;
-    this.isExpanded = data.isExpanded || function() { return false };
-    this.collapse = data.collapse || function() { };
-    this.expand = data.expand || function() { };
+    this.isExpanded = data.isExpanded || function () {
+      return false;
+    };
+
+    this.collapse = data.collapse || function () { };
+    this.expand = data.expand || function () { };
     this.canDrag = data.canDrag === void 0 ? true : data.canDrag;
     this.canNodeClick = data.canNodeClick === void 0 ? true : data.canNodeClick;
     this.hidden = this.isExpanded();
   }
 
-  get data() {
+  public get data() {
     return this._data;
   }
 
-  set data(value) {
+  public set data(value) {
     this._data = value;
 
     if (this.original) {
-      this.original.data = value
+      this.original.data = value;
     }
 
     this._updateContext();
   }
 
-  get level() {
+  public get level() {
     return this._level;
   }
 
-  set level(value) {
+  public set level(value) {
     this._level = value;
     this.templateContext.level = this.level;
   }
 
-  get parent() {
+  public get parent() {
     return this._parent;
   }
 
-  set parent(value) {
+  public set parent(value) {
     this._parent = value;
     this.templateContext.parent = this.parent;
   }
 
-  set index(value: number) {
+  public set index(value: number) {
     this._index = value;
   }
 
-  get index(): number {
+  public get index(): number {
     return this._index;
   }
 
-  set first(value: boolean) {
+  public set first(value: boolean) {
     this._firstNode = value;
   }
 
-  set last(value: boolean) {
+  public set last(value: boolean) {
     this._lastNode = value;
   }
 

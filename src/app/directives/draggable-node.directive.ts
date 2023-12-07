@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectorRef,
   ContentChild,
   Directive,
   ElementRef,
@@ -9,20 +8,21 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
-  Output,
+  Output
 } from '@angular/core';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { Draggable } from '../classes/draggable';
+import { IDragEnd } from '../interfaces/draggable.interface';
+import { FlatItemNode } from '../models/flat-item-node.model';
+import { LoggerService } from '../services/logger.service';
+import { FsTreeDatabaseService } from '../services/tree-database.service';
+import { FsTreeService } from '../services/tree.service';
+
 import { FsDraggableNodeContentDirective } from './draggable-node-content.directive';
 import { FsDraggableNodeTargetDirective } from './draggable-node-target.directive';
-import { FlatItemNode } from '../models/flat-item-node.model';
-import { IDragEnd } from '../interfaces/draggable.interface';
-import { FsTreeDatabaseService } from '../services/tree-database.service';
-import { LoggerService } from '../services/logger.service';
-import { FsTreeService } from '../services/tree.service';
 
 
 @Directive({
@@ -58,10 +58,10 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
     private _el: ElementRef,
     private _zone: NgZone,
     private _tree: FsTreeService<T>,
-  ) {}
+  ) { }
 
   public ngOnInit() {
-    if(this._tree.config.draggable) {
+    if (this._tree.config.draggable) {
       this._zone.runOutsideAngular(() => {
         this._draggable = new Draggable(
           this._db.containerElement,
@@ -89,7 +89,7 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   }
 
   public ngOnDestroy() {
-    if(this._tree.config.draggable) {
+    if (this._tree.config.draggable) {
       this._draggable.destroy();
     }
 
@@ -100,7 +100,7 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   private _initSubscriptions() {
     this._draggable.dragStart$
       .pipe(
-        takeUntil(this._destroy)
+        takeUntil(this._destroy),
       )
       .subscribe(() => {
         this.dragStart.emit(this.node);

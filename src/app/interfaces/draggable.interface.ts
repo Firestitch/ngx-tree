@@ -6,7 +6,7 @@ export interface IOrderedNode {
 }
 
 export interface IDragEnd {
-  node: FlatItemNode,
-  dropInto: FlatItemNode,
-  dropPosition: 'above' | 'below' | 'center'
+  node: FlatItemNode;
+  dropInto: FlatItemNode;
+  dropPosition: 'above' | 'below' | 'center';
 }

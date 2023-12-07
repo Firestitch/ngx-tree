@@ -1,5 +1,5 @@
 ::ng-deep {
-  body.block-selection {
+  body.fs-tree-dragging {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
@@ -23,6 +23,10 @@
     .content {
       cursor: copy !important;
     }
+  }
+
+  fs-node-actions {
+    display: none;
   }
 }
 
@@ -88,7 +92,7 @@
     opacity: .5;
   }
 
-  &.draggable-elem > .node > .container {
+  &.dragging > .node > .container {
     opacity: .5;
   }
 
