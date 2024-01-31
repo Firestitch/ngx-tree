@@ -113,6 +113,12 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     this._cd.markForCheck();
   }
 
+  public unselectAll() {
+    this.tree.unselectAll();
+
+    this._cd.markForCheck();
+  }
+
   /**
    * Insert node above target
    *
