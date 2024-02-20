@@ -24,26 +24,25 @@ import { AppMaterialModule } from './material.module';
 @NgModule({
     bootstrap: [AppComponent],
     imports: [
-        BrowserModule,
-        FsTreeModule,
-        BrowserAnimationsModule,
-        AppMaterialModule,
-        FormsModule,
-        RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
-        FsExampleModule.forRoot(),
-        FsMessageModule.forRoot(),
+      BrowserModule,
+      FsTreeModule,
+      BrowserAnimationsModule,
+      AppMaterialModule,
+      FormsModule,
+      RouterModule.forRoot([], { relativeLinkResolution: 'legacy' }),
+      FsExampleModule.forRoot(),
+      FsMessageModule.forRoot(),
     ],
     declarations: [
-        AppComponent,
-        ExampleComponent,
-        LevelsLimitComponent,
-        FixedManageOrderingComponent,
-        ManageFixedOrderingComponent,
-        FixedFixedOrderingComponent,
-        ActionsComponent,
-        EditDialogComponent,
+      AppComponent,
+      ExampleComponent,
+      LevelsLimitComponent,
+      FixedManageOrderingComponent,
+      ManageFixedOrderingComponent,
+      FixedFixedOrderingComponent,
+      ActionsComponent,
+      EditDialogComponent,
     ],
-    providers: []
 })
 export class PlaygroundModule {
 }
