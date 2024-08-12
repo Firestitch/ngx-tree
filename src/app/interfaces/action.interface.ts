@@ -11,6 +11,7 @@ export type FsTreeActionItem = (FsTreeActionItemConfig | FsTreeActionItemsGroup)
 
 export interface FsTreeActionItemsGroup {
   label?: string;
+  show?: FsTreeActionShowFn;
   items: FsTreeActionItemConfig[];
 }
 

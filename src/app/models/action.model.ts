@@ -7,6 +7,7 @@ export enum TreeActionType {
 }
 
 export class Action {
+  
   public type: TreeActionType;
   public icon: string;
   public items: ActionItem[];
@@ -15,7 +16,8 @@ export class Action {
     const action = new Action(data);
 
     if (action.type === TreeActionType.Menu) {
-      action.items.forEach((item) => item.update(node));
+      action.items
+        .forEach((item) => item.update(node));
     }
 
     return action;

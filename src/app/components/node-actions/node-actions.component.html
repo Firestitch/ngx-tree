@@ -1,10 +1,12 @@
 <ng-container *ngFor="let action of actions" [ngSwitch]="action.type">
   <!-- Menu -->
-  <ng-container *ngSwitchCase="0">
+  <ng-container *ngSwitchCase="TreeActionType.Menu">
     <fs-menu>
       <ng-container *ngFor="let item of action.items">
         <ng-container *ngIf="item.isGroup">
-          <fs-menu-group [label]="item.label">
+          <fs-menu-group 
+              [hidden]="!item.visible"
+              [label]="item.label">
             <ng-container *ngFor="let subItem of item.children">
               <ng-template 
                   fs-menu-item

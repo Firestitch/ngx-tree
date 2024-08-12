@@ -62,7 +62,9 @@ export class ActionItem {
   public updateVisibility(node: FlatItemNode) {
     if (this._showFn) {
       this._visible = this._showFn(node);
-    } else if (this.isGroup) {
+    }
+
+    if (this.isGroup && this._visible) {
       this._children.forEach((action) => {
         action.updateVisibility(node);
       });
@@ -103,6 +105,10 @@ export class ActionItem {
 
   private _initGroupItem(data: FsTreeActionItemsGroup) {
     this._isGroup = true;
+    
+    if (data.show) {
+      this._showFn = data.show;
+    }    
 
     if (Array.isArray(data.items)) {
       this._children = data.items.map((item) => new ActionItem(item));

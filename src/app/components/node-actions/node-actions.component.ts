@@ -9,7 +9,7 @@ import {
 
 import { FsTreeAction } from '../../interfaces/action.interface';
 
-import { Action } from '../../models/action.model';
+import { Action, TreeActionType } from '../../models/action.model';
 import { FlatItemNode } from '../../models/flat-item-node.model';
 
 
@@ -26,6 +26,7 @@ export class FsNodeActionsComponent implements OnInit, DoCheck {
   public node: FlatItemNode;
 
   public actions: Action[] = [];
+  public TreeActionType = TreeActionType;
 
   private _nodeDiffer: KeyValueDiffer<any, any>;
 
