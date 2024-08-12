@@ -11,6 +11,7 @@ import { isGroupItem } from '../helpers/is-group-item';
 import { FlatItemNode } from './flat-item-node.model';
 
 export class ActionItem {
+
   public label: string;
 
   private _routerLink: FsTreeActionActionLink;
@@ -59,14 +60,15 @@ export class ActionItem {
   }
 
   public updateVisibility(node: FlatItemNode) {
-    if (this.isGroup) {
+    if (this._showFn) {
+      this._visible = this._showFn(node);
+    } else if (this.isGroup) {
       this._children.forEach((action) => {
         action.updateVisibility(node);
       });
 
-      this._visible = this._children.some((action) => action._visible);
-    } else if (this._showFn) {
-      this._visible = this._showFn(node);
+      this._visible = this._children
+        .some((action) => action._visible);
     }
   }
 

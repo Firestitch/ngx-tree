@@ -6,22 +6,24 @@
         <ng-container *ngIf="item.isGroup">
           <fs-menu-group [label]="item.label">
             <ng-container *ngFor="let subItem of item.children">
-              <ng-template fs-menu-item
-                           (click)="subItem.click(node)"
-                           [link]="subItem.routerLink?.link"
-                           [queryParams]="subItem.routerLink?.queryParams"
-                           [hidden]="!subItem.visible">
+              <ng-template 
+                  fs-menu-item
+                  (click)="subItem.click(node)"
+                  [link]="subItem.routerLink?.link"
+                  [queryParams]="subItem.routerLink?.queryParams"
+                  [hidden]="!subItem.visible">
                 {{ subItem.label }}
               </ng-template>
             </ng-container>
           </fs-menu-group>
         </ng-container>
         <ng-container *ngIf="!item.isGroup">
-          <ng-template fs-menu-item
-                       (click)="item.click(node)"
-                       [link]="item.routerLink?.link"
-                       [queryParams]="item.routerLink?.queryParams"
-                       [hidden]="!item.visible">
+          <ng-template 
+              fs-menu-item
+              (click)="item.click(node)"
+              [link]="item.routerLink?.link"
+              [queryParams]="item.routerLink?.queryParams"
+              [hidden]="!item.visible">
             {{ item.label }}
           </ng-template>
         </ng-container>
