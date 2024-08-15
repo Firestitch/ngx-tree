@@ -9,7 +9,7 @@
 <p>With max depth 2 and without selection</p>
 
 <fs-tree [config]="config" #tree>
-  <ng-template fsTreeNode let-name="name" let-id="id">
-    <a class="primary">{{ name }} (ID: {{ id }})</a>
+  <ng-template fsTreeNode let-data="data">
+    <a class="primary">{{ data.name }} (ID: {{ data.id }})</a>
   </ng-template>
 </fs-tree>

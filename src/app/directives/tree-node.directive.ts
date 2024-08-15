@@ -28,8 +28,6 @@ export class FsTreeNodeDirective {
     dir: FsTreeNodeDirective,
     context: unknown,
   ): context is { 
-    id: any, 
-    name: string, 
     index: number, 
     level: number, 
     last: boolean,

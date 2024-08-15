@@ -1,13 +1,14 @@
 import {
-  Component, Inject, OnInit, OnDestroy,
   ChangeDetectionStrategy,
+  Component, Inject,
+  OnDestroy,
 } from '@angular/core';
 
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { FsMessage } from '@firestitch/message';
 
-import { Subject, of } from 'rxjs';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -15,7 +16,7 @@ import { Subject, of } from 'rxjs';
   styleUrls: ['./edit-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditDialogComponent implements OnInit, OnDestroy {
+export class EditDialogComponent implements OnDestroy {
 
   public node = null;
 
@@ -28,8 +29,6 @@ export class EditDialogComponent implements OnInit, OnDestroy {
   ) {
     this.node = this._data.node;
   }
-
-  public ngOnInit(): void {}
 
   public ngOnDestroy(): void {
     this._destroy$.next();

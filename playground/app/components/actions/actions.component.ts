@@ -1,15 +1,19 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+
+import { MatDialog } from '@angular/material/dialog';
+
 import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
-import { TREE_DATA } from '../../data';
 import { TreeActionType } from '../../../../src/app/models/action.model';
-import { MatDialog } from '@angular/material/dialog';
+import { TREE_DATA } from '../../data';
+
 import { EditDialogComponent } from './edit-dialog';
 
 
 @Component({
   selector: 'actions',
-  templateUrl: 'actions.component.html'
+  templateUrl: './actions.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActionsComponent {
   @ViewChild('tree')
@@ -21,8 +25,12 @@ export class ActionsComponent {
     childrenName: 'accounts',
     sortBy: (data) => {
       return data.sort((a, b) => {
-        if (a.id < b.id) { return -1; }
-        if (b.id < b.id) { return 1; }
+        if (a.id < b.id) {
+          return -1; 
+        }
+        if (b.id < b.id) {
+          return 1; 
+        }
 
         return 0;
       });
@@ -44,13 +52,13 @@ export class ActionsComponent {
           {
             label: 'Delete',
             click: (node) => {
-              this.tree.remove(node)
-            }
-          }
+              this.tree.remove(node);
+            },
+          },
         ],
 
-      }
-    ]
+      },
+    ],
   };
 
   constructor(
@@ -67,13 +75,13 @@ export class ActionsComponent {
   }
 
   public createRootNode() {
-    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) })
+    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) });
   }
 
   private _edit(node: FlatItemNode) {
     this._dialog
       .open(EditDialogComponent, {
-        data: { node: node.data }
+        data: { node: node.data },
       })
       .afterClosed()
       .subscribe((data) => {

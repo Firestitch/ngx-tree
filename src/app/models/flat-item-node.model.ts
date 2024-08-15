@@ -104,18 +104,10 @@ export class FlatItemNode {
       this._dataStoredKeys = Object.keys(this.data);
     }
 
-    for (const key in this.data) {
-      const item = this.data[key];
-
-      if (this.data.hasOwnProperty(key)) {
-        this.templateContext[key] = item;
-      }
-    }
-
     this.templateContext.level = this.level;
     this.templateContext.parent = this.parent;
     this.templateContext.data = this._data;
-    this.templateContext.node = this._data;
+    this.templateContext.node = this;
     this.templateContext.flatItemNode = this;
     this.templateContext.index = this._index;
     this.templateContext.last = this._lastNode;

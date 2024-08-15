@@ -1,13 +1,15 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+
 import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
-import { TREE_DATA } from '../../data';
 import { TreeActionType } from '../../../../src/app/models/action.model';
+import { TREE_DATA } from '../../data';
 
 
 @Component({
   selector: 'fixed-fixed-ordering',
-  templateUrl: './fixed-fixed-ordering.component.html'
+  templateUrl: './fixed-fixed-ordering.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FixedFixedOrderingComponent {
   @ViewChild('tree')
@@ -22,17 +24,22 @@ export class FixedFixedOrderingComponent {
         return ['my-class-0', 'level-0'];
       } else if (node.level === 1) {
         return 'my-class-1 level-1';
-      } else {
-        return ['my-class-other', 'level-other'];
       }
+ 
+      return ['my-class-other', 'level-other'];
+      
     },
     change: (data) => {
       console.log('Data was changed: ', data);
     },
     sortBy: (data) => {
       return data.sort((a, b) => {
-        if (a.id < b.id) { return -1; }
-        if (b.id < b.id) { return 1; }
+        if (a.id < b.id) {
+          return -1; 
+        }
+        if (b.id < b.id) {
+          return 1; 
+        }
 
         return 0;
       });
@@ -61,8 +68,8 @@ export class FixedFixedOrderingComponent {
               return node.level === 0;
             },
             click: (node: FlatItemNode) => {
-              this.tree.append({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node)
-            }
+              this.tree.append({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node);
+            },
           },
           {
             label: 'Create Object Above',
@@ -70,8 +77,8 @@ export class FixedFixedOrderingComponent {
               return node.level === 1;
             },
             click: (node: FlatItemNode) => {
-              this.tree.insertAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
-            }
+              this.tree.insertAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node);
+            },
           },
           {
             label: 'Create Object Below',
@@ -79,19 +86,19 @@ export class FixedFixedOrderingComponent {
               return node.level === 1;
             },
             click: (node) => {
-              this.tree.insertBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
-            }
+              this.tree.insertBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node);
+            },
           },
           {
             label: 'Delete',
             click: (node: FlatItemNode) => {
-              this.tree.remove(node)
-            }
-          }
+              this.tree.remove(node);
+            },
+          },
         ],
 
-      }
-    ]
+      },
+    ],
   };
 
   public collapseAll() {
@@ -103,10 +110,10 @@ export class FixedFixedOrderingComponent {
   }
 
   public createRootNode() {
-    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) })
+    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) });
   }
 
-  private getRandomId(min, max) {
+  public getRandomId(min: number, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 }

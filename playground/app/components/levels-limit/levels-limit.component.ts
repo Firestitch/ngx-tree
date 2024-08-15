@@ -1,13 +1,15 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+
 import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
-import { TREE_DATA } from '../../data';
 import { TreeActionType } from '../../../../src/app/models/action.model';
+import { TREE_DATA } from '../../data';
 
 
 @Component({
   selector: 'levels-limit',
-  templateUrl: './levels-limit.component.html'
+  templateUrl: './levels-limit.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LevelsLimitComponent {
   @ViewChild('tree')
@@ -50,8 +52,8 @@ export class LevelsLimitComponent {
                 label: 'Action 2',
                 click: (node) => {
                   console.log('action 2 clicked');
-                }
-              }
+                },
+              },
             ],
           },
           {
@@ -60,8 +62,8 @@ export class LevelsLimitComponent {
               return node.level === 0;
             },
             click: (node) => {
-              this.tree.append({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node)
-            }
+              this.tree.append({ name: 'Level 2 Object', id: this.getRandomId(100, 999) }, node);
+            },
           },
           {
             label: 'Create Object Above',
@@ -69,8 +71,8 @@ export class LevelsLimitComponent {
               return node.level === 1;
             },
             click: (node) => {
-              this.tree.insertAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
-            }
+              this.tree.insertAbove({ name: 'New Object', id: this.getRandomId(100, 999) }, node);
+            },
           },
           {
             label: 'Create Object Below',
@@ -78,19 +80,19 @@ export class LevelsLimitComponent {
               return node.level === 1;
             },
             click: (node) => {
-              this.tree.insertBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node)
-            }
+              this.tree.insertBelow({ name: 'New Object', id: this.getRandomId(100, 999) }, node);
+            },
           },
           {
             label: 'Delete',
             click: (node) => {
-              this.tree.remove(node)
-            }
-          }
+              this.tree.remove(node);
+            },
+          },
         ],
 
-      }
-    ]
+      },
+    ],
   };
 
   public collapseAll() {
@@ -102,10 +104,10 @@ export class LevelsLimitComponent {
   }
 
   public createRootNode() {
-    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) })
+    this.tree.append({ name: 'Root Object', id: this.getRandomId(100, 999) });
   }
 
-  private getRandomId(min, max) {
+  public getRandomId(min: number, max: number) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 }
