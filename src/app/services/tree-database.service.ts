@@ -31,8 +31,6 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   private _dataChange = new Subject<ITreeDataChange>();
   private _destroy$ = new Subject<void>();
 
-  constructor() { }
-
   public get dataChange(): Observable<ITreeDataChange> {
     return this._dataChange.asObservable();
   }
