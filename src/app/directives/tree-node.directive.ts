@@ -30,6 +30,7 @@ export class FsTreeNodeDirective {
   ): context is { 
     index: number, 
     level: number, 
+    levelName: string, 
     last: boolean,
     first: boolean,
     parent: FlatItemNode,

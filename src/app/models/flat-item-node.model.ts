@@ -2,6 +2,7 @@ import { ItemNode } from './item-node.model';
 
 
 export class FlatItemNode {
+
   public el: any;
   public expandable: boolean;
   public original: ItemNode;
@@ -17,15 +18,16 @@ export class FlatItemNode {
   private _lastNode = false;
   private _firstNode = false;
   private _index: number = null;
-
   private _dataStoredKeys = [];
   private _data: any;
   private _level: number;
+  private _levelName: string;
   private _parent: FlatItemNode;
 
   constructor(data: any = {}) {
     this.data = data.data || null;
     this.level = data.level;
+    this.levelName = data.levelName;
     this.expandable = data.expandable || false;
     this.parent = data.parent || null;
     this.original = data.original || null;
@@ -34,10 +36,10 @@ export class FlatItemNode {
       return false;
     };
 
-    this.collapse = data.collapse || function () { };
-    this.expand = data.expand || function () { };
-    this.canDrag = data.canDrag === void 0 ? true : data.canDrag;
-    this.canNodeClick = data.canNodeClick === void 0 ? true : data.canNodeClick;
+    this.collapse = data.collapse || function () { /** */ };
+    this.expand = data.expand || function () { /**  */ };
+    this.canDrag = data.canDrag === undefined ? true : data.canDrag;
+    this.canNodeClick = data.canNodeClick === undefined ? true : data.canNodeClick;
     this.hidden = this.isExpanded();
   }
 
@@ -53,6 +55,15 @@ export class FlatItemNode {
     }
 
     this._updateContext();
+  }
+
+  public get levelName() {
+    return this._levelName;
+  }
+
+  public set levelName(value) {
+    this._levelName = value;
+    this.templateContext.levelName = this.levelName;
   }
 
   public get level() {
@@ -97,6 +108,7 @@ export class FlatItemNode {
     this._dataStoredKeys.forEach((key) => {
       delete this.templateContext[key];
     });
+
     delete this.templateContext.node;
 
     // Store new data keys

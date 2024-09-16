@@ -24,6 +24,7 @@ export interface ITreeConfig<T> {
   change?: (data: ITreeDataChange) => void;
   sortBy?: (data: T[], parent?: T ) => T[];
   childrenName?: string | ((level: number) => string);
+  levelName?: ((level: number) => string);
   actions?: FsTreeAction[];
   draggable?: boolean,
   canDrag?: TreeCanDrag;

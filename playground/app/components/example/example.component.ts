@@ -49,6 +49,9 @@ export class ExampleComponent {
     childrenName: (level) => {
       return 'accounts';
     },
+    levelName: (level) => {
+      return 'account';
+    },
   };
 
   public collapseAll() {

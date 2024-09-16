@@ -7,7 +7,7 @@
       matTreeNodeToggle
       matTreeNodePadding
       fsTreeNodeClass
-      class="fs-tree-level-{{node.level}}"
+      [class]="'fs-tree-level-' + node.level"
       [ngClass]="treeNodeData?.klass"
       [class.fs-tree-node-first]="node.templateContext?.first"
       [class.fs-tree-node-last]="node.templateContext?.last"
@@ -55,7 +55,7 @@
       *matTreeNodeDef="let node; when: hasChild"
       matTreeNodePadding
       fsTreeNodeClass
-      class="fs-tree-level-{{node.level}}"
+      [class]="'fs-tree-level-' + node.level"
       [ngClass]="treeNodeData?.klass"
       [class.fs-tree-node-first]="node.templateContext?.first"
       [class.fs-tree-node-last]="node.templateContext?.last"

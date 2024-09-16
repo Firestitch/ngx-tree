@@ -103,6 +103,7 @@ export class FsTreeService<T> implements OnDestroy {
     flatNode.parent = this.getFlatItemNode(node.parent);
     flatNode.originalParent = this.getItemNode(flatNode.parent);
     flatNode.level = level;
+    flatNode.levelName = this.config.levelName ? this.config.levelName(level) : null;
     flatNode.expandable = (node.children && node.children.length > 0);
     flatNode.isExpanded = () => this.treeControl.isExpanded(flatNode);
     flatNode.collapse = () => this.treeControl.collapse(flatNode);

@@ -8,7 +8,7 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
-  Output
+  Output,
 } from '@angular/core';
 
 import { Subject } from 'rxjs';

@@ -5,8 +5,10 @@
 </div>
 <fs-tree [config]="config" #tree>
   <ng-template 
-      fsTreeNode class="test"
+      fsTreeNode 
+      class="test"
       let-level="level"
+      let-levelName="levelName"
       let-data="data"
       let-first="first"
       let-last="last"
