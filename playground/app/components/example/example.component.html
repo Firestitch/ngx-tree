@@ -1,8 +1,6 @@
-<div style="float: right">
+<div style="float: right" class="fs-row.gap-xs.wrap">
   <button mat-raised-button (click)="expandAll()">Expand All</button>
-  &nbsp;
   <button mat-raised-button (click)="collapseAll()">Collapse All</button>
-  &nbsp;
   <button mat-raised-button (click)="consoleDebug()">Console Debug</button>
 </div>
 <fs-tree [config]="config" #tree>

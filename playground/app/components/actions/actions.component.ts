@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
 import { TreeActionType } from '../../../../src/app/models/action.model';
-import { TREE_DATA } from '../../data';
+import { TreeData } from '../../data';
 
 import { EditDialogComponent } from './edit-dialog';
 
@@ -20,7 +20,7 @@ export class ActionsComponent {
   public tree: FsTreeComponent<any>;
 
   public config: ITreeConfig<any> = {
-    data: TREE_DATA,
+    data: TreeData,
     maxLevel: 2,
     childrenName: 'accounts',
     sortBy: (data) => {

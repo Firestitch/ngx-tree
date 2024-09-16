@@ -1,7 +1,7 @@
 /**
  * The Json object for to-do list data.
  */
-export const TREE_DATA =  [
+export const TreeData =  [
   {
     id: 1,
     name: 'Aubrey Kelly',
@@ -13,17 +13,14 @@ export const TREE_DATA =  [
           {
             id: 3,
             name: 'Anthony Owens',
-            accounts: []
           },
           {
             id: 4,
             name: 'Carole Mills',
-            accounts: []
           },
           {
             id: 5,
             name: 'Christopher Barrett',
-            accounts: []
           },
           {
             id: 6,
@@ -32,11 +29,10 @@ export const TREE_DATA =  [
               {
                 id: 7,
                 name: 'Dianne Reyes',
-                accounts: []
               },
-            ]
+            ],
           },
-        ]
+        ],
       },
       {
         id: 8,
@@ -45,16 +41,14 @@ export const TREE_DATA =  [
           {
             id: 9,
             name: 'Jesus Graves',
-            accounts: []
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   },
   {
     id: 10,
     name: 'Ronald Carlson',
-    accounts: []
   },
   {
     id: 11,
@@ -67,9 +61,9 @@ export const TREE_DATA =  [
           {
             id: 13,
             name: 'Terra Reyes',
-            accounts: []
+            accounts: [],
           },
-        ]
+        ],
       },
       {
         id: 14,
@@ -82,32 +76,32 @@ export const TREE_DATA =  [
               {
                 id: 16,
                 name: 'James Ramos',
-                accounts: []
+                accounts: [],
               },
               {
                 id: 17,
                 name: 'Danielle Webb',
-                accounts: []
+                accounts: [],
               },
-            ]
+            ],
           },
           {
             id: 18,
             name: 'Kay Gregory',
-            accounts: []
+            accounts: [],
           },
           {
             id: 19,
             name: 'Brian Hunter',
-            accounts: []
+            accounts: [],
           },
-        ]
+        ],
       },
       {
         id: 20,
         name: 'Susan Shelton',
-        accounts: []
+        accounts: [],
       },
-    ]
+    ],
   },
 ];

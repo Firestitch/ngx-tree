@@ -1,7 +1,7 @@
 {
   "name": "@firestitch/tree",
   "description": "@firestitch/tree",
-  "version": "13.1.1",
+  "version": "13.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Firestitch/ngx-tree"
@@ -43,7 +43,7 @@
     "@angular/platform-browser-dynamic": "^13.4.0",
     "@angular/router": "^13.4.0",
     "@firestitch/api": "^12.4.0",
-    "@firestitch/component-tools": "^13.0.6",
+    "@firestitch/component-tools": "^14.0.2",
     "@firestitch/core": "^12.1.0",
     "@firestitch/date": "^12.4.5",
     "@firestitch/drawer": "^12.0.0",
@@ -55,6 +55,7 @@
     "@firestitch/lint": "^14.0.11",
     "@firestitch/message": "^12.3.1",
     "@firestitch/store": "^12.0.0",
+    "@firestitch/style": "^13.1.13",
     "date-fns": "^2.28.0",
     "lodash-es": "^4.17.21",
     "rxjs": "^6.6.7",

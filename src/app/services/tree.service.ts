@@ -223,7 +223,9 @@ export class FsTreeService<T> implements OnDestroy {
    *
    * @param node
    */
-  public onDragStart(node: FlatItemNode) { }
+  public onDragStart(node: FlatItemNode) { 
+    //
+  }
 
   public onDrop(data: IDragEnd) {
     if (data.dropInto === data.node) {
@@ -473,6 +475,11 @@ export class FsTreeService<T> implements OnDestroy {
     this._updateClasses$.next();
   }
 
+  public unselectAll(): void {
+    this.checklistSelection.clear();
+    this._updateSelected();
+  }
+
   public getNodes(rootNode?: FlatItemNode): FlatItemNode[] {
     if (rootNode) {
       const rootNodeItem = this.getItemNode(rootNode);
@@ -549,11 +556,6 @@ export class FsTreeService<T> implements OnDestroy {
 
       this.config.selection.change(selected);
     }
-  }
-
-  public unselectAll(): void {
-    this.checklistSelection.clear();
-    this._updateSelected();
   }
 
   private _updateSelected(): void {

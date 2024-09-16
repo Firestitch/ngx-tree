@@ -52,12 +52,13 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   // Possibility to expand/collapse for nodes
   public blocked = false;
 
-  public rootChildrenExist$ = this.tree.dataChange$.pipe(
-    map((value) => {
-      return value
-        .some((node) => !!node.children && node.children.length > 0);
-    }),
-  );
+  public rootChildrenExist$ = this.tree.dataChange$
+    .pipe(
+      map((value) => {
+        return value
+          .some((node) => !!node.children && node.children.length > 0);
+      }),
+    );
 
   private _destroy$ = new Subject<void>();
 

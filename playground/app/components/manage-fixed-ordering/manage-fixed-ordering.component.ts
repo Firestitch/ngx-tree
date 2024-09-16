@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
 import { TreeActionType } from '../../../../src/app/models/action.model';
-import { TREE_DATA } from '../../data';
+import { TreeData } from '../../data';
 
 
 @Component({
@@ -16,7 +16,7 @@ export class ManageFixedOrderingComponent {
   public tree: FsTreeComponent<any>;
 
   public config: ITreeConfig<any> = {
-    data: TREE_DATA,
+    data: TreeData,
     maxLevel: 2,
     childrenName: 'accounts',
     change: (data) => {

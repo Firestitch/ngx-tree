@@ -4,7 +4,7 @@ import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitc
 
 import { of } from 'rxjs';
 
-import { TREE_DATA } from '../../data';
+import { TreeData } from '../../data';
 
 
 @Component({
@@ -18,7 +18,7 @@ export class ExampleComponent {
   public tree: FsTreeComponent<any>;
 
   public config: ITreeConfig<any> = {
-    data: TREE_DATA,
+    data: TreeData,
     dragAxis: TreeDragAxis.Y,
     expandLevel: Infinity,
     init: (data) => {
@@ -46,7 +46,9 @@ export class ExampleComponent {
         return of(null);
       },
     },
-    childrenName: 'accounts',
+    childrenName: (level) => {
+      return 'accounts';
+    },
   };
 
   public collapseAll() {
@@ -59,6 +61,8 @@ export class ExampleComponent {
 
   public consoleDebug() {
     const rootNodes = this.tree.getNodes(null);
+    console.log('Get Data', this.tree.getData());
+    
     console.log('Get Root Nodes', rootNodes);
 
     const firstRootChildrenNodes = this.tree.getNodes(rootNodes[0]);

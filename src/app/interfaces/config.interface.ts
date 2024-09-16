@@ -1,10 +1,11 @@
 import { Observable } from 'rxjs';
 
-import { FsTreeAction } from './action.interface';
-import { FlatItemNode } from '../models/flat-item-node.model';
-import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
-import { ItemNode } from '../models/item-node.model';
 import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { ITreeDataChange } from '../interfaces/tree-data-change.interface';
+import { FlatItemNode } from '../models/flat-item-node.model';
+import { ItemNode } from '../models/item-node.model';
+
+import { FsTreeAction } from './action.interface';
 
 
 export interface ITreeConfig<T> {
@@ -22,7 +23,7 @@ export interface ITreeConfig<T> {
    */
   change?: (data: ITreeDataChange) => void;
   sortBy?: (data: T[], parent?: T ) => T[];
-  childrenName?: string;
+  childrenName?: string | ((level: number) => string);
   actions?: FsTreeAction[];
   draggable?: boolean,
   canDrag?: TreeCanDrag;
