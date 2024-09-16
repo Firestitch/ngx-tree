@@ -93,6 +93,7 @@ export class FsTreeService<T> implements OnDestroy {
   /**
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
    */
+  // eslint-disable-next-line max-statements
   public transformer = (node: ItemNode, level: number) => {
     const existingNode = this._database.nestedNodeMap.get(node);
     const flatNode = existingNode && existingNode.data === node.data
@@ -481,7 +482,22 @@ export class FsTreeService<T> implements OnDestroy {
     this._updateSelected();
   }
 
+  /**
+   * @deprecated Use getChildrenNodes instead
+   */
   public getNodes(rootNode?: FlatItemNode): FlatItemNode[] {
+    return this.getChildrenNodes(rootNode);
+  }
+
+  public getSiblingNodes(rootNode?: FlatItemNode): FlatItemNode[] {
+    if (rootNode) {
+      return this.getChildrenNodes(rootNode.parent);
+    }
+
+    return [];
+  }
+
+  public getChildrenNodes(rootNode?: FlatItemNode): FlatItemNode[] {
     if (rootNode) {
       const rootNodeItem = this.getItemNode(rootNode);
       const children = rootNodeItem.children
