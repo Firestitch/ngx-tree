@@ -639,7 +639,7 @@ export class Droppable {
    * Cancel timer for expand
    */
   private _cancelExpandTimer() {
-    this._timerDestroy$.next();
+    this._timerDestroy$.next(null);
     this._timerStarted = false;
   }
 }

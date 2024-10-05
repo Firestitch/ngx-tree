@@ -86,7 +86,7 @@ export class FsTreeService<T> implements OnDestroy {
   }
 
   public ngOnDestroy() {
-    this._destroy$.next();
+    this._destroy$.next(null);
     this._destroy$.complete();
   }
 
@@ -474,7 +474,7 @@ export class FsTreeService<T> implements OnDestroy {
   }
 
   public updateNodesClasses() {
-    this._updateClasses$.next();
+    this._updateClasses$.next(null);
   }
 
   public unselectAll(): void {

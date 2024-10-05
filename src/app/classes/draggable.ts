@@ -113,7 +113,7 @@ export class Draggable {
     this._calcAutoScrollParams();
 
     // Emit event that drag started
-    this._dragStart$.next();
+    this._dragStart$.next(null);
 
     // Store information about expand status. If node has been expanded, then we should expand it after drag
     // this._expandedBeforeDrag = this._node.isExpanded();
@@ -155,7 +155,7 @@ export class Draggable {
     this._initDroppable(event);
     this._addEventListeners();
 
-    this._dragStart$.next();
+    this._dragStart$.next(null);
   }
 
   /**
@@ -261,7 +261,7 @@ export class Draggable {
     this._el.nativeElement.removeEventListener('mousedown', this._dragStartHandler);
     this._el.nativeElement.removeEventListener('touchstart', this._dragStartHandler);
 
-    this._destroy$.next();
+    this._destroy$.next(null);
     this._destroy$.complete();
   }
 

@@ -93,7 +93,7 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
       this._draggable.destroy();
     }
 
-    this._destroy.next();
+    this._destroy.next(null);
     this._destroy.complete();
   }
 
