@@ -6,7 +6,7 @@
 
 @include fs-style.core();
 @include mat.core();
-@include fs-tree(mat.$blue-palette);
+@include fs-tree(mat.$m2-blue-palette);
 
 mat-tree {
   a.primary {

@@ -2,16 +2,16 @@
 
 @mixin fs-tree($theme) {
 
-  $primary: mat.define-palette($theme);
+  $primary: mat.m2-define-palette($theme);
 
   fs-tree {
     .droppable-area {
-      background-color: color-mix(in srgb, mat.get-color-from-palette($primary) , transparent 80%);
+      background-color: color-mix(in srgb, mat.m2-get-color-from-palette($primary) , transparent 80%);
     }
 
     .mat-tree-node {
       &.drag-over .node {
-        background-color: color-mix(in srgb, mat.get-color-from-palette($primary) , transparent 80%);
+        background-color: color-mix(in srgb, mat.m2-get-color-from-palette($primary) , transparent 80%);
       }
     }
   }
