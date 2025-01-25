@@ -1,11 +1,27 @@
-<div style="float: right" class="fs-row.gap-xs.wrap">
-  <button mat-raised-button (click)="expandAll()">Expand All</button>
-  <button mat-raised-button (click)="collapseAll()">Collapse All</button>
-  <button mat-raised-button (click)="consoleDebug()">Console Debug</button>
+<div
+    style="float: right"
+    class="fs-row.gap-xs.wrap">
+  <button
+      mat-raised-button
+      (click)="expandAll()">
+    Expand All
+  </button>
+  <button
+      mat-raised-button
+      (click)="collapseAll()">
+    Collapse All
+  </button>
+  <button
+      mat-raised-button
+      (click)="consoleDebug()">
+    Console Debug
+  </button>
 </div>
-<fs-tree [config]="config" #tree>
-  <ng-template 
-      fsTreeNode 
+<fs-tree
+    [config]="config"
+    #tree>
+  <ng-template
+      fsTreeNode
       class="test"
       let-level="level"
       let-levelName="levelName"
@@ -14,5 +30,14 @@
       let-last="last"
       let-index="index">
     {{ data.name }} (ID: {{ data.id }})
+    <mat-form-field>
+      <mat-label>
+        Name
+      </mat-label>
+      <input
+        matInput
+        [(ngModel)]="data.name"
+        name="name">
+    </mat-form-field>
   </ng-template>
 </fs-tree>

@@ -20,9 +20,6 @@ export class Draggable {
   private _droppable: Droppable;
   private _scrolled = false;
 
-  // Drag
-  // Draggable target from event.target when drag started
-  private _dragTarget: HTMLDivElement = null;
   // Draggable HTML node (copy from dragTarget)
   private _draggableEl: HTMLDivElement = null;
 
@@ -41,7 +38,6 @@ export class Draggable {
   // Dimentions for dragTarget for future calculations
   private _dragDims;
 
-  private _containerHeight = 0;
   private _screenHeight = 0;
   private _limitToScroll = 0;
 
@@ -147,7 +143,6 @@ export class Draggable {
     window.document.body.classList.add('fs-tree-dragging');
 
     this.dragging = true;
-    this._dragTarget = event.target;
     this._dragDims = this._el.nativeElement.getBoundingClientRect();
     this._shiftX = event.clientX - this._dragDims.left;
 
@@ -441,9 +436,6 @@ export class Draggable {
   }
 
   private _calcAutoScrollParams() {
-    const containerSizes = this._containerElement.nativeElement.getBoundingClientRect();
-    this._containerHeight = containerSizes.height;
-
     this._screenHeight = window.matchMedia('(orientation: landscape)').matches ? screen.availWidth || screen.width : screen.availHeight || screen.height;
 
     this._limitToScroll = this._screenHeight * 0.15;

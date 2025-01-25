@@ -1,12 +1,12 @@
-import { Directive, ElementRef, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, OnDestroy, OnInit } from '@angular/core';
 
 import { MatTreeNode } from '@angular/material/tree';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { FsTreeService } from '../services/tree.service';
 import { FlatItemNode } from '../models/flat-item-node.model';
+import { FsTreeService } from '../services/tree.service';
 
 
 @Directive({
@@ -20,7 +20,6 @@ export class FsTreeNodeClassDirective implements OnInit, OnDestroy {
   constructor(
     private _node: MatTreeNode<FlatItemNode>,
     private _tree: FsTreeService<unknown>,
-    private _renderer: Renderer2,
     private _el: ElementRef,
   ) {
   }
@@ -61,13 +60,15 @@ export class FsTreeNodeClassDirective implements OnInit, OnDestroy {
         this._el.nativeElement.classList.remove(...this._classesList);
       }
 
-      this._el.nativeElement.classList.add(...classesList as string[]);
-      this._classesList = classesList as string[];
+      this._el.nativeElement.classList.add(...classesList);
+      this._classesList = classesList;
     });
   }
 
   private _classesListsAreSame(clsList1: string[], clsList2: string[]): boolean {
-    if (clsList1?.length !== clsList2?.length) { return false; }
+    if (clsList1?.length !== clsList2?.length) {
+      return false; 
+    }
 
     return !clsList1.every((cls, index) => {
       return cls === clsList2[index];

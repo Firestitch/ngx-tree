@@ -62,12 +62,12 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     private _cd: ChangeDetectorRef,
   ) { 
     this.rootChildrenExist$ = this.tree.dataChange$
-    .pipe(
-      map((value) => {
-        return value
-          .some((node) => !!node.children && node.children.length > 0);
-      }),
-    );
+      .pipe(
+        map((value) => {
+          return value
+            .some((node) => !!node.children && node.children.length > 0);
+        }),
+      );
   }
 
   public ngOnInit() {
@@ -212,7 +212,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   }
 
   public getNodes(rootNode?: FlatItemNode): FlatItemNode[] {
-    return this.tree.getNodes(rootNode);
+    return this.tree.getChildrenNodes(rootNode);
   }
 
   public getSiblingNodes(rootNode?: FlatItemNode): FlatItemNode[] {
