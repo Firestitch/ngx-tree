@@ -35,7 +35,7 @@ export interface ITreeConfig<T> {
   nodeClick?: (event: ITreeNodeClick) => void;
   canNodeClick?: TreeCanNodeClick;
   dragAxis?: TreeDragAxis;
-  filterItem?: (query: any) => boolean;
+  filterItem?: (node: ItemNode, query: any) => boolean;
   filters?: IFilterConfigItem[];
 }
 
