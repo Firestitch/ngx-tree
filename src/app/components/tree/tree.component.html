@@ -1,3 +1,6 @@
+@if (filterConfig) {
+  <fs-filter [config]="filterConfig"></fs-filter>
+}
 <mat-tree
     [dataSource]="tree.dataSource"
     [treeControl]="tree.treeControl"

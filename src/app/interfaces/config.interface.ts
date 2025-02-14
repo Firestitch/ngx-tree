@@ -1,3 +1,5 @@
+import { IFilterConfigItem } from '@firestitch/filter';
+
 import { Observable } from 'rxjs';
 
 import { TreeDragAxis } from '../enums/drag-axis.enum';
@@ -15,6 +17,7 @@ export interface ITreeConfig<T> {
   data?: T;
   init?: (data: ItemNode[]) => void;
   changeReorder?: (data: ITreeChangeReorder) => void;
+  changeFilter?: (query: any) => Observable<any>;
   changeInsert?: (data: ITreeChangeInsert) => void;
   changeRemove?: (data: ITreeChangeRemove) => void;
   changeUpdate?: (data: ITreeChangeUpdate) => void;
@@ -33,6 +36,7 @@ export interface ITreeConfig<T> {
   nodeClick?: (event: ITreeNodeClick) => void;
   canNodeClick?: TreeCanNodeClick;
   dragAxis?: TreeDragAxis;
+  filters?: IFilterConfigItem[];
 }
 
 export type TreeCanDrag = (node: FlatItemNode) => boolean;

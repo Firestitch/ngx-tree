@@ -1,23 +1,24 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTreeModule } from '@angular/material/tree';
 
+import { FsFilterModule } from '@firestitch/filter';
 import { FsMenuModule } from '@firestitch/menu';
 
-import { FsTreeComponent } from './components/tree/tree.component';
 import { FsNodeActionsComponent } from './components/node-actions/node-actions.component';
-import { FsTreeNodeDirective } from './directives/tree-node.directive';
-import { FsDraggableNodeDirective } from './directives/draggable-node.directive';
-import { FsDraggableNodeTargetDirective } from './directives/draggable-node-target.directive';
+import { FsTreeComponent } from './components/tree/tree.component';
 import { FsDraggableNodeContentDirective } from './directives/draggable-node-content.directive';
+import { FsDraggableNodeTargetDirective } from './directives/draggable-node-target.directive';
+import { FsDraggableNodeDirective } from './directives/draggable-node.directive';
 import { FsTreeNodeClassDirective } from './directives/tree-node-class.directive';
+import { FsTreeNodeDirective } from './directives/tree-node.directive';
 
 
 @NgModule({
@@ -30,7 +31,9 @@ import { FsTreeNodeClassDirective } from './directives/tree-node-class.directive
     MatIconModule,
     MatInputModule,
     MatTreeModule,
+
     FsMenuModule,
+    FsFilterModule,
   ],
   exports: [
     FsTreeComponent,
@@ -44,9 +47,6 @@ import { FsTreeNodeClassDirective } from './directives/tree-node-class.directive
     FsDraggableNodeContentDirective,
     FsDraggableNodeTargetDirective,
     FsTreeNodeClassDirective,
-  ],
-  providers: [
-    // FsComponentService,
   ],
 })
 export class FsTreeModule {}

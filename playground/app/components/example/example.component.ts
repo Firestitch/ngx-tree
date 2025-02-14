@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
+import { ItemType } from '@firestitch/filter';
 import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitch/tree';
 
 import { of } from 'rxjs';
@@ -16,6 +17,8 @@ export class ExampleComponent {
 
   @ViewChild('tree')
   public tree: FsTreeComponent<any>;
+
+  public keyword: string = '';
 
   public config: ITreeConfig<any> = {
     data: TreeData,
@@ -36,6 +39,11 @@ export class ExampleComponent {
     changeReorder: (data) => {
       console.log('== Reorder Callback', data);
     },
+    changeFilter: (query) => {
+      console.log('== Change Filter Callback', query);
+
+      return of(null);
+    },
     selection: {
       selected: (node: ItemNode) => {
         return node.data.id <= 10;
@@ -52,6 +60,14 @@ export class ExampleComponent {
     levelName: (level) => {
       return 'account';
     },
+    filters: [
+      {
+        label: 'Search',
+        type: ItemType.Keyword,
+        name: 'keyword',
+      },
+    ],
+
   };
 
   public collapseAll() {

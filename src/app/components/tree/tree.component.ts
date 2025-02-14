@@ -10,8 +10,10 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { Observable, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { FilterConfig } from '@firestitch/filter';
+
+import { Observable, of, Subject } from 'rxjs';
+import { map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { FsTreeAction } from '../../interfaces/action.interface';
@@ -36,6 +38,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   @Input()
   public config: ITreeConfig<T> = {};
 
+  public filterConfig: FilterConfig;
+
   @ViewChild('emptyItem')
   public emptyItem: ElementRef;
 
@@ -56,6 +60,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   private _destroy$ = new Subject<void>();
 
+  private _search$ = new Subject<string>();
+
   constructor(
     public tree: FsTreeService<T>,
     private _el: ElementRef,
@@ -73,6 +79,27 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public ngOnInit() {
     this.tree.init(this._el, this.config);
     this.actions = this.config.actions || [];
+
+    if (this.config.filters?.length) {
+      this.filterConfig = {
+        change: (query) => {
+          this._search$.next(query);
+        },
+        items: this.config.filters,
+      };
+    }
+
+    // Below allows the previous search to be cancelled 
+    this._search$
+      .pipe(
+        switchMap((query) => {
+          // Search for query
+          return of(query);
+        }),
+        takeUntil(this._destroy$),
+      ).subscribe((result) => {
+        console.log(result);
+      });
   }
 
   public ngOnDestroy() {
