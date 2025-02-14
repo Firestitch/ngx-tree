@@ -39,10 +39,10 @@ export class ExampleComponent {
     changeReorder: (data) => {
       console.log('== Reorder Callback', data);
     },
-    changeFilter: (query) => {
-      console.log('== Change Filter Callback', query);
+    filterItem: (query) => {
+      console.log('== Filter Item Callback', query);
 
-      return of(null);
+      return true;
     },
     selection: {
       selected: (node: ItemNode) => {
