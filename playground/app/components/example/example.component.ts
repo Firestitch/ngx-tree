@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 
 import { ItemType } from '@firestitch/filter';
-import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitch/tree';
+import { FlatItemNode, FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitch/tree';
 
 import { of } from 'rxjs';
 
@@ -42,7 +42,7 @@ export class ExampleComponent {
     filterItem: (node: ItemNode, query) => {
       console.log('== Filter Item Callback', query);
 
-      return true;
+      return node.data.name.toLowerCase().indexOf(query) > -1;
     },
     selection: {
       selected: (node: ItemNode) => {
@@ -67,7 +67,12 @@ export class ExampleComponent {
         name: 'keyword',
       },
     ],
-
+    trackBy: (node: FlatItemNode) => {
+      return node.data.id;
+    },
+    compareWith: (node1: FlatItemNode, node2: FlatItemNode) => {
+      return node1.data.id === node2.data.id;
+    },
   };
 
   public collapseAll() {
@@ -81,7 +86,7 @@ export class ExampleComponent {
   public consoleDebug() {
     const rootNodes = this.tree.getNodes(null);
     console.log('Get Data', this.tree.getData());
-    
+
     console.log('Get Root Nodes', rootNodes);
 
     const firstRootChildrenNodes = this.tree.getNodes(rootNodes[0]);

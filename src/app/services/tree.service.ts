@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 
 import { SelectionModel } from '@angular/cdk/collections';
-import { FlatTreeControl } from '@angular/cdk/tree';
+import { FlatTreeControl, FlatTreeControlOptions } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
 import { Observable, Subject } from 'rxjs';
@@ -29,6 +29,7 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
 
 import { FsTreeDatabaseService } from './tree-database.service';
+import { filterTree } from '../helpers/tree-filter-hidden';
 
 
 @Injectable()
@@ -47,7 +48,7 @@ export class FsTreeService<T> implements OnDestroy {
   public blocked = false;
 
   /** The selection for checklist */
-  public checklistSelection = new SelectionModel<FlatItemNode>(true /* multiple */);
+  public checklistSelection: SelectionModel<FlatItemNode>;
 
   private _updateClasses$ = new Subject<void>();
 
@@ -57,11 +58,7 @@ export class FsTreeService<T> implements OnDestroy {
     private _database: FsTreeDatabaseService<T>,
     private _cd: ChangeDetectorRef,
     private _zone: NgZone,
-  ) {
-    this.treeFlattener = new MatTreeFlattener(this.transformer, getLevel, isExpandable, getChildren);
-    this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
-    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-  }
+  ) {}
 
   public get updateClasses$(): Observable<void> {
     return this._updateClasses$.asObservable();
@@ -79,6 +76,8 @@ export class FsTreeService<T> implements OnDestroy {
       draggable: config.draggable ?? true,
       dragAxis: config.dragAxis ?? TreeDragAxis.XY,
     };
+
+    this._initDependencies();
 
     this._database.initialize(this.treeControl, this.config);
     this._updateSelected();
@@ -225,7 +224,7 @@ export class FsTreeService<T> implements OnDestroy {
    *
    * @param node
    */
-  public onDragStart(node: FlatItemNode) { 
+  public onDragStart(node: FlatItemNode) {
     //
   }
 
@@ -514,6 +513,63 @@ export class FsTreeService<T> implements OnDestroy {
       });
   }
 
+  public filterVisibleNodes(query: string): void {
+    if (!query) {
+      this.dataSource.data = this._database.data;
+
+      return;
+    }
+
+    this.treeFlattener
+      .flattenNodes(this._database.data)
+      .forEach((flattenNode: FlatItemNode) => {
+        const originalNode = flattenNode.original;
+
+        originalNode.hidden = !this.config.filterItem(originalNode, query)
+      });
+
+    const nData = [];
+
+    this._database.data
+      .forEach((node: ItemNode) => {
+        node = filterTree(node);
+
+        if (node) {
+          nData.push(node);
+        }
+      });
+
+    this.dataSource.data = nData;
+  }
+
+  private _initDependencies(): void {
+    this.treeFlattener = new MatTreeFlattener(
+      this.transformer,
+      getLevel,
+      isExpandable,
+      getChildren,
+    );
+
+    let treeControlOptions: FlatTreeControlOptions<any, any>;
+    if (!!this.config.trackBy) {
+      treeControlOptions  = {
+        trackBy: (n) => {
+          return n.data.id;
+        }
+      };
+    }
+    this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable, treeControlOptions);
+
+    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+
+    this.checklistSelection = new SelectionModel<FlatItemNode>(
+      true,
+      [],
+      false,
+      (this.config.compareWith ?? undefined)
+    );
+  }
+
   private _selectNode(node: FlatItemNode) {
     const descendants = this.treeControl.getDescendants(node);
     this.checklistSelection.select(node, ...descendants);
@@ -534,8 +590,7 @@ export class FsTreeService<T> implements OnDestroy {
         takeUntil(this._destroy$),
       )
       .subscribe((event: ITreeDataChange) => {
-        this.dataSource.data = [];
-        this.dataSource.data = this._database.data;
+        this.dataSource.data = [...this._database.data];
 
         if (this.config.change) {
           this.config.change(event);

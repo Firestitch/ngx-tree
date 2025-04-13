@@ -12,8 +12,8 @@ import {
 
 import { FilterConfig } from '@firestitch/filter';
 
-import { Observable, of, Subject } from 'rxjs';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { FsTreeAction } from '../../interfaces/action.interface';
@@ -66,7 +66,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     public tree: FsTreeService<T>,
     private _el: ElementRef,
     private _cd: ChangeDetectorRef,
-  ) { 
+  ) {
     this.rootChildrenExist$ = this.tree.dataChange$
       .pipe(
         map((value) => {
@@ -83,23 +83,11 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     if (this.config.filters?.length) {
       this.filterConfig = {
         change: (query) => {
-          this._search$.next(query);
+          this.tree.filterVisibleNodes(query.keyword);
         },
         items: this.config.filters,
       };
     }
-
-    // Below allows the previous search to be cancelled 
-    this._search$
-      .pipe(
-        switchMap((query) => {
-          // Search for query
-          return of(query);
-        }),
-        takeUntil(this._destroy$),
-      ).subscribe((result) => {
-        console.log(result);
-      });
   }
 
   public ngOnDestroy() {
