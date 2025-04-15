@@ -10,7 +10,7 @@ import { ItemNode } from '../models/item-node.model';
 import { FsTreeAction } from './action.interface';
 
 
-export interface ITreeConfigBase<T> {
+export interface ITreeConfig<T> {
   maxLevel?: number;
   expandLevel?: number;
   selection?: ITreeSelectionConfig;
@@ -35,23 +35,9 @@ export interface ITreeConfigBase<T> {
   nodeClick?: (event: ITreeNodeClick) => void;
   canNodeClick?: TreeCanNodeClick;
   dragAxis?: TreeDragAxis;
+  filterItem?: (node: ItemNode, query: any) => boolean;
+  filters?: IFilterConfigItem[];
 }
-
-export interface ITreeConfigWithFilters<T> extends ITreeConfigBase<T> {
-  filterItem: (node: ItemNode, query: any) => boolean;
-  filters: IFilterConfigItem[];
-  trackBy: (node: FlatItemNode) => unknown;
-  compareWith: (node1: FlatItemNode, node2: FlatItemNode) => boolean;
-}
-
-export interface ITreeConfigWithoutFilters<T> extends ITreeConfigBase<T> {
-  filterItem?: never;
-  filters?: never;
-  trackBy?: never;
-  compareWith?: never;
-}
-
-export type ITreeConfig<T> = ITreeConfigWithoutFilters<T> | ITreeConfigWithFilters<T>;
 
 export type TreeCanDrag = (node: FlatItemNode) => boolean;
 export type TreeCanNodeClick = (node: FlatItemNode) => boolean;

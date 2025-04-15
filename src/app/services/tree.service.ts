@@ -29,7 +29,6 @@ import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
 
 import { FsTreeDatabaseService } from './tree-database.service';
-import { filterTree } from '../helpers/tree-filter-hidden';
 
 
 @Injectable()
@@ -515,31 +514,18 @@ export class FsTreeService<T> implements OnDestroy {
 
   public filterVisibleNodes(query: string): void {
     if (!query) {
-      this.dataSource.data = this._database.data;
-
       return;
     }
 
-    this.treeFlattener
-      .flattenNodes(this._database.data)
-      .forEach((flattenNode: FlatItemNode) => {
-        const originalNode = flattenNode.original;
+    this.treeControl.collapseAll();
 
-        originalNode.hidden = !this.config.filterItem(originalNode, query)
-      });
-
-    const nData = [];
-
-    this._database.data
-      .forEach((node: ItemNode) => {
-        node = filterTree(node);
-
-        if (node) {
-          nData.push(node);
+    this._database.treeControl.dataNodes
+      .filter ((node) => this.config.filterItem(node.original, query))
+      .forEach((node) => {
+        if (node.parent) {
+          node.parent.expand();
         }
       });
-
-    this.dataSource.data = nData;
   }
 
   private _initDependencies(): void {
@@ -550,24 +536,9 @@ export class FsTreeService<T> implements OnDestroy {
       getChildren,
     );
 
-    let treeControlOptions: FlatTreeControlOptions<any, any>;
-    if (!!this.config.trackBy) {
-      treeControlOptions  = {
-        trackBy: (n) => {
-          return n.data.id;
-        }
-      };
-    }
-    this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable, treeControlOptions);
-
+    this.treeControl = new FlatTreeControl<FlatItemNode>(getLevel, isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-
-    this.checklistSelection = new SelectionModel<FlatItemNode>(
-      true,
-      [],
-      false,
-      (this.config.compareWith ?? undefined)
-    );
+    this.checklistSelection = new SelectionModel<FlatItemNode>(true);
   }
 
   private _selectNode(node: FlatItemNode) {

@@ -39,11 +39,6 @@ export class ExampleComponent {
     changeReorder: (data) => {
       console.log('== Reorder Callback', data);
     },
-    filterItem: (node: ItemNode, query) => {
-      console.log('== Filter Item Callback', query);
-
-      return node.data.name.toLowerCase().indexOf(query) > -1;
-    },
     selection: {
       selected: (node: ItemNode) => {
         return node.data.id <= 10;
@@ -60,6 +55,11 @@ export class ExampleComponent {
     levelName: (level) => {
       return 'account';
     },
+    filterItem: (node: ItemNode, query) => {
+      console.log('== Filter Item Callback', query);
+
+      return node.data.name.toLowerCase().indexOf(query) > -1;
+    },
     filters: [
       {
         label: 'Search',
@@ -67,12 +67,6 @@ export class ExampleComponent {
         name: 'keyword',
       },
     ],
-    trackBy: (node: FlatItemNode) => {
-      return node.data.id;
-    },
-    compareWith: (node1: FlatItemNode, node2: FlatItemNode) => {
-      return node1.data.id === node2.data.id;
-    },
   };
 
   public collapseAll() {
