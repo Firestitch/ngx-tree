@@ -522,8 +522,11 @@ export class FsTreeService<T> implements OnDestroy {
     this._database.treeControl.dataNodes
       .filter ((node) => this.config.filterItem(node.original, query))
       .forEach((node) => {
-        if (node.parent) {
-          node.parent.expand();
+        let nodeToExpand = node.parent;
+        // expand all nodes untill root
+        while (nodeToExpand) {
+          nodeToExpand.expand();
+          nodeToExpand = nodeToExpand.parent;
         }
       });
   }
