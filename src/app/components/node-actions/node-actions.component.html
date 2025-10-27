@@ -1,36 +1,38 @@
-<ng-container *ngFor="let action of actions" [ngSwitch]="action.type">
-  <!-- Menu -->
-  <ng-container *ngSwitchCase="TreeActionType.Menu">
-    <fs-menu>
-      <ng-container *ngFor="let item of action.items">
-        <ng-container *ngIf="item.isGroup">
-          <fs-menu-group 
+@for (action of actions; track action) {
+  @switch (action.type) {
+    <!-- Menu -->
+    @case (TreeActionType.Menu) {
+      <fs-menu>
+        @for (item of action.items; track item) {
+          @if (item.isGroup) {
+            <fs-menu-group
               [hidden]="!item.visible"
               [label]="item.label">
-            <ng-container *ngFor="let subItem of item.children">
-              <ng-template 
+              @for (subItem of item.children; track subItem) {
+                <ng-template
                   fs-menu-item
                   (click)="subItem.click(node)"
                   [link]="subItem.routerLink?.link"
                   [queryParams]="subItem.routerLink?.queryParams"
                   [hidden]="!subItem.visible">
-                {{ subItem.label }}
-              </ng-template>
-            </ng-container>
-          </fs-menu-group>
-        </ng-container>
-        <ng-container *ngIf="!item.isGroup">
-          <ng-template 
+                  {{ subItem.label }}
+                </ng-template>
+              }
+            </fs-menu-group>
+          }
+          @if (!item.isGroup) {
+            <ng-template
               fs-menu-item
               (click)="item.click(node)"
               [link]="item.routerLink?.link"
               [queryParams]="item.routerLink?.queryParams"
               [hidden]="!item.visible">
-            {{ item.label }}
-          </ng-template>
-        </ng-container>
-      </ng-container>
-    </fs-menu>
-  </ng-container>
-  <!-- /Menu -->
-</ng-container>
+              {{ item.label }}
+            </ng-template>
+          }
+        }
+      </fs-menu>
+    }
+    <!-- /Menu -->
+  }
+}
