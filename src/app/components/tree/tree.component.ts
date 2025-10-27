@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { FilterConfig } from '@firestitch/filter';
+import { FilterConfig, FsFilterModule } from '@firestitch/filter';
 
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -23,15 +23,44 @@ import { ItemNode } from '../../models/item-node.model';
 import { LoggerService } from '../../services/logger.service';
 import { FsTreeDatabaseService } from '../../services/tree-database.service';
 import { FsTreeService } from '../../services/tree.service';
+import { MatTree, MatTreeNodeDef, MatTreeNode, MatTreeNodePadding } from '@angular/material/tree';
+import { NgClass, NgTemplateOutlet, AsyncPipe } from '@angular/common';
+import { FsTreeNodeClassDirective } from '../../directives/tree-node-class.directive';
+import { FsDraggableNodeDirective } from '../../directives/draggable-node.directive';
+import { FsDraggableNodeContentDirective } from '../../directives/draggable-node-content.directive';
+import { MatIconButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatIcon } from '@angular/material/icon';
+import { FsDraggableNodeTargetDirective } from '../../directives/draggable-node-target.directive';
+import { FsNodeActionsComponent } from '../node-actions/node-actions.component';
 
 
 @Component({
-  selector: 'fs-tree',
-  templateUrl: './tree.component.html',
-  styleUrls: ['./tree.component.scss'],
-  providers: [FsTreeDatabaseService, LoggerService],
-  viewProviders: [FsTreeService],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'fs-tree',
+    templateUrl: './tree.component.html',
+    styleUrls: ['./tree.component.scss'],
+    providers: [FsTreeDatabaseService, LoggerService],
+    viewProviders: [FsTreeService],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        FsFilterModule,
+        MatTree,
+        NgClass,
+        MatTreeNodeDef,
+        MatTreeNode,
+        MatTreeNodePadding,
+        FsTreeNodeClassDirective,
+        FsDraggableNodeDirective,
+        FsDraggableNodeContentDirective,
+        MatIconButton,
+        MatCheckbox,
+        MatIcon,
+        FsDraggableNodeTargetDirective,
+        NgTemplateOutlet,
+        FsNodeActionsComponent,
+        AsyncPipe,
+    ],
 })
 export class FsTreeComponent<T> implements OnInit, OnDestroy {
 

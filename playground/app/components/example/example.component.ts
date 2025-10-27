@@ -6,12 +6,28 @@ import { FlatItemNode, FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } fr
 import { of } from 'rxjs';
 
 import { TreeData } from '../../data';
+import { MatButton } from '@angular/material/button';
+import { FsTreeComponent as FsTreeComponent_1 } from '../../../../src/app/components/tree/tree.component';
+import { FsTreeNodeDirective } from '../../../../src/app/directives/tree-node.directive';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
-  selector: 'example',
-  templateUrl: './example.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'example',
+    templateUrl: './example.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        MatButton,
+        FsTreeComponent_1,
+        FsTreeNodeDirective,
+        MatFormField,
+        MatLabel,
+        MatInput,
+        FormsModule,
+    ],
 })
 export class ExampleComponent {
 

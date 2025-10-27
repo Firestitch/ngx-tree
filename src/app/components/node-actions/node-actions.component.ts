@@ -10,12 +10,15 @@ import {
 import { FsTreeAction } from '../../interfaces/action.interface';
 import { Action, TreeActionType } from '../../models/action.model';
 import { FlatItemNode } from '../../models/flat-item-node.model';
+import { FsMenuModule } from '@firestitch/menu';
 
 
 @Component({
-  selector: 'fs-node-actions',
-  templateUrl: './node-actions.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'fs-node-actions',
+    templateUrl: './node-actions.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [FsMenuModule],
 })
 export class FsNodeActionsComponent implements OnInit, DoCheck {
   @Input()

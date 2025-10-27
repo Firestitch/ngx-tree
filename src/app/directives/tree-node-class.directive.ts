@@ -10,7 +10,8 @@ import { FsTreeService } from '../services/tree.service';
 
 
 @Directive({
-  selector: '[fsTreeNodeClass]',
+    selector: '[fsTreeNodeClass]',
+    standalone: true,
 })
 export class FsTreeNodeClassDirective implements OnInit, OnDestroy {
 

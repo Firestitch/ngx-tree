@@ -4,7 +4,8 @@ import { FlatItemNode } from '../models';
 
 
 @Directive({
-  selector: '[fsTreeNode]',
+    selector: '[fsTreeNode]',
+    standalone: true,
 })
 export class FsTreeNodeDirective {
 

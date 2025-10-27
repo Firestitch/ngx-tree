@@ -4,12 +4,21 @@ import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
 
 import { TreeActionType } from '../../../../src/app/models/action.model';
 import { TreeData } from '../../data';
+import { MatButton } from '@angular/material/button';
+import { FsTreeComponent as FsTreeComponent_1 } from '../../../../src/app/components/tree/tree.component';
+import { FsTreeNodeDirective } from '../../../../src/app/directives/tree-node.directive';
 
 
 @Component({
-  selector: 'fixed-fixed-ordering',
-  templateUrl: './fixed-fixed-ordering.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'fixed-fixed-ordering',
+    templateUrl: './fixed-fixed-ordering.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        MatButton,
+        FsTreeComponent_1,
+        FsTreeNodeDirective,
+    ],
 })
 export class FixedFixedOrderingComponent {
   @ViewChild('tree')

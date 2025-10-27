@@ -26,7 +26,8 @@ import { FsDraggableNodeTargetDirective } from './draggable-node-target.directiv
 
 
 @Directive({
-  selector: '[fsDraggableNode]',
+    selector: '[fsDraggableNode]',
+    standalone: true,
 })
 export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDestroy {
 

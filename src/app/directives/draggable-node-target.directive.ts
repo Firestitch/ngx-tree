@@ -1,7 +1,8 @@
 import { Directive, HostBinding } from '@angular/core';
 
 @Directive({
-  selector: '[fsDraggableNodeTarget]',
+    selector: '[fsDraggableNodeTarget]',
+    standalone: true,
 })
 export class FsDraggableNodeTargetDirective {
 
