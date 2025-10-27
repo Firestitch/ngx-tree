@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, inject } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
 
@@ -25,6 +25,8 @@ import { FsTreeNodeDirective } from '../../../../src/app/directives/tree-node.di
     ],
 })
 export class ActionsComponent {
+  private _dialog = inject(MatDialog);
+
   @ViewChild('tree')
   public tree: FsTreeComponent<any>;
 
@@ -69,11 +71,6 @@ export class ActionsComponent {
       },
     ],
   };
-
-  constructor(
-    private _dialog: MatDialog,
-  ) {
-  }
 
   public collapseAll() {
     this.tree.collapseAll();

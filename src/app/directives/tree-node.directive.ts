@@ -1,4 +1,4 @@
-import { Directive, Input, TemplateRef } from '@angular/core';
+import { Directive, Input, TemplateRef, inject } from '@angular/core';
 
 import { FlatItemNode } from '../models';
 
@@ -8,14 +8,11 @@ import { FlatItemNode } from '../models';
     standalone: true,
 })
 export class FsTreeNodeDirective {
+  private _templateRef = inject<TemplateRef<any>>(TemplateRef);
+
 
   @Input('class')
   private _klass = '';
-
-  constructor(
-    private _templateRef: TemplateRef<any>,
-  ) {
-  }
 
   public get templateRef(): TemplateRef<any> {
     return this._templateRef;

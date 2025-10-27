@@ -1,4 +1,4 @@
-import { Directive, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, OnDestroy, OnInit, inject } from '@angular/core';
 
 import { MatTreeNode } from '@angular/material/tree';
 
@@ -14,16 +14,13 @@ import { FsTreeService } from '../services/tree.service';
     standalone: true,
 })
 export class FsTreeNodeClassDirective implements OnInit, OnDestroy {
+  private _node = inject<MatTreeNode<FlatItemNode>>(MatTreeNode);
+  private _tree = inject<FsTreeService<unknown>>(FsTreeService);
+  private _el = inject(ElementRef);
+
 
   private _classesList: string[];
   private _destroy$ = new Subject<void>();
-
-  constructor(
-    private _node: MatTreeNode<FlatItemNode>,
-    private _tree: FsTreeService<unknown>,
-    private _el: ElementRef,
-  ) {
-  }
 
   public ngOnInit() {
     if (this._node && this._tree.config.nodeClass) {

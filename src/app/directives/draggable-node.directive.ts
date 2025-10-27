@@ -1,15 +1,4 @@
-import {
-  AfterViewInit,
-  ContentChild,
-  Directive,
-  ElementRef,
-  EventEmitter,
-  Input,
-  NgZone,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { AfterViewInit, ContentChild, Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, inject } from '@angular/core';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -30,6 +19,12 @@ import { FsDraggableNodeTargetDirective } from './draggable-node-target.directiv
     standalone: true,
 })
 export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDestroy {
+  private _db = inject<FsTreeDatabaseService<T>>(FsTreeDatabaseService);
+  private _logger = inject(LoggerService);
+  private _el = inject(ElementRef);
+  private _zone = inject(NgZone);
+  private _tree = inject<FsTreeService<T>>(FsTreeService);
+
 
   @Input('fsDraggableNode')
   public node: FlatItemNode;
@@ -52,14 +47,6 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
   private _draggable: Draggable;
 
   private _destroy = new Subject<void>();
-
-  constructor(
-    private _db: FsTreeDatabaseService<T>,
-    private _logger: LoggerService,
-    private _el: ElementRef,
-    private _zone: NgZone,
-    private _tree: FsTreeService<T>,
-  ) { }
 
   public ngOnInit() {
     if (this._tree.config.draggable) {

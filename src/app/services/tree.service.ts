@@ -1,10 +1,4 @@
-import {
-  ChangeDetectorRef,
-  ElementRef,
-  Injectable,
-  NgZone,
-  OnDestroy,
-} from '@angular/core';
+import { ChangeDetectorRef, ElementRef, Injectable, NgZone, OnDestroy, inject } from '@angular/core';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl, FlatTreeControlOptions } from '@angular/cdk/tree';
@@ -33,6 +27,10 @@ import { FsTreeDatabaseService } from './tree-database.service';
 
 @Injectable()
 export class FsTreeService<T> implements OnDestroy {
+  private _database = inject<FsTreeDatabaseService<T>>(FsTreeDatabaseService);
+  private _cd = inject(ChangeDetectorRef);
+  private _zone = inject(NgZone);
+
 
   public config: ITreeConfig<T> = {};
 
@@ -52,12 +50,6 @@ export class FsTreeService<T> implements OnDestroy {
   private _updateClasses$ = new Subject<void>();
 
   private _destroy$ = new Subject<void>();
-
-  constructor(
-    private _database: FsTreeDatabaseService<T>,
-    private _cd: ChangeDetectorRef,
-    private _zone: NgZone,
-  ) {}
 
   public get updateClasses$(): Observable<void> {
     return this._updateClasses$.asObservable();

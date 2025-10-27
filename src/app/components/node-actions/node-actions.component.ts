@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component, DoCheck,
-  Input,
-  KeyValueDiffer,
-  KeyValueDiffers,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DoCheck, Input, KeyValueDiffer, KeyValueDiffers, OnInit, inject } from '@angular/core';
 
 import { FsTreeAction } from '../../interfaces/action.interface';
 import { Action, TreeActionType } from '../../models/action.model';
@@ -21,6 +14,8 @@ import { FsMenuModule } from '@firestitch/menu';
     imports: [FsMenuModule],
 })
 export class FsNodeActionsComponent implements OnInit, DoCheck {
+  private _differs = inject(KeyValueDiffers);
+
   @Input()
   public rawActions: FsTreeAction[];
 
@@ -32,9 +27,9 @@ export class FsNodeActionsComponent implements OnInit, DoCheck {
 
   private _nodeDiffer: KeyValueDiffer<any, any>;
 
-  constructor(
-    private _differs: KeyValueDiffers,
-  ) {
+  constructor() {
+    const _differs = this._differs;
+
     this._nodeDiffer = _differs.find({}).create();
   }
 

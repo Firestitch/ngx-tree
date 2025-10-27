@@ -1,14 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  ElementRef,
-  Input,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 
 import { FilterConfig, FsFilterModule } from '@firestitch/filter';
 
@@ -63,6 +53,10 @@ import { FsNodeActionsComponent } from '../node-actions/node-actions.component';
     ],
 })
 export class FsTreeComponent<T> implements OnInit, OnDestroy {
+  tree = inject<FsTreeService<T>>(FsTreeService);
+  private _el = inject(ElementRef);
+  private _cd = inject(ChangeDetectorRef);
+
 
   @Input()
   public config: ITreeConfig<T> = {};
@@ -91,11 +85,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   private _search$ = new Subject<string>();
 
-  constructor(
-    public tree: FsTreeService<T>,
-    private _el: ElementRef,
-    private _cd: ChangeDetectorRef,
-  ) {
+  constructor() {
     this.rootChildrenExist$ = this.tree.dataChange$
       .pipe(
         map((value) => {

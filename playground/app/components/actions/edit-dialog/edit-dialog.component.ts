@@ -1,8 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component, Inject,
-  OnDestroy,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, inject } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 
@@ -34,16 +30,16 @@ import { MatButton } from '@angular/material/button';
     ],
 })
 export class EditDialogComponent implements OnDestroy {
+  private _data = inject(MAT_DIALOG_DATA);
+  private _dialogRef = inject<MatDialogRef<EditDialogComponent>>(MatDialogRef);
+  private _message = inject(FsMessage);
+
 
   public node = null;
 
   private _destroy$ = new Subject<void>();
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) private _data: any,
-    private _dialogRef: MatDialogRef<EditDialogComponent>,
-    private _message: FsMessage,
-  ) {
+  constructor() {
     this.node = this._data.node;
   }
 
