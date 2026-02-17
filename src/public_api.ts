@@ -40,3 +40,5 @@ export { FsTreeChange } from './app/enums/tree-change.enum';
 export { TreeDragAxis } from './app/enums/drag-axis.enum';
 
 export { FsTreeNodeDirective } from './app/directives/tree-node.directive';
+
+export { FsTreeModule } from './app/fs-tree.module';
