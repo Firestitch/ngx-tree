@@ -235,10 +235,18 @@ export class FsTreeService<T> implements OnDestroy {
       insertIndex = this._database.insertNodeBelow(dropInto, node);
     } else {
       insertIndex = this._database.insertNode(dropInto, node);
+
+      if (data.dropInto && !data.dropInto.isExpanded()) {
+        data.dropInto.expand();
+      }
     }
 
     // Run in zone back because before it was ran outside angular
     this._zone.run(() => {
+      // Force full view re-creation so CdkTreeNodePadding recalculates
+      // indentation when nodes move to a different level
+      this.dataSource.data = [];
+
       // Notify about data change
       const payload: ITreeChangeReorder = {
         fromParent: this.getFlatItemNode(fromParent),
