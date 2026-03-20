@@ -47,9 +47,13 @@ export class FsTreeService<T> implements OnDestroy {
   /** The selection for checklist */
   public checklistSelection: SelectionModel<FlatItemNode>;
 
+  private _searchQuery = '';
   private _updateClasses$ = new Subject<void>();
-
   private _destroy$ = new Subject<void>();
+
+  public get searchQuery(): string {
+    return this._searchQuery;
+  }
 
   public get updateClasses$(): Observable<void> {
     return this._updateClasses$.asObservable();
@@ -112,6 +116,7 @@ export class FsTreeService<T> implements OnDestroy {
     flatNode.last = nodesList.length - 1 === flatNode.index;
     flatNode.data = node.data;
     flatNode.canNodeClick = this.config.canNodeClick ? this.config.canNodeClick(flatNode) : false;
+    flatNode.templateContext.searchQuery = this._searchQuery;
 
     this._database.flatNodeMap.set(flatNode, node);
     this._database.nestedNodeMap.set(node, flatNode);
@@ -512,6 +517,58 @@ export class FsTreeService<T> implements OnDestroy {
       });
   }
 
+  public search(query: string): void {
+    if (!query) {
+      this.clearSearch();
+
+      return;
+    }
+
+    this._searchQuery = query;
+
+    const filterFn = this.config.filterItem
+      || ((node: ItemNode, q: string) => {
+        return JSON.stringify(node.data).toLowerCase().includes(q.toLowerCase());
+      });
+
+    this.treeControl.collapseAll();
+
+    const dataNodes = this.treeControl.dataNodes;
+
+    dataNodes.forEach((node) => {
+      node.searchHidden = true;
+      node.templateContext.searchQuery = query;
+    });
+
+    dataNodes
+      .filter((node) => filterFn(node.original, query))
+      .forEach((node) => {
+        node.searchHidden = false;
+
+        let ancestor = node.parent;
+        while (ancestor) {
+          ancestor.searchHidden = false;
+          ancestor.expand();
+          ancestor = ancestor.parent;
+        }
+      });
+
+    this._cd.markForCheck();
+  }
+
+  public clearSearch(): void {
+    this._searchQuery = '';
+
+    this.treeControl.dataNodes.forEach((node) => {
+      node.searchHidden = false;
+      node.templateContext.searchQuery = '';
+    });
+
+    this.treeControl.collapseAll();
+    this._updateExpanded();
+    this._cd.markForCheck();
+  }
+
   public filterVisibleNodes(query: string): void {
     if (!query) {
       return;
@@ -523,7 +580,6 @@ export class FsTreeService<T> implements OnDestroy {
       .filter ((node) => this.config.filterItem(node.original, query))
       .forEach((node) => {
         let nodeToExpand = node.parent;
-        // expand all nodes untill root
         while (nodeToExpand) {
           nodeToExpand.expand();
           nodeToExpand = nodeToExpand.parent;

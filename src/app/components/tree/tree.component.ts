@@ -23,6 +23,8 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { FsDraggableNodeTargetDirective } from '../../directives/draggable-node-target.directive';
 import { FsNodeActionsComponent } from '../node-actions/node-actions.component';
+import { FsTreeHighlightPipe } from '../../pipes/highlight.pipe';
+import { FsTreeSearchHighlightDirective } from '../../directives/search-highlight.directive';
 
 
 @Component({
@@ -49,6 +51,8 @@ import { FsNodeActionsComponent } from '../node-actions/node-actions.component';
         FsDraggableNodeTargetDirective,
         NgTemplateOutlet,
         FsNodeActionsComponent,
+        FsTreeHighlightPipe,
+        FsTreeSearchHighlightDirective,
         AsyncPipe,
     ],
 })
@@ -102,7 +106,7 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
     if (this.config.filters?.length) {
       this.filterConfig = {
         change: (query) => {
-          this.tree.filterVisibleNodes(query.keyword);
+          this.tree.search(query.keyword);
         },
         items: this.config.filters,
       };
@@ -255,6 +259,14 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   public setData(data: unknown): void {
     this.tree.setData(data);
+  }
+
+  public search(query: string): void {
+    this.tree.search(query);
+  }
+
+  public clearSearch(): void {
+    this.tree.clearSearch();
   }
 
   public nodeClick(node: FlatItemNode): void {

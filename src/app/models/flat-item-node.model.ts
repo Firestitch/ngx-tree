@@ -8,6 +8,7 @@ export class FlatItemNode {
   public original: ItemNode;
   public originalParent: ItemNode;
   public hidden = false; // Need for droppable orderNodesByCoords
+  public searchHidden = false;
   public isExpanded;
   public collapse;
   public expand;
