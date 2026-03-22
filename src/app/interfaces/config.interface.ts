@@ -1,4 +1,4 @@
-import { IFilterConfigItem } from '@firestitch/filter';
+import { FsFilterAction, IFilterConfigItem } from '@firestitch/filter';
 
 import { Observable } from 'rxjs';
 
@@ -37,6 +37,7 @@ export interface ITreeConfig<T> {
   dragAxis?: TreeDragAxis;
   filterItem?: (node: ItemNode, query: any) => boolean;
   filters?: IFilterConfigItem[];
+  filterActions?: FsFilterAction[];
 }
 
 export type TreeCanDrag = (node: FlatItemNode) => boolean;

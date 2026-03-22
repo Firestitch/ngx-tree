@@ -1,10 +1,21 @@
+import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, Input, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+
+import { MatIconButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatIcon } from '@angular/material/icon';
+import { MatTree, MatTreeNode, MatTreeNodeDef, MatTreeNodePadding } from '@angular/material/tree';
 
 import { FilterConfig, FsFilterModule } from '@firestitch/filter';
 
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { FsDraggableNodeContentDirective } from '../../directives/draggable-node-content.directive';
+import { FsDraggableNodeTargetDirective } from '../../directives/draggable-node-target.directive';
+import { FsDraggableNodeDirective } from '../../directives/draggable-node.directive';
+import { FsTreeSearchHighlightDirective } from '../../directives/search-highlight.directive';
+import { FsTreeNodeClassDirective } from '../../directives/tree-node-class.directive';
 import { FsTreeNodeDirective } from '../../directives/tree-node.directive';
 import { FsTreeAction } from '../../interfaces/action.interface';
 import { ITreeConfig } from '../../interfaces/config.interface';
@@ -13,54 +24,40 @@ import { ItemNode } from '../../models/item-node.model';
 import { LoggerService } from '../../services/logger.service';
 import { FsTreeDatabaseService } from '../../services/tree-database.service';
 import { FsTreeService } from '../../services/tree.service';
-import { MatTree, MatTreeNodeDef, MatTreeNode, MatTreeNodePadding } from '@angular/material/tree';
-import { NgClass, NgTemplateOutlet, AsyncPipe } from '@angular/common';
-import { FsTreeNodeClassDirective } from '../../directives/tree-node-class.directive';
-import { FsDraggableNodeDirective } from '../../directives/draggable-node.directive';
-import { FsDraggableNodeContentDirective } from '../../directives/draggable-node-content.directive';
-import { MatIconButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
-import { MatIcon } from '@angular/material/icon';
-import { FsDraggableNodeTargetDirective } from '../../directives/draggable-node-target.directive';
 import { FsNodeActionsComponent } from '../node-actions/node-actions.component';
-import { FsTreeHighlightPipe } from '../../pipes/highlight.pipe';
-import { FsTreeSearchHighlightDirective } from '../../directives/search-highlight.directive';
 
 
 @Component({
-    selector: 'fs-tree',
-    templateUrl: './tree.component.html',
-    styleUrls: ['./tree.component.scss'],
-    providers: [FsTreeDatabaseService, LoggerService],
-    viewProviders: [FsTreeService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [
-        FsFilterModule,
-        MatTree,
-        NgClass,
-        MatTreeNodeDef,
-        MatTreeNode,
-        MatTreeNodePadding,
-        FsTreeNodeClassDirective,
-        FsDraggableNodeDirective,
-        FsDraggableNodeContentDirective,
-        MatIconButton,
-        MatCheckbox,
-        MatIcon,
-        FsDraggableNodeTargetDirective,
-        NgTemplateOutlet,
-        FsNodeActionsComponent,
-        FsTreeHighlightPipe,
-        FsTreeSearchHighlightDirective,
-        AsyncPipe,
-    ],
+  selector: 'fs-tree',
+  templateUrl: './tree.component.html',
+  styleUrls: ['./tree.component.scss'],
+  providers: [FsTreeDatabaseService, LoggerService],
+  viewProviders: [FsTreeService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [
+    FsFilterModule,
+    MatTree,
+    NgClass,
+    MatTreeNodeDef,
+    MatTreeNode,
+    MatTreeNodePadding,
+    FsTreeNodeClassDirective,
+    FsDraggableNodeDirective,
+    FsDraggableNodeContentDirective,
+    MatIconButton,
+    MatCheckbox,
+    MatIcon,
+    FsDraggableNodeTargetDirective,
+    NgTemplateOutlet,
+    FsNodeActionsComponent,
+    FsTreeSearchHighlightDirective,
+    AsyncPipe,
+  ],
 })
 export class FsTreeComponent<T> implements OnInit, OnDestroy {
-  tree = inject<FsTreeService<T>>(FsTreeService);
-  private _el = inject(ElementRef);
-  private _cd = inject(ChangeDetectorRef);
-
+  
+  public tree = inject<FsTreeService<T>>(FsTreeService);
 
   @Input()
   public config: ITreeConfig<T> = {};
@@ -86,8 +83,8 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public rootChildrenExist$: Observable<boolean>;
 
   private _destroy$ = new Subject<void>();
-
-  private _search$ = new Subject<string>();
+  private _el = inject(ElementRef);
+  private _cd = inject(ChangeDetectorRef);
 
   constructor() {
     this.rootChildrenExist$ = this.tree.dataChange$
@@ -102,13 +99,14 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
   public ngOnInit() {
     this.tree.init(this._el, this.config);
     this.actions = this.config.actions || [];
-
-    if (this.config.filters?.length) {
+    
+    if (this.config.filters?.length || this.config.filterActions?.length) {
       this.filterConfig = {
         change: (query) => {
           this.tree.search(query.keyword);
         },
-        items: this.config.filters,
+        items: this.config.filters || [],
+        actions: this.config.filterActions || [],
       };
     }
   }

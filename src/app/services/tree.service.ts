@@ -27,13 +27,8 @@ import { FsTreeDatabaseService } from './tree-database.service';
 
 @Injectable()
 export class FsTreeService<T> implements OnDestroy {
-  private _database = inject<FsTreeDatabaseService<T>>(FsTreeDatabaseService);
-  private _cd = inject(ChangeDetectorRef);
-  private _zone = inject(NgZone);
-
 
   public config: ITreeConfig<T> = {};
-
   public treeControl: FlatTreeControl<FlatItemNode>;
   public treeFlattener: MatTreeFlattener<ItemNode, FlatItemNode>;
   public dataSource: MatTreeFlatDataSource<ItemNode, FlatItemNode>;
@@ -50,6 +45,9 @@ export class FsTreeService<T> implements OnDestroy {
   private _searchQuery = '';
   private _updateClasses$ = new Subject<void>();
   private _destroy$ = new Subject<void>();
+  private _database = inject<FsTreeDatabaseService<T>>(FsTreeDatabaseService);
+  private _cd = inject(ChangeDetectorRef);
+  private _zone = inject(NgZone);
 
   public get searchQuery(): string {
     return this._searchQuery;
