@@ -20,7 +20,8 @@
       (drop)="tree.onDrop($event)">
     <div
         class="node"
-        fsDraggableNodeContent>
+        fsDraggableNodeContent
+        [class.fs-tree-node-draggable]="tree.dragNodeMode && node.canDrag">
       <div class="container">
         @if (rootChildrenExist$ | async) {
           <button
@@ -39,7 +40,7 @@
         <mat-icon
             fsDraggableNodeTarget
             class="fs-tree-draggable-handle"
-            [ngClass]="{ 'draggable': tree.config.draggable, 'no-drag': !node.canDrag }">
+            [ngClass]="{ 'draggable': tree.dragHandleVisible, 'no-drag': !node.canDrag }">
           drag_handle
         </mat-icon>
         <div
@@ -74,7 +75,8 @@
       (drop)="tree.onDrop($event)">
     <div
         class="node"
-        fsDraggableNodeContent>
+        fsDraggableNodeContent
+        [class.fs-tree-node-draggable]="tree.dragNodeMode && node.canDrag">
       <div class="container">
         @if (rootChildrenExist$ | async) {
           <button
@@ -98,7 +100,7 @@
         <mat-icon
             fsDraggableNodeTarget
             class="fs-tree-draggable-handle"
-            [ngClass]="{ 'draggable': tree.config.draggable, 'no-drag': !node.canDrag }">
+            [ngClass]="{ 'draggable': tree.dragHandleVisible, 'no-drag': !node.canDrag }">
           drag_handle
         </mat-icon>
         <div

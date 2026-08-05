@@ -26,7 +26,6 @@ export class FixedManageOrderingComponent {
 
   public config: ITreeConfig<any> = {
     data: TreeData,
-    maxLevel: 2,
     childrenName: 'accounts',
     change: (data) => {
       console.log('Data was changed: ', data);

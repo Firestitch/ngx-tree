@@ -57,6 +57,10 @@
   align-items: center;
   border-radius: 2px;
 
+  &.fs-tree-node-draggable {
+    cursor: grab;
+  }
+
   .container {
     display: flex;
     align-items: center;
@@ -116,6 +120,12 @@
     margin-top: 35px;
 
     button, .checklist-leaf-node {
+      display: none;
+    }
+
+    // The dragged copy shows the content only, never the handle it was grabbed by
+    .container .fs-tree-draggable-target,
+    .container .fs-tree-draggable-target.draggable {
       display: none;
     }
   }

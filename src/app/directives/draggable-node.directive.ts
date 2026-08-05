@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { Draggable } from '../classes/draggable';
+import { TreeDragMode } from '../enums/drag-mode.enum';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { LoggerService } from '../services/logger.service';
@@ -55,11 +56,12 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
           this._db.containerElement,
           this.node,
           this.draggableContent,
-          this.draggableTarget,
+          this._dragTarget(this._tree.dragMode),
           this._db.nestedNodeMap,
           { canDrop: this.candDrop },
           this._logger,
           this._tree.config.dragAxis,
+          this._tree.dragMode,
         );
       });
 
@@ -85,7 +87,23 @@ export class FsDraggableNodeDirective<T> implements OnInit, AfterViewInit, OnDes
     this._destroy.complete();
   }
 
+  private _dragTarget(dragMode: TreeDragMode): ElementRef {
+    return dragMode === TreeDragMode.Node
+      ? this.draggableContent
+      : this.draggableTarget;
+  }
+
   private _initSubscriptions() {
+    this._tree.dragMode$
+      .pipe(
+        takeUntil(this._destroy),
+      )
+      .subscribe((dragMode) => {
+        this._zone.runOutsideAngular(() => {
+          this._draggable.setDragMode(dragMode, this._dragTarget(dragMode));
+        });
+      });
+
     this._draggable.dragStart$
       .pipe(
         takeUntil(this._destroy),

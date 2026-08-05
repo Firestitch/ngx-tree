@@ -5,12 +5,34 @@ import { filter, takeUntil } from 'rxjs/operators';
 
 
 import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { TreeDragMode } from '../enums/drag-mode.enum';
 import { IDragEnd } from '../interfaces/draggable.interface';
 import { FlatItemNode } from '../models/flat-item-node.model';
 import { ItemNode } from '../models/item-node.model';
 import { LoggerService } from '../services/logger.service';
 
 import { Droppable } from './droppable';
+
+
+// Elements that must stay interactive when the whole node acts as a drag target.
+// Only anchors that actually navigate are excluded, a plain <a> is a common way to
+// style clickable node content and still has to be draggable
+const nonDraggableSelector = [
+  'fs-node-actions',
+  'button',
+  'a[href]',
+  'input',
+  'textarea',
+  'select',
+  'label',
+  '[contenteditable]',
+  '.mat-mdc-checkbox',
+  '.mat-mdc-select',
+  '.mat-mdc-form-field',
+].join(',');
+
+// Distance in pixels the pointer has to travel before a node drag kicks in
+const dragThreshold = 5;
 
 
 export class Draggable {
@@ -24,7 +46,7 @@ export class Draggable {
   private _draggableEl: HTMLDivElement = null;
 
   private _expandedBeforeDrag = false;
-  private _visibleChildren: FlatItemNode[];
+  private _visibleChildren: FlatItemNode[] = [];
 
   // Observables
   private _dragStart$ = new Subject<void>();
@@ -41,10 +63,18 @@ export class Draggable {
   private _screenHeight = 0;
   private _limitToScroll = 0;
 
+  // Pointer position of the not yet confirmed drag
+  private _pendingStart: { x: number, y: number } = null;
+
+  // Element the mouse/touch start events are bound to
+  private _target: ElementRef;
+
   // Handlers for remove listeners in feature
   private _dragStartHandler = this.dragStart.bind(this);
   private _moveHandler = this.dragTo.bind(this);
   private _dropHandler = this.dragEnd.bind(this);
+  private _thresholdMoveHandler = this._checkDragThreshold.bind(this);
+  private _thresholdCancelHandler = this._cancelPendingDrag.bind(this);
 
 
   /**
@@ -53,28 +83,53 @@ export class Draggable {
    * @param _containerElement
    * @param _node
    * @param _el
-   * @param _target
+   * @param target
    * @param _nodes
    * @param _restrictions
    * @param _logger
    * @param _dragAxis
+   * @param _dragMode
    */
   constructor(
     private readonly _containerElement: ElementRef,
     private readonly _node: FlatItemNode,
     private readonly _el: ElementRef,
-    private readonly _target: ElementRef,
+    target: ElementRef,
     private readonly _nodes: Map<ItemNode, FlatItemNode>,
     private readonly _restrictions: any,
     private readonly _logger: LoggerService,
     private readonly _dragAxis: TreeDragAxis,
+    private _dragMode: TreeDragMode = TreeDragMode.Handle,
   ) {
+    this._target = target;
 
     // Listen mouse or touch events
-    this._target.nativeElement.addEventListener('mousedown', this._dragStartHandler);
-    this._target.nativeElement.addEventListener('touchstart', this._dragStartHandler);
+    this._addTargetListeners();
 
     this._subscribe();
+  }
+
+  /**
+   * Rebind the drag initiator without recreating the whole tree
+   *
+   * @param dragMode
+   * @param target
+   */
+  public setDragMode(dragMode: TreeDragMode, target: ElementRef) {
+    if (this._dragMode === dragMode && this._target === target) {
+      return;
+    }
+
+    if (this.dragging) {
+      this.destroyDraggable();
+      this.destroyDroppable();
+    }
+
+    this._cancelPendingDrag();
+    this._removeTargetListeners();
+    this._dragMode = dragMode;
+    this._target = target;
+    this._addTargetListeners();
   }
 
   public get dragStart$(): Observable<void> {
@@ -105,52 +160,26 @@ export class Draggable {
       return;
     }
 
-    this._touchFix(event);
-    this._calcAutoScrollParams();
-
-    // Emit event that drag started
-    this._dragStart$.next(null);
-
-    // Store information about expand status. If node has been expanded, then we should expand it after drag
-    // this._expandedBeforeDrag = this._node.isExpanded();
-
-    // Collapse node before drag
-    // if (this._expandedBeforeDrag) {
-    //   // this._node.collapse();
-    //   // this._hideChildrenNodes(this._node);
-    // }
-    this._visibleChildren = this._getVisibleChildren(this._node);
-    this._addClassForChildrenNodes();
-
-    //this._logger.timeStart('DRAG_START');
-
-    // Update level 0 statuses
-    this._nodes.forEach((node) => {
-      if (node.level === 0) {
-
-        //this._logger.log('Drag Start Checking', node);
-
-        node.hidden = false;
-        if (node.isExpanded()) {
-          this._checkChildrenExpandedStatus(node, true);
-        } else {
-          // this._hideChildrenNodes(node);
-        }
+    // When the whole node is the drag target the drag can not start right away, otherwise
+    // clicking, selecting text or using the inline controls would be impossible
+    if (this._dragMode === TreeDragMode.Node) {
+      if (this._isNonDraggableTarget(event.target)) {
+        return;
       }
-    });
 
-    //this._logger.timeStop('DRAG_START');
-    window.document.body.classList.add('fs-tree-dragging');
+      this._touchFix(event);
+      this._pendingStart = { x: event.clientX, y: event.clientY };
 
-    this.dragging = true;
-    this._dragDims = this._el.nativeElement.getBoundingClientRect();
-    this._shiftX = event.clientX - this._dragDims.left;
+      window.document.addEventListener('mousemove', this._thresholdMoveHandler);
+      window.document.addEventListener('touchmove', this._thresholdMoveHandler, { passive: false } as any);
+      window.document.addEventListener('mouseup', this._thresholdCancelHandler);
+      window.document.addEventListener('touchend', this._thresholdCancelHandler);
+      window.document.addEventListener('touchcancel', this._thresholdCancelHandler);
 
-    this._initDraggableElement(event);
-    this._initDroppable(event);
-    this._addEventListeners();
+      return;
+    }
 
-    this._dragStart$.next(null);
+    this._beginDrag(event);
   }
 
   /**
@@ -206,6 +235,12 @@ export class Draggable {
       return;
     }
 
+    // A drag started from the node itself ends over a clickable area, swallow the
+    // click that the browser fires right after the drop
+    if (this._dragMode === TreeDragMode.Node) {
+      this._suppressNextClick();
+    }
+
     this.destroyDraggable();
 
     if (this._expandedBeforeDrag) {
@@ -253,8 +288,8 @@ export class Draggable {
    * Destroy
    */
   public destroy() {
-    this._el.nativeElement.removeEventListener('mousedown', this._dragStartHandler);
-    this._el.nativeElement.removeEventListener('touchstart', this._dragStartHandler);
+    this._cancelPendingDrag();
+    this._removeTargetListeners();
 
     this._destroy$.next(null);
     this._destroy$.complete();
@@ -263,6 +298,128 @@ export class Draggable {
   public destroyDroppable() {
     this._droppable?.destroy();
     this._droppable = null;
+  }
+
+  /**
+   * Prepare draggable elements and add events
+   *
+   * @param event
+   */
+  private _beginDrag(event) {
+    this._touchFix(event);
+    this._calcAutoScrollParams();
+
+    // Emit event that drag started
+    this._dragStart$.next(null);
+
+    // Store information about expand status. If node has been expanded, then we should expand it after drag
+    // this._expandedBeforeDrag = this._node.isExpanded();
+
+    // Collapse node before drag
+    // if (this._expandedBeforeDrag) {
+    //   // this._node.collapse();
+    //   // this._hideChildrenNodes(this._node);
+    // }
+    this._visibleChildren = this._getVisibleChildren(this._node);
+    this._addClassForChildrenNodes();
+
+    //this._logger.timeStart('DRAG_START');
+
+    // Update level 0 statuses
+    this._nodes.forEach((node) => {
+      if (node.level === 0) {
+
+        //this._logger.log('Drag Start Checking', node);
+
+        node.hidden = false;
+        if (node.isExpanded()) {
+          this._checkChildrenExpandedStatus(node, true);
+        } else {
+          // this._hideChildrenNodes(node);
+        }
+      }
+    });
+
+    //this._logger.timeStop('DRAG_START');
+    window.document.body.classList.add('fs-tree-dragging');
+
+    this.dragging = true;
+    this._dragDims = this._el.nativeElement.getBoundingClientRect();
+    this._shiftX = event.clientX - this._dragDims.left;
+
+    this._initDraggableElement(event);
+    this._initDroppable(event);
+    this._addEventListeners();
+
+    this._dragStart$.next(null);
+  }
+
+  private _addTargetListeners() {
+    this._target.nativeElement.addEventListener('mousedown', this._dragStartHandler);
+    this._target.nativeElement.addEventListener('touchstart', this._dragStartHandler);
+  }
+
+  private _removeTargetListeners() {
+    this._target.nativeElement.removeEventListener('mousedown', this._dragStartHandler);
+    this._target.nativeElement.removeEventListener('touchstart', this._dragStartHandler);
+  }
+
+  /**
+   * Start the drag only when the pointer travelled far enough, so clicks,
+   * text selection and inline controls keep working
+   *
+   * @param event
+   */
+  private _checkDragThreshold(event) {
+    if (!this._pendingStart) {
+      return;
+    }
+
+    this._touchFix(event);
+
+    const movedX = Math.abs(event.clientX - this._pendingStart.x);
+    const movedY = Math.abs(event.clientY - this._pendingStart.y);
+
+    if (movedX < dragThreshold && movedY < dragThreshold) {
+      return;
+    }
+
+    this._cancelPendingDrag();
+
+    // Drop any text selection made between mousedown and the threshold being reached
+    window.getSelection()?.removeAllRanges();
+
+    this._beginDrag(event);
+  }
+
+  private _cancelPendingDrag() {
+    this._pendingStart = null;
+
+    window.document.removeEventListener('mousemove', this._thresholdMoveHandler);
+    window.document.removeEventListener('touchmove', this._thresholdMoveHandler);
+    window.document.removeEventListener('mouseup', this._thresholdCancelHandler);
+    window.document.removeEventListener('touchend', this._thresholdCancelHandler);
+    window.document.removeEventListener('touchcancel', this._thresholdCancelHandler);
+  }
+
+  private _isNonDraggableTarget(target: EventTarget): boolean {
+    return target instanceof Element
+      && !!target.closest(nonDraggableSelector);
+  }
+
+  private _suppressNextClick() {
+    const suppress = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    window.document.addEventListener('click', suppress, true);
+
+    // The click is dispatched right after mouseup, drop the listener afterwards so an
+    // unrelated click never gets swallowed
+    window.setTimeout(() => {
+      window.document.removeEventListener('click', suppress, true);
+    });
   }
 
   /**

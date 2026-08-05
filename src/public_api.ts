@@ -38,6 +38,7 @@ export { ItemNode } from './app/models/item-node.model';
 
 export { FsTreeChange } from './app/enums/tree-change.enum';
 export { TreeDragAxis } from './app/enums/drag-axis.enum';
+export { TreeDragMode } from './app/enums/drag-mode.enum';
 
 export { FsTreeNodeDirective } from './app/directives/tree-node.directive';
 export { FsTreeHighlightPipe } from './app/pipes/highlight.pipe';

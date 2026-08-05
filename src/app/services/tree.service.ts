@@ -4,11 +4,12 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl, FlatTreeControlOptions } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { skip, takeUntil } from 'rxjs/operators';
 
 
 import { TreeDragAxis } from '../enums/drag-axis.enum';
+import { TreeDragMode } from '../enums/drag-mode.enum';
 import { FsTreeChange } from '../enums/tree-change.enum';
 import { dataBuilder } from '../helpers/data-builder';
 import { getChildren } from '../helpers/get-children';
@@ -44,6 +45,7 @@ export class FsTreeService<T> implements OnDestroy {
 
   private _searchQuery = '';
   private _updateClasses$ = new Subject<void>();
+  private _dragMode$ = new BehaviorSubject<TreeDragMode>(TreeDragMode.Handle);
   private _destroy$ = new Subject<void>();
   private _database = inject<FsTreeDatabaseService<T>>(FsTreeDatabaseService);
   private _cd = inject(ChangeDetectorRef);
@@ -51,6 +53,35 @@ export class FsTreeService<T> implements OnDestroy {
 
   public get searchQuery(): string {
     return this._searchQuery;
+  }
+
+  public get dragMode(): TreeDragMode {
+    return this._dragMode$.getValue();
+  }
+
+  /**
+   * Emits only on change, the initial mode is applied when the draggable is created
+   */
+  public get dragMode$(): Observable<TreeDragMode> {
+    return this._dragMode$
+      .pipe(
+        skip(1),
+        takeUntil(this._destroy$),
+      );
+  }
+
+  /**
+   * Whether the drag handle should be rendered for a node
+   */
+  public get dragHandleVisible(): boolean {
+    return !!this.config.draggable && this.dragMode === TreeDragMode.Handle;
+  }
+
+  /**
+   * Whether the node content itself initiates the drag
+   */
+  public get dragNodeMode(): boolean {
+    return !!this.config.draggable && this.dragMode === TreeDragMode.Node;
   }
 
   public get updateClasses$(): Observable<void> {
@@ -68,7 +99,10 @@ export class FsTreeService<T> implements OnDestroy {
       ...config,
       draggable: config.draggable ?? true,
       dragAxis: config.dragAxis ?? TreeDragAxis.XY,
+      dragMode: config.dragMode ?? TreeDragMode.Handle,
     };
+
+    this._dragMode$.next(this.config.dragMode);
 
     this._initDependencies();
 
@@ -266,6 +300,22 @@ export class FsTreeService<T> implements OnDestroy {
     if (this.config.nodeClick) {
       this.config.nodeClick({ node });
     }
+  }
+
+  /**
+   * Switch between dragging from the handle and dragging the node itself
+   *
+   * @param dragMode
+   */
+  public setDragMode(dragMode: TreeDragMode): void {
+    if (this.dragMode === dragMode) {
+      return;
+    }
+
+    this.config.dragMode = dragMode;
+    this._dragMode$.next(dragMode);
+
+    this._cd.markForCheck();
   }
 
   /**

@@ -12,6 +12,7 @@ import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { FsDraggableNodeContentDirective } from '../../directives/draggable-node-content.directive';
+import { TreeDragMode } from '../../enums/drag-mode.enum';
 import { FsDraggableNodeTargetDirective } from '../../directives/draggable-node-target.directive';
 import { FsDraggableNodeDirective } from '../../directives/draggable-node.directive';
 import { FsTreeSearchHighlightDirective } from '../../directives/search-highlight.directive';
@@ -269,6 +270,17 @@ export class FsTreeComponent<T> implements OnInit, OnDestroy {
 
   public nodeClick(node: FlatItemNode): void {
     this.tree.nodeClick(node);
+  }
+
+  /**
+   * Switch between dragging from the handle and dragging the node itself
+   *
+   * @param dragMode
+   */
+  public setDragMode(dragMode: TreeDragMode): void {
+    this.tree.setDragMode(dragMode);
+
+    this._cd.markForCheck();
   }
 
 }

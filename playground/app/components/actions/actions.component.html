@@ -1,12 +1,22 @@
 <div style="float: right">
-  <button mat-raised-button (click)="expandAll()">Expand All</button>
+  <mat-button-toggle-group
+      [value]="dragMode"
+      (change)="dragModeChange($event.value)"
+      aria-label="Drag mode">
+    <mat-button-toggle [value]="TreeDragMode.Handle">
+      Drag Handle
+    </mat-button-toggle>
+    <mat-button-toggle [value]="TreeDragMode.Node">
+      Drag Node
+    </mat-button-toggle>
+  </mat-button-toggle-group>
   &nbsp;
-  <button mat-raised-button (click)="collapseAll()">Collapse All</button>
+  <button mat-stroked-button (click)="expandAll()">Expand All</button>
   &nbsp;
-  <button mat-raised-button color="primary" (click)="createRootNode()">Create new Level 1 Object</button>
+  <button mat-stroked-button (click)="collapseAll()">Collapse All</button>
+  &nbsp;
+  <button mat-stroked-button color="primary" (click)="createRootNode()">Create new Level 1 Object</button>
 </div>
-
-<p>With max depth 2 and without selection</p>
 
 <fs-tree [config]="config" #tree>
   <ng-template fsTreeNode let-data="data">

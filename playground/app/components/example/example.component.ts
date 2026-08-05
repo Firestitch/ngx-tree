@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
 import { MatButton } from '@angular/material/button';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 
 import { ItemType } from '@firestitch/filter';
-import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis } from '@firestitch/tree';
+import { FsTreeComponent, ItemNode, ITreeConfig, TreeDragAxis, TreeDragMode } from '@firestitch/tree';
 
 import { of } from 'rxjs';
 
@@ -21,12 +19,10 @@ import { TreeData } from '../../data';
   standalone: true,
   imports: [
     MatButton,
+    MatButtonToggleGroup,
+    MatButtonToggle,
     FsTreeComponent,
     FsTreeNodeDirective,
-    MatFormField,
-    MatLabel,
-    MatInput,
-    FormsModule,
   ],
 })
 export class ExampleComponent {
@@ -34,11 +30,13 @@ export class ExampleComponent {
   @ViewChild('tree')
   public tree: FsTreeComponent<any>;
 
-  public keyword: string = '';
+  public TreeDragMode = TreeDragMode;
+  public dragMode: TreeDragMode = TreeDragMode.Handle;
 
   public config: ITreeConfig<any> = {
     data: TreeData,
     dragAxis: TreeDragAxis.Y,
+    dragMode: TreeDragMode.Handle,
     expandLevel: Infinity,
     init: (data) => {
       console.log('== Init Callback', data);
@@ -82,6 +80,11 @@ export class ExampleComponent {
       },
     ],
   };
+
+  public dragModeChange(dragMode: TreeDragMode) {
+    this.dragMode = dragMode;
+    this.tree.setDragMode(dragMode);
+  }
 
   public collapseAll() {
     this.tree.collapseAll();

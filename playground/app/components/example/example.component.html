@@ -1,18 +1,29 @@
 <div
     style="float: right"
     class="fs-row.gap-xs.wrap">
+  <mat-button-toggle-group
+      [value]="dragMode"
+      (change)="dragModeChange($event.value)"
+      aria-label="Drag mode">
+    <mat-button-toggle [value]="TreeDragMode.Handle">
+      Drag Handle
+    </mat-button-toggle>
+    <mat-button-toggle [value]="TreeDragMode.Node">
+      Drag Node
+    </mat-button-toggle>
+  </mat-button-toggle-group>
   <button
-      mat-raised-button
+      mat-stroked-button
       (click)="expandAll()">
     Expand All
   </button>
   <button
-      mat-raised-button
+      mat-stroked-button
       (click)="collapseAll()">
     Collapse All
   </button>
   <button
-      mat-raised-button
+      mat-stroked-button
       (click)="consoleDebug()">
     Console Debug
   </button>
@@ -31,14 +42,5 @@
       let-index="index">
     {{ data.name }}
     (ID: {{ data.id }})
-    <mat-form-field>
-      <mat-label>
-        Name
-      </mat-label>
-      <input
-        matInput
-        [(ngModel)]="data.name"
-        name="name">
-    </mat-form-field>
   </ng-template>
 </fs-tree>

@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, ViewChild, inject } from '@angular/
 
 import { MatDialog } from '@angular/material/dialog';
 
-import { FlatItemNode, FsTreeComponent, ITreeConfig } from '@firestitch/tree';
+import { FlatItemNode, FsTreeComponent, ITreeConfig, TreeDragMode } from '@firestitch/tree';
 
 import { TreeActionType } from '../../../../src/app/models/action.model';
 import { TreeData } from '../../data';
 
 import { EditDialogComponent } from './edit-dialog';
 import { MatButton } from '@angular/material/button';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { FsTreeComponent as FsTreeComponent_1 } from '../../../../src/app/components/tree/tree.component';
 import { FsTreeNodeDirective } from '../../../../src/app/directives/tree-node.directive';
 
@@ -20,6 +21,8 @@ import { FsTreeNodeDirective } from '../../../../src/app/directives/tree-node.di
     standalone: true,
     imports: [
         MatButton,
+        MatButtonToggleGroup,
+        MatButtonToggle,
         FsTreeComponent_1,
         FsTreeNodeDirective,
     ],
@@ -30,22 +33,13 @@ export class ActionsComponent {
   @ViewChild('tree')
   public tree: FsTreeComponent<any>;
 
+  public TreeDragMode = TreeDragMode;
+  public dragMode: TreeDragMode = TreeDragMode.Handle;
+
   public config: ITreeConfig<any> = {
     data: TreeData,
-    maxLevel: 2,
+    dragMode: TreeDragMode.Handle,
     childrenName: 'accounts',
-    sortBy: (data) => {
-      return data.sort((a, b) => {
-        if (a.id < b.id) {
-          return -1; 
-        }
-        if (b.id < b.id) {
-          return 1; 
-        }
-
-        return 0;
-      });
-    },
     canDrag: (node) => {
       return true;
     },
@@ -71,6 +65,11 @@ export class ActionsComponent {
       },
     ],
   };
+
+  public dragModeChange(dragMode: TreeDragMode) {
+    this.dragMode = dragMode;
+    this.tree.setDragMode(dragMode);
+  }
 
   public collapseAll() {
     this.tree.collapseAll();
