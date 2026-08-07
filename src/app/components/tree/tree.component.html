@@ -8,6 +8,7 @@
   <mat-tree-node
       *matTreeNodeDef="let node"
       matTreeNodePadding
+      [matTreeNodePaddingIndent]="30"
       fsTreeNodeClass
       [class]="'fs-tree-level-' + node.level"
       [ngClass]="treeNodeData?.klass"
@@ -63,6 +64,7 @@
   <mat-tree-node
       *matTreeNodeDef="let node; when: hasChild"
       matTreeNodePadding
+      [matTreeNodePaddingIndent]="30"
       fsTreeNodeClass
       [class]="'fs-tree-level-' + node.level"
       [ngClass]="treeNodeData?.klass"

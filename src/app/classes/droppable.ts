@@ -35,8 +35,8 @@ export class Droppable {
   // elements which had been marked "over" (center). And we will clean all of them when it's needed
   private _cacheOfDragOveredElements = new Set<HTMLDivElement>();
 
-  // Default for one level. For example if element has level 4 then padding will be 4 * 40
-  private readonly _defaultPadding = 40;
+  // Default for one level. For example if element has level 4 then padding will be 4 * 30
+  private readonly _defaultPadding = 30;
   // Extra padding for correct align highlight area under element
   private readonly _extraPadding = 30;
   // Half of height of highlight area
@@ -289,7 +289,7 @@ export class Droppable {
     const diff = x - this._rootLevelPosition - 20;
 
     if (diff >= 0) {
-      const level = Math.round(diff / 40);
+      const level = Math.round(diff / this._defaultPadding);
 
       if (level > maxLevel) {
         return maxLevel;
