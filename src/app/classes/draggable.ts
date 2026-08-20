@@ -69,6 +69,9 @@ export class Draggable {
   // Element the mouse/touch start events are bound to
   private _target: ElementRef;
 
+  // Set while waiting for the pointer to be released after a cancelled drag
+  private _releaseHandler: () => void = null;
+
   // Handlers for remove listeners in feature
   private _dragStartHandler = this.dragStart.bind(this);
   private _moveHandler = this.dragTo.bind(this);
@@ -264,6 +267,29 @@ export class Draggable {
     this.destroyDroppable();
   }
 
+  /**
+   * Abort the drag without dropping the node
+   */
+  public cancelDrag() {
+    if (!this.dragging) {
+      return;
+    }
+
+    // The pointer is still down, swallow the click the browser fires on release
+    if (this._dragMode === TreeDragMode.Node) {
+      this._suppressClickOnRelease();
+    }
+
+    this.destroyDraggable();
+
+    if (this._expandedBeforeDrag) {
+      this._expandedBeforeDrag = false;
+      this._node.expand();
+    }
+
+    this.destroyDroppable();
+  }
+
   public destroyDraggable() {
     this.dragging = false;
 
@@ -272,7 +298,7 @@ export class Draggable {
     window.document.removeEventListener('mouseup', this._dropHandler);
     window.document.removeEventListener('touchend', this._dropHandler);
     window.document.removeEventListener('touchcancel', this._dropHandler);
-    window.document.removeEventListener('keydown', this._escapeHandler);
+    window.removeEventListener('keydown', this._escapeHandler, true);
 
     window.document.body.classList.remove('fs-tree-dragging');
     this._node.el.classList.remove('dragging');
@@ -289,6 +315,7 @@ export class Draggable {
    */
   public destroy() {
     this._cancelPendingDrag();
+    this._removeReleaseListener();
     this._removeTargetListeners();
 
     this._destroy$.next(null);
@@ -306,6 +333,8 @@ export class Draggable {
    * @param event
    */
   private _beginDrag(event) {
+    this._removeReleaseListener();
+
     this._touchFix(event);
     this._calcAutoScrollParams();
 
@@ -407,6 +436,30 @@ export class Draggable {
       && !!target.closest(nonDraggableSelector);
   }
 
+  /**
+   * The drag was cancelled while the pointer is still down, wait for the release and
+   * swallow the click that follows it
+   */
+  private _suppressClickOnRelease() {
+    this._removeReleaseListener();
+
+    this._releaseHandler = () => {
+      this._removeReleaseListener();
+      this._suppressNextClick();
+    };
+
+    window.document.addEventListener('mouseup', this._releaseHandler, true);
+  }
+
+  private _removeReleaseListener() {
+    if (!this._releaseHandler) {
+      return;
+    }
+
+    window.document.removeEventListener('mouseup', this._releaseHandler, true);
+    this._releaseHandler = null;
+  }
+
   private _suppressNextClick() {
     const suppress = (event: MouseEvent) => {
       event.preventDefault();
@@ -452,14 +505,23 @@ export class Draggable {
     window.document.addEventListener('mouseup', this._dropHandler);
     window.document.addEventListener('touchend', this._dropHandler);
     window.document.addEventListener('touchcancel', this._dropHandler);
-    window.document.addEventListener('keydown', this._escapeHandler);
+
+    // Capture phase on window so the drag sees Escape before anything else can, a dialog,
+    // drawer or overlay hosting the tree must not close when a drag is cancelled
+    window.addEventListener('keydown', this._escapeHandler, true);
   }
 
   private _escapeHandler = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      this.destroyDraggable();
-      this.destroyDroppable();
+    if (event.key !== 'Escape' || !this.dragging) {
+      return;
     }
+
+    // The Escape belongs to the drag, keep it from reaching anything else
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    this.cancelDrag();
   };
 
   /**
