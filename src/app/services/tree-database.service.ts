@@ -58,6 +58,9 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   ) {
     this.treeControl = treeControl;
     this._config = config;
+
+    this.clearNodeMaps();
+
     // Build the tree nodes from Json object. The result is a list of `ItemNode` with nested
     // file node as children.
     this.data = treeBuilder(
@@ -75,6 +78,11 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
   }
 
   public setData(data: unknown): void {
+    // Every node below is built from scratch, so the maps must let go of the previous
+    // generation. Entries left behind point at nodes that are not rendered anymore and
+    // their detached elements break the drag&drop lookups and leak the DOM they hold
+    this.clearNodeMaps();
+
     this.data = treeBuilder(
       data,
       0,
@@ -87,6 +95,37 @@ export class FsTreeDatabaseService<T> implements OnDestroy {
 
     // Notify the change.
     this.updateData(FsTreeChange.UpdateData, this.data);
+  }
+
+  /**
+   * Forget every node, the tree is about to be built from scratch
+   */
+  public clearNodeMaps(): void {
+    this.flatNodeMap.clear();
+    this.nestedNodeMap.clear();
+  }
+
+  /**
+   * Drop the entries of the nodes that are not part of the tree anymore. Nodes removed
+   * without a full rebuild would otherwise stay in the maps for the lifetime of the page
+   *
+   * @param nodes
+   */
+  public syncNodeMaps(nodes: FlatItemNode[]): void {
+    const activeNodes = new Set(nodes);
+
+    this.flatNodeMap.forEach((itemNode: ItemNode, flatNode: FlatItemNode) => {
+      if (activeNodes.has(flatNode)) {
+        return;
+      }
+
+      this.flatNodeMap.delete(flatNode);
+
+      // The item node may already have been remapped to the flat node that replaced this one
+      if (this.nestedNodeMap.get(itemNode) === flatNode) {
+        this.nestedNodeMap.delete(itemNode);
+      }
+    });
   }
 
   public updateSort(target: ItemNode = null) {

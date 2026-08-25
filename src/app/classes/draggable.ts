@@ -54,8 +54,10 @@ export class Draggable {
   private _expandNode$ = new Subject<FlatItemNode>();
   private _destroy$ = new Subject();
 
-  // Shift for align element under correct cursor position
+  // Shift for align the dragged copy under the cursor, keeps it exactly where the node
+  // has been grabbed
   private _shiftX;
+  private _shiftY;
 
   // Dimentions for dragTarget for future calculations
   private _dragDims;
@@ -193,7 +195,7 @@ export class Draggable {
   public dragTo(event) {
     this._touchFix(event);
 
-    const topOffset = (event.y || event.clientY) - (this._dragDims.height / 2);
+    const topOffset = (event.y || event.clientY) - this._shiftY;
     const leftOffset = (event.x || event.pageX) - this._shiftX;
 
     this._draggableEl.style.top = `${topOffset}px`;
@@ -375,6 +377,7 @@ export class Draggable {
     this.dragging = true;
     this._dragDims = this._el.nativeElement.getBoundingClientRect();
     this._shiftX = event.clientX - this._dragDims.left;
+    this._shiftY = event.clientY - this._dragDims.top;
 
     this._initDraggableElement(event);
     this._initDroppable(event);
@@ -556,7 +559,7 @@ export class Draggable {
       this._logger,
     );
 
-    this._droppable.shift((event.x || event.clientX) - this._dragDims.left);
+    this._droppable.shift(this._shiftX);
 
     this._node.el.classList.add('dragging');
   }

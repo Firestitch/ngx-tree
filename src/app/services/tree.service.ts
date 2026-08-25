@@ -670,6 +670,10 @@ export class FsTreeService<T> implements OnDestroy {
       .subscribe((event: ITreeDataChange) => {
         this.dataSource.data = [...this._database.data];
 
+        // The flatten above rebuilt the node maps, drop whatever is left from the tree
+        // as it was before the change
+        this._database.syncNodeMaps(this.treeControl.dataNodes ?? []);
+
         if (this.config.change) {
           this.config.change(event);
         }

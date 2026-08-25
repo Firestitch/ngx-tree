@@ -239,7 +239,9 @@ export class Droppable {
     this._orderedNodes = [];
 
     this._nodes.forEach((node) => {
-      if (node.el && !node.hidden) {
+      // An element that has been removed from the document has no dimensions, its zero
+      // rect would sort to the top of the list and swallow the lookups of every drag
+      if (node.el?.isConnected && !node.hidden) {
         const dimentions = node.el.getBoundingClientRect();
         const insertIndex = lower(this._orderedNodes, dimentions.y, (item) => item.dimentions.y);
 
